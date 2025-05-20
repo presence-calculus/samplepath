@@ -61,11 +61,10 @@ For more advanced usage, see examples in the repository.
 
 ## 📚 Documentation
 
-- 📘 [Concepts and API Reference](https://py.pcalc.org)
-- 🧪 [Tests](../test/)
-- 🧠 [Blog](https://polaris-flow-dispatch.com)
+- 📘 [API Reference](https://py.pcalc.org)
+- 🧠 [Concepts and Blog](https://www.polaris-flow-dispatch.com)
 
----
+
 
 ## 🛠 Development
 
