@@ -16,7 +16,7 @@ stochastic and non-linear systems.
 
 The toolkit includes implementations for key concepts of The Presence Calculus, including
 
-- A `Presence` class representing the fundamental unit of analysis in the Presence Calculus. 
+- A `Presence` class representing the fundamental unit of analysis. 
 - The `PresenceMatrix` for computing over presences.
 - The `PresenceInvariant` that expresses the fundamental invariant of The Presence Calculus. 
 
