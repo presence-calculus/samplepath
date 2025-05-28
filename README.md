@@ -46,10 +46,10 @@ pip install pypcalc[pandas,polars]
 ## 🚀 Quickstart
 
 ```python
-from pcalc.presence import Presence
+from pcalc.presence import PresenceAssertion
 
 # A presence record indicating an element existed in a boundary from t=0 to t=10
-p = Presence(element="job-42", boundary="system-a", onset_time=0.0, reset_time=10.0)
+p = PresenceAssertion(element="job-42", boundary="system-a", onset_time=0.0, reset_time=10.0)
 
 print(p.duration())  # Outputs: 10.0
 ```
