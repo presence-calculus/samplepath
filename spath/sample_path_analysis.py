@@ -1070,13 +1070,8 @@ def produce_all_charts(csv_path: str,
 
 
 def main():
-    parser = cli.get_parser()
+    args = cli.parse_args()
 
-    args = parser.parse_args()
-
-    if args.completed and args.incomplete:
-        print("Error: --completed and --incomplete cannot be used together", file=sys.stderr)
-        sys.exit(2)
 
     global LAMBDA_PCTL_UPPER, LAMBDA_PCTL_LOWER, LAMBDA_WARMUP_HOURS
     LAMBDA_PCTL_UPPER = args.lambda_pctl

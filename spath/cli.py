@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
 import argparse
+import sys
+
+def validate_args(args):
+    error = False
+
+    if args.completed and args.incomplete:
+        print("Error: --completed and --incomplete cannot be used together", file=sys.stderr)
+
+    if error:
+        sys.exit(1)
 
 
-def get_parser():
+def parse_args():
     parser = argparse.ArgumentParser(description="Finite-window Little's Law charts from intervals CSV")
     parser.add_argument("--completed", action="store_true",
                         help="Only include items with an end_ts (completed work only)")
@@ -34,7 +44,11 @@ def get_parser():
     parser.add_argument("--horizon-days", type=float, default=28.0,
                         help="Minimum horizon in days when assessing coherence (default 28)")
     parser.add_argument("csv", type=str, help="Path to CSV (id,start_ts,end_ts[,class])")
-    return parser
+
+
+    args = parser.parse_args()
+    validate_args(args)
+    return args
 
 
 def get_class_filters(classes):
