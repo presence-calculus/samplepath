@@ -21,6 +21,8 @@ import matplotlib.pyplot as plt
 import cli
 from csv_loader import csv_to_dataframe
 from filter import FilterResult, apply_filters
+from metrics import compute_sample_path_metrics, compute_finite_window_flow_metrics, FlowMetricsResult
+
 
 # -------------------------------
 # Plot helpers
@@ -609,71 +611,9 @@ def build_event_stream(df: pd.DataFrame) -> List[Tuple[pd.Timestamp, int, int]]:
     return events
 
 
-def sweep_at_times(events: List[Tuple[pd.Timestamp, int, int]], sample_times: List[pd.Timestamp]) -> Tuple[List[pd.Timestamp], np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Compute L(T), Λ(T), w(T), N(t), A(T) at given sample times."""
-    if not events:
-        return sample_times, np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
-
-    events = sorted(events, key=lambda e: e[0])
-    sample_times = sorted(sample_times)
-    t0 = sample_times[0]
-
-    A = 0.0
-    N = 0
-    arrivals = 0
-
-    out_L = []
-    out_Lam = []
-    out_w = []
-    out_N = []
-    out_A = []
-
-    ev_i = 0
-    prev_time = t0
-
-    for t in sample_times:
-        while ev_i < len(events) and events[ev_i][0] <= t:
-            ev_time, dN, a = events[ev_i]
-            dt_h = (ev_time - prev_time).total_seconds() / 3600.0
-            if dt_h > 0:
-                A += N * dt_h
-                prev_time = ev_time
-            N += dN
-            arrivals += a
-            ev_i += 1
-
-        dt_h = (t - prev_time).total_seconds() / 3600.0
-        if dt_h > 0:
-            A += N * dt_h
-            prev_time = t
-
-        elapsed_h = (t - t0).total_seconds() / 3600.0
-        L = (A / elapsed_h) if elapsed_h > 0 else np.nan
-        Lam = (arrivals / elapsed_h) if elapsed_h > 0 else np.nan
-        w = (A / arrivals) if arrivals > 0 else np.nan
-
-        out_L.append(L)
-        out_Lam.append(Lam)
-        out_w.append(w)
-        out_N.append(N)
-        out_A.append(A)
-
-    return sample_times, np.array(out_L), np.array(out_Lam), np.array(out_w), np.array(out_N), np.array(out_A)
-
-
 def sweep_timestamp_series(events: List[Tuple[pd.Timestamp, int, int]]):
     unique_times: List[pd.Timestamp] = sorted({t for t, _, _ in events})
-    return sweep_at_times(events, unique_times)
-
-
-def sweep_daily_series(events: List[Tuple[pd.Timestamp, int, int]]):
-    if not events:
-        return [], np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
-    first = min(t for t, _, _ in events).normalize()
-    last = max(t for t, _, _ in events).normalize()
-    days = pd.date_range(start=first, end=last, freq="D")
-    times = [pd.Timestamp(t) for t in days.to_pydatetime()]
-    return sweep_at_times(events, times)
+    return compute_sample_path_metrics(events, unique_times)
 
 
 def compute_empirical_targets(df: pd.DataFrame, t0: pd.Timestamp, t_end: pd.Timestamp) -> Tuple[float, float]:
@@ -792,8 +732,17 @@ def produce_all_charts(csv_path: str,
 
     # Build events and sweeps
     events = build_event_stream(df)
-    t_times, t_L, t_Lam, t_w, t_N, t_A = sweep_timestamp_series(events)
-    d_times, d_L, d_Lam, d_w, d_N, d_A = sweep_daily_series(events)
+    # Compute core finite window flow metrics
+    metrics = compute_finite_window_flow_metrics(events)
+
+    t_times, t_L, t_Lam, t_w, t_N, t_A = (
+        metrics.times,
+        metrics.L,
+        metrics.Lambda,
+        metrics.w,
+        metrics.N,
+        metrics.A
+    )
 
     # Empirical targets & dynamic baselines
     if len(t_times) > 0:
@@ -802,24 +751,14 @@ def produce_all_charts(csv_path: str,
     else:
         W_emp_ts = lam_emp_ts = float('nan')
         W_star_ts = lam_star_ts = np.array([])
-    if len(d_times) > 0:
-        W_emp_d, lam_emp_d = compute_empirical_targets(df, d_times[0], d_times[-1])
-        W_star_d, lam_star_d = compute_dynamic_empirical_series(df, d_times)
-    else:
-        W_emp_d = lam_emp_d = float('nan')
-        W_star_d = lam_star_d = np.array([])
 
     # Relative errors & coherence
     eW_ts, eLam_ts, elapsed_ts = compute_tracking_errors(t_times, t_w, t_Lam, W_star_ts, lam_star_ts)
-    eW_d, eLam_d, elapsed_d = compute_tracking_errors(d_times, d_w, d_Lam, W_star_d, lam_star_d)
-
     coh_summary_lines: List[str] = []
     if epsilon is not None and horizon_days is not None:
         h_hrs = float(horizon_days) * 24.0
         sc_ts, ok_ts, tot_ts = compute_coherence_score(eW_ts, eLam_ts, elapsed_ts, float(epsilon), h_hrs)
-        sc_d, ok_d, tot_d = compute_coherence_score(eW_d, eLam_d, elapsed_d, float(epsilon), h_hrs)
         coh_summary_lines.append(f"Coherence (timestamp): eps={epsilon:g}, H={horizon_days:g}d -> {ok_ts}/{tot_ts} ({(sc_ts*100 if sc_ts==sc_ts else 0):.1f}%)")
-        coh_summary_lines.append(f"Coherence (daily):     eps={epsilon:g}, H={horizon_days:g}d -> {ok_d}/{tot_d} ({(sc_d*100 if sc_d==sc_d else 0):.1f}%)")
 
     # Scatter arrays
     t_scatter_times: List[pd.Timestamp] = []
@@ -832,10 +771,6 @@ def produce_all_charts(csv_path: str,
                 t_end = t_times[-1]
                 t_scatter_times = df["start_ts"].tolist()
                 t_scatter_vals = ((t_end - df["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
-            if len(d_times) > 0:
-                d_end = d_times[-1]
-                d_scatter_times = df["start_ts"].tolist()
-                d_scatter_vals = ((d_end - df["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
         else:
             df_c = df[df["end_ts"].notna()].copy()
             if not df_c.empty:
@@ -887,47 +822,10 @@ def produce_all_charts(csv_path: str,
                                                    f'Dynamic convergence + errors (timestamp, {mode_label})', ts_conv_dyn3, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
         written.append(ts_conv_dyn3)
 
-    # Daily charts
-    dL = os.path.join(out_dir, "daily_L.png")
-    dLam = os.path.join(out_dir, "daily_Lambda.png")
-    dw = os.path.join(out_dir, "daily_w.png")
-    dNp = os.path.join(out_dir, "daily_N.png")
 
-    draw_line_chart(d_times, d_L, f"L(T) — time-average number (daily, {mode_label})", "L(T)", dL)
-    draw_lambda_chart(d_times, d_Lam, f"Λ(T) — cumulative arrivals per hour (daily, {mode_label})", "Λ(T) [1/hr]", dLam, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
-
-    if scatter and len(d_scatter_times) > 0:
-        draw_line_chart_with_scatter(d_times, d_w,
-                                     f"w(T) — average residence time in window (daily, {mode_label})",
-                                     "w(T) [hrs]", dw, d_scatter_times, d_scatter_vals,
-                                     scatter_label=("Item age at sweep end" if incomplete_only else "Item time in system"))
-    else:
-        draw_line_chart(d_times, d_w, f"w(T) — average residence time in window (daily, {mode_label})", "w(T) [hrs]", dw)
-
-    draw_step_chart(d_times, d_N, f"N(t) — active processes (daily, {mode_label})", "N(t)", dNp)
-    written += [dL, dLam, dw, dNp]
-
-    # Convergence diagnostics (daily)
-    if len(d_times) > 0:
-        d_conv = os.path.join(out_dir, 'daily_convergence.png')
-        draw_convergence_panel(d_times, d_w, d_Lam, W_emp_d, lam_emp_d,
-                               f'Convergence diagnostics (daily, {mode_label})', d_conv)
-        written.append(d_conv)
-
-        d_conv_dyn = os.path.join(out_dir, 'daily_convergence_dynamic.png')
-        draw_dynamic_convergence_panel(d_times, d_w, d_Lam, W_star_d, lam_star_d,
-                                       f'Dynamic convergence (daily, {mode_label})', d_conv_dyn)
-        written.append(d_conv_dyn)
-
-        d_conv_dyn3 = os.path.join(out_dir, 'daily_convergence_dynamic_errors.png')
-        draw_dynamic_convergence_panel_with_errors(d_times, d_w, d_Lam, W_star_d, lam_star_d,
-                                                   eW_d, eLam_d, epsilon,
-                                                   f'Dynamic convergence + errors (daily, {mode_label})', d_conv_dyn3, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
-        written.append(d_conv_dyn3)
 
     # --- End-effect diagnostics ---
     rA_ts, rB_ts, rho_ts = compute_end_effect_series(df, t_times, t_A, W_star_ts) if len(t_times) > 0 else (np.array([]), np.array([]), np.array([]))
-    rA_d,  rB_d,  rho_d  = compute_end_effect_series(df, d_times, d_A, W_star_d)  if len(d_times)  > 0 else (np.array([]), np.array([]), np.array([]))
 
     if len(t_times) > 0:
         ts_conv_dyn4 = os.path.join(out_dir, 'timestamp_convergence_dynamic_errors_endeffects.png')
@@ -937,22 +835,12 @@ def produce_all_charts(csv_path: str,
             f'Dynamic convergence + errors + end-effects (timestamp, {mode_label})', ts_conv_dyn4, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
         written.append(ts_conv_dyn4)
 
-    if len(d_times) > 0:
-        d_conv_dyn4 = os.path.join(out_dir, 'daily_convergence_dynamic_errors_endeffects.png')
-        draw_dynamic_convergence_panel_with_errors_and_endeffects(
-            d_times, d_w, d_Lam, W_star_d, lam_star_d, eW_d, eLam_d,
-            rA_d, rB_d, rho_d, epsilon,
-            f'Dynamic convergence + errors + end-effects (daily, {mode_label})', d_conv_dyn4, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
-        written.append(d_conv_dyn4)
 
     # Vertical stacks (4×1)
     col_ts = os.path.join(out_dir, 'timestamp_stack.png')
     draw_four_panel_column(t_times, t_N, t_L, t_Lam, t_w, f'Finite-window metrics (timestamp, {mode_label})', col_ts, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
     written.append(col_ts)
 
-    col_d = os.path.join(out_dir, 'daily_stack.png')
-    draw_four_panel_column(d_times, d_N, d_L, d_Lam, d_w, f'Finite-window metrics (daily, {mode_label})', col_d, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
-    written.append(col_d)
 
     # 5-panel stacks including A(T)
     if with_A:
@@ -962,11 +850,6 @@ def produce_all_charts(csv_path: str,
                                scatter_times=t_scatter_times, scatter_values=t_scatter_vals, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
         written.append(col_ts5)
 
-        col_d5 = os.path.join(out_dir, 'daily_stack_with_A.png')
-        draw_five_panel_column(d_times, d_N, d_L, d_Lam, d_w, d_A,
-                               f'Finite-window metrics incl. A(T) (daily, {mode_label})', col_d5,
-                               scatter_times=d_scatter_times, scatter_values=d_scatter_vals, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
-        written.append(col_d5)
     elif scatter:
         col_ts5s = os.path.join(out_dir, 'timestamp_stack_with_scatter.png')
         draw_five_panel_column_with_scatter(t_times, t_N, t_L, t_Lam, t_w,
@@ -974,31 +857,6 @@ def produce_all_charts(csv_path: str,
                                             col_ts5s,
                                             scatter_times=t_scatter_times, scatter_values=t_scatter_vals, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
         written.append(col_ts5s)
-
-        col_d5s = os.path.join(out_dir, 'daily_stack_with_scatter.png')
-        draw_five_panel_column_with_scatter(d_times, d_N, d_L, d_Lam, d_w,
-                                            f'Finite-window metrics with w(T) plain + w(T)+scatter (daily, {mode_label})',
-                                            col_d5s,
-                                            scatter_times=d_scatter_times, scatter_values=d_scatter_vals, lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower, lambda_warmup_hours=lambda_warmup_hours)
-        written.append(col_d5s)
-
-    # Optional daily breakdowns derived from A(T)
-    if with_daily_breakdown:
-        delta_A = np.empty(len(d_A)); delta_A[:] = np.nan
-        if len(d_A) > 1:
-            delta_A[1:] = d_A[1:] - d_A[:-1]
-        delta_t_hours = np.empty(len(d_times)); delta_t_hours[:] = np.nan
-        if len(d_times) > 1:
-            delta_t_hours[1:] = [((d_times[i] - d_times[i-1]).total_seconds() / 3600.0) for i in range(1, len(d_times))]
-        avg_WIP_daily = delta_A / delta_t_hours
-
-        daily_wiphours_path = os.path.join(out_dir, 'daily_wip_hours.png')
-        draw_bar_chart(d_times, delta_A, f'Daily WIP-hours ΔA (daily, {mode_label})', 'ΔA per day [hrs·items]', daily_wiphours_path)
-        written.append(daily_wiphours_path)
-
-        daily_avgwip_path = os.path.join(out_dir, 'daily_avg_WIP.png')
-        draw_line_chart(d_times, avg_WIP_daily, f'Daily average WIP (daily, {mode_label})', 'Avg WIP per day', daily_avgwip_path)
-        written.append(daily_avgwip_path)
 
     # Write coherence summary (and print)
     if coh_summary_lines:
