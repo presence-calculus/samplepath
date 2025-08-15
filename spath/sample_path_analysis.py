@@ -716,7 +716,7 @@ def produce_all_charts(csv_path: str,
 
     filter_result: FilterResult = apply_filters(df, args)
     df = filter_result.df
-
+    mode_label = filter_result.label
 
     # Build events and sweeps
     events = build_arrival_departure_events(df)
@@ -731,6 +731,25 @@ def produce_all_charts(csv_path: str,
         metrics.N,
         metrics.A
     )
+
+    out_dir = ensure_output_dir(csv_path)
+    written: List[str] = []
+
+    # Timestamp charts
+    ts_L = os.path.join(out_dir, "timestamp_L.png")
+    ts_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
+    ts_w = os.path.join(out_dir, "timestamp_w.png")
+    ts_Np = os.path.join(out_dir, "timestamp_N.png")
+
+    draw_line_chart(t_times, t_L, f"L(T) — time-average number (timestamp, {mode_label})", "L(T)", ts_L)
+    draw_lambda_chart(t_times, t_Lam, f"Λ(T) — cumulative arrivals per hour (timestamp, {mode_label})", "Λ(T) [1/hr]",
+                      ts_Lam, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
+    draw_line_chart(t_times, t_w, f"w(T) — average residence time in window (timestamp, {mode_label})",
+                    "w(T) [hrs]", ts_w)
+
+    draw_step_chart(t_times, t_N, f"N(t) — active processes (timestamp, {mode_label})", "N(t)", ts_Np)
+    written += [ts_L, ts_Lam, ts_w, ts_Np]
+
 
     # Empirical targets & dynamic baselines
     if len(t_times) > 0:
@@ -751,8 +770,6 @@ def produce_all_charts(csv_path: str,
     # Scatter arrays
     t_scatter_times: List[pd.Timestamp] = []
     t_scatter_vals = np.array([])
-    d_scatter_times: List[pd.Timestamp] = []
-    d_scatter_vals = np.array([])
     if scatter:
         if incomplete_only:
             if len(t_times) > 0:
@@ -764,33 +781,14 @@ def produce_all_charts(csv_path: str,
             if not df_c.empty:
                 t_scatter_times = df_c["end_ts"].tolist()
                 t_scatter_vals = ((df_c["end_ts"] - df_c["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
-                d_scatter_times = t_scatter_times
-                d_scatter_vals = t_scatter_vals
 
-    mode_label = filter_result.label
-
-    out_dir = ensure_output_dir(csv_path)
-    written: List[str] = []
-
-    # Timestamp charts
-    ts_L = os.path.join(out_dir, "timestamp_L.png")
-    ts_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
-    ts_w = os.path.join(out_dir, "timestamp_w.png")
-    ts_Np = os.path.join(out_dir, "timestamp_N.png")
-
-    draw_line_chart(t_times, t_L, f"L(T) — time-average number (timestamp, {mode_label})", "L(T)", ts_L)
-    draw_lambda_chart(t_times, t_Lam, f"Λ(T) — cumulative arrivals per hour (timestamp, {mode_label})", "Λ(T) [1/hr]", ts_Lam, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
 
     if scatter and len(t_scatter_times) > 0:
         label = "Item age at sweep end" if incomplete_only else "Item time in system"
         draw_line_chart_with_scatter(t_times, t_w,
                                      f"w(T) — average residence time in window (timestamp, {mode_label})",
                                      "w(T) [hrs]", ts_w, t_scatter_times, t_scatter_vals, scatter_label=label)
-    else:
-        draw_line_chart(t_times, t_w, f"w(T) — average residence time in window (timestamp, {mode_label})", "w(T) [hrs]", ts_w)
 
-    draw_step_chart(t_times, t_N, f"N(t) — active processes (timestamp, {mode_label})", "N(t)", ts_Np)
-    written += [ts_L, ts_Lam, ts_w, ts_Np]
 
     # Convergence diagnostics (timestamp)
     if len(t_times) > 0:
