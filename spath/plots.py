@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2025 Krishna Kumar
 # SPDX-License-Identifier: MIT
+import os
 from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
+
+from spath.filter import FilterResult
+from spath.metrics import FlowMetricsResult, compute_dynamic_empirical_series, compute_tracking_errors, \
+    compute_coherence_score, compute_end_effect_series
 
 
 def draw_line_chart(times: List[pd.Timestamp], values: np.ndarray, title: str, ylabel: str, out_path: str) -> None:
@@ -91,184 +96,6 @@ def draw_bar_chart(times: List[pd.Timestamp], values: np.ndarray, title: str, yl
     ax.legend()
     _format_date_axis(ax)
     fig.tight_layout()
-    fig.savefig(out_path)
-    plt.close(fig)
-
-
-def draw_four_panel_column(times: List[pd.Timestamp],
-                           N_vals: np.ndarray,
-                           L_vals: np.ndarray,
-                           Lam_vals: np.ndarray,
-                           w_vals: np.ndarray,
-                           title: str,
-                           out_path: str,
-                           lambda_pctl_upper: Optional[float] = None,
-                           lambda_pctl_lower: Optional[float] = None,
-                           lambda_warmup_hours: Optional[float] = None
-                           ) -> None:
-    fig, axes = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
-
-    axes[0].step(times, N_vals, where='post', label='N(t)')
-    axes[0].set_title('N(t) — active processes')
-    axes[0].set_ylabel('N(t)')
-    axes[0].legend()
-
-    axes[1].plot(times, L_vals, label='L(T)')
-    axes[1].set_title('L(T) — time-average number')
-    axes[1].set_ylabel('L(T)')
-    axes[1].legend()
-
-    axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
-    axes[2].set_title('Λ(T) — cumulative arrival rate')
-    axes[2].set_ylabel('Λ(T) [1/hr]')
-    axes[2].legend()
-    _clip_axis_to_percentile(axes[2], times, Lam_vals,
-                             upper_p=lambda_pctl_upper,
-                             lower_p=lambda_pctl_lower,
-                             warmup_hours=lambda_warmup_hours)
-
-    axes[3].plot(times, w_vals, label='w(T) [hrs]')
-    axes[3].set_title('w(T) — average residence time in window')
-    axes[3].set_ylabel('w(T) [hrs]')
-    axes[3].set_xlabel('Date')
-    axes[3].legend()
-
-    for ax in axes:
-        _format_date_axis(ax)
-
-    fig.suptitle(title)
-    plt.tight_layout(rect=(0, 0, 1, 0.97))
-    fig.savefig(out_path)
-    plt.close(fig)
-
-
-def draw_five_panel_column(times: List[pd.Timestamp],
-                           N_vals: np.ndarray,
-                           L_vals: np.ndarray,
-                           Lam_vals: np.ndarray,
-                           w_vals: np.ndarray,
-                           A_vals: np.ndarray,
-                           title: str,
-                           out_path: str,
-                           scatter_times: Optional[List[pd.Timestamp]] = None,
-                           scatter_values: Optional[np.ndarray] = None,
-                           scatter_label: str = "Item time in system",
-                           lambda_pctl_upper: Optional[float] = None,
-                           lambda_pctl_lower: Optional[float] = None,
-                           lambda_warmup_hours: Optional[float] = None
-                           ) -> None:
-    fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
-
-    axes[0].step(times, N_vals, where='post', label='N(t)')
-    axes[0].set_title('N(t) — active processes')
-    axes[0].set_ylabel('N(t)')
-    axes[0].legend()
-
-    axes[1].plot(times, L_vals, label='L(T)')
-    axes[1].set_title('L(T) — time-average number')
-    axes[1].set_ylabel('L(T)')
-    axes[1].legend()
-
-    axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
-    axes[2].set_title('Λ(T) — cumulative arrival rate')
-    axes[2].set_ylabel('Λ(T) [1/hr]')
-    axes[2].legend()
-    _clip_axis_to_percentile(axes[2], times, Lam_vals,
-                             upper_p=lambda_pctl_upper,
-                             lower_p=lambda_pctl_lower,
-                             warmup_hours=lambda_warmup_hours)
-
-    axes[3].plot(times, w_vals, label='w(T) [hrs]')
-    if scatter_times is not None and scatter_values is not None and len(scatter_times) > 0:
-        axes[3].scatter(scatter_times, scatter_values, s=16, alpha=0.6, marker='o', label=scatter_label)
-    axes[3].set_title('w(T) — average residence time in window')
-    axes[3].set_ylabel('w(T) [hrs]')
-    axes[3].legend()
-
-    axes[4].plot(times, A_vals, label='A(T) [hrs·items]')
-    axes[4].set_title('A(T) — cumulative area ∫N(t)dt')
-    axes[4].set_ylabel('A(T) [hrs·items]')
-    axes[4].set_xlabel('Date')
-    axes[4].legend()
-
-    for ax in axes:
-        _format_date_axis(ax)
-
-    fig.suptitle(title)
-    plt.tight_layout(rect=(0, 0, 1, 0.97))
-    fig.savefig(out_path)
-    plt.close(fig)
-
-
-def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
-                                        N_vals: np.ndarray,
-                                        L_vals: np.ndarray,
-                                        Lam_vals: np.ndarray,
-                                        w_vals: np.ndarray,
-                                        title: str,
-                                        out_path: str,
-                                        scatter_times: Optional[List[pd.Timestamp]] = None,
-                                        scatter_values: Optional[np.ndarray] = None,
-                                        scatter_label: str = "Item time in system",
-                                        lambda_pctl_upper: Optional[float] = None,
-                                        lambda_pctl_lower: Optional[float] = None,
-                                        lambda_warmup_hours: Optional[float] = None
-                                        ) -> None:
-    fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
-
-    axes[0].step(times, N_vals, where='post', label='N(t)')
-    axes[0].set_title('N(t) — active processes')
-    axes[0].set_ylabel('N(t)')
-    axes[0].legend()
-
-    axes[1].plot(times, L_vals, label='L(T)')
-    axes[1].set_title('L(T) — time-average number')
-    axes[1].set_ylabel('L(T)')
-    axes[1].legend()
-
-    axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
-    axes[2].set_title('Λ(T) — cumulative arrival rate')
-    axes[2].set_ylabel('Λ(T) [1/hr]')
-    axes[2].legend()
-    _clip_axis_to_percentile(axes[2], times, Lam_vals,
-                             upper_p=lambda_pctl_upper,
-                             lower_p=lambda_pctl_lower,
-                             warmup_hours=lambda_warmup_hours)
-
-    axes[3].plot(times, w_vals, label='w(T) [hrs]')
-    axes[3].set_title('w(T) — average residence time (plain, own scale)')
-    axes[3].set_ylabel('w(T) [hrs]')
-    axes[3].legend()
-
-    axes[4].plot(times, w_vals, label='w(T) [hrs]')
-    if scatter_times is not None and scatter_values is not None and len(scatter_values) > 0:
-        axes[4].scatter(scatter_times, scatter_values, s=16, alpha=0.6, marker='o', label=scatter_label)
-    axes[4].set_title('w(T) — with per-item durations (scatter, combined scale)')
-    axes[4].set_ylabel('w(T) [hrs]')
-    axes[4].set_xlabel('Date')
-    axes[4].legend()
-
-    try:
-        w_min = np.nanmin(w_vals); w_max = np.nanmax(w_vals)
-        if np.isfinite(w_min) and np.isfinite(w_max):
-            pad = 0.05 * max(w_max - w_min, 1.0)
-            axes[3].set_ylim(w_min - pad, w_max + pad)
-        if scatter_values is not None and len(scatter_values) > 0:
-            s_min = np.nanmin(scatter_values); s_max = np.nanmax(scatter_values)
-            cmin = np.nanmin([w_min, s_min]); cmax = np.nanmax([w_max, s_max])
-        else:
-            cmin, cmax = w_min, w_max
-        if np.isfinite(cmin) and np.isfinite(cmax):
-            pad2 = 0.05 * max(cmax - cmin, 1.0)
-            axes[4].set_ylim(cmin - pad2, cmax + pad2)
-    except Exception:
-        pass
-
-    for ax in axes:
-        _format_date_axis(ax)
-
-    fig.suptitle(title)
-    plt.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(out_path)
     plt.close(fig)
 
@@ -511,3 +338,344 @@ def _format_date_axis(ax: plt.Axes) -> None:
         ax.figure.autofmt_xdate()
     except Exception:
         pass
+
+
+def plot_core_flow_metrics(
+        args,
+        filter_result:Optional[FilterResult],
+        metrics: FlowMetricsResult,
+        out_dir: str
+) -> List[str]:
+
+    out_dir = ensure_output_dir(out_dir)
+    filter_label = filter_result.label if filter_result else ""
+
+    path_N = os.path.join(out_dir, "timestamp_N.png")
+    draw_step_chart(metrics.times, metrics.N, f"N(t) — active processes (timestamp, {filter_label})", "N(t)", path_N)
+
+    path_L = os.path.join(out_dir, "timestamp_L.png")
+    draw_line_chart(metrics.times, metrics.L, f"L(T) — time-average number (timestamp, {filter_label})", "L(T)", path_L)
+
+    path_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
+    draw_lambda_chart(metrics.times, metrics.Lambda, f"Λ(T) — cumulative arrivals per hour (timestamp, {filter_label})", "Λ(T) [1/hr]",
+                      path_Lam, args.lambda_pctl, args.lambda_lower_pctl, args.lambda_warmup)
+
+    path_w = os.path.join(out_dir, "timestamp_w.png")
+    draw_line_chart(metrics.times, metrics.w, f"w(T) — average residence time in window (timestamp, {filter_label})",
+                    "w(T) [hrs]", path_w)
+
+    return [path_N, path_L, path_Lam, path_w]
+
+
+def plot_sojourn_time_scatter(args, df, filter_result, metrics,out_dir) -> List[str]:
+    t_scatter_times: List[pd.Timestamp] = []
+    t_scatter_vals = np.array([])
+    written = []
+    if args.incomplete:
+        if len(metrics.times) > 0:
+            t_scatter_times = df["start_ts"].tolist()
+            t_scatter_vals = df["duration_hr"].to_numpy()
+
+    else:
+        df_c = df[df["end_ts"].notna()].copy()
+        if not df_c.empty:
+            t_scatter_times = df_c["end_ts"].tolist()
+            t_scatter_vals = df_c["duration_hr"].to_numpy()
+
+    if len(t_scatter_times) > 0:
+        ts_w_scatter = os.path.join(out_dir, "timestamp_w_with_scatter.png")
+        label = "Item age at sweep end" if args.incomplete else "Item time in system"
+        draw_line_chart_with_scatter(metrics.times, metrics.w,
+                                     f"w(T) — average residence time in window (timestamp, {filter_result.label})",
+                                     "w(T) [hrs]", ts_w_scatter, t_scatter_times, t_scatter_vals, scatter_label=label)
+
+        written += [ts_w_scatter]
+
+    return written
+
+
+def draw_four_panel_column(times: List[pd.Timestamp],
+                           N_vals: np.ndarray,
+                           L_vals: np.ndarray,
+                           Lam_vals: np.ndarray,
+                           w_vals: np.ndarray,
+                           title: str,
+                           out_path: str,
+                           lambda_pctl_upper: Optional[float] = None,
+                           lambda_pctl_lower: Optional[float] = None,
+                           lambda_warmup_hours: Optional[float] = None
+                           ) -> None:
+    fig, axes = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
+
+    axes[0].step(times, N_vals, where='post', label='N(t)')
+    axes[0].set_title('N(t) — active processes')
+    axes[0].set_ylabel('N(t)')
+    axes[0].legend()
+
+    axes[1].plot(times, L_vals, label='L(T)')
+    axes[1].set_title('L(T) — time-average number')
+    axes[1].set_ylabel('L(T)')
+    axes[1].legend()
+
+    axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
+    axes[2].set_title('Λ(T) — cumulative arrival rate')
+    axes[2].set_ylabel('Λ(T) [1/hr]')
+    axes[2].legend()
+    _clip_axis_to_percentile(axes[2], times, Lam_vals,
+                             upper_p=lambda_pctl_upper,
+                             lower_p=lambda_pctl_lower,
+                             warmup_hours=lambda_warmup_hours)
+
+    axes[3].plot(times, w_vals, label='w(T) [hrs]')
+    axes[3].set_title('w(T) — average residence time in window')
+    axes[3].set_ylabel('w(T) [hrs]')
+    axes[3].set_xlabel('Date')
+    axes[3].legend()
+
+    for ax in axes:
+        _format_date_axis(ax)
+
+    fig.suptitle(title)
+    plt.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.savefig(out_path)
+    plt.close(fig)
+
+
+def draw_five_panel_column(times: List[pd.Timestamp],
+                           N_vals: np.ndarray,
+                           L_vals: np.ndarray,
+                           Lam_vals: np.ndarray,
+                           w_vals: np.ndarray,
+                           A_vals: np.ndarray,
+                           title: str,
+                           out_path: str,
+                           scatter_times: Optional[List[pd.Timestamp]] = None,
+                           scatter_values: Optional[np.ndarray] = None,
+                           scatter_label: str = "Item time in system",
+                           lambda_pctl_upper: Optional[float] = None,
+                           lambda_pctl_lower: Optional[float] = None,
+                           lambda_warmup_hours: Optional[float] = None
+                           ) -> None:
+    fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
+
+    axes[0].step(times, N_vals, where='post', label='N(t)')
+    axes[0].set_title('N(t) — active processes')
+    axes[0].set_ylabel('N(t)')
+    axes[0].legend()
+
+    axes[1].plot(times, L_vals, label='L(T)')
+    axes[1].set_title('L(T) — time-average number')
+    axes[1].set_ylabel('L(T)')
+    axes[1].legend()
+
+    axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
+    axes[2].set_title('Λ(T) — cumulative arrival rate')
+    axes[2].set_ylabel('Λ(T) [1/hr]')
+    axes[2].legend()
+    _clip_axis_to_percentile(axes[2], times, Lam_vals,
+                             upper_p=lambda_pctl_upper,
+                             lower_p=lambda_pctl_lower,
+                             warmup_hours=lambda_warmup_hours)
+
+    axes[3].plot(times, w_vals, label='w(T) [hrs]')
+    if scatter_times is not None and scatter_values is not None and len(scatter_times) > 0:
+        axes[3].scatter(scatter_times, scatter_values, s=16, alpha=0.6, marker='o', label=scatter_label)
+    axes[3].set_title('w(T) — average residence time in window')
+    axes[3].set_ylabel('w(T) [hrs]')
+    axes[3].legend()
+
+    axes[4].plot(times, A_vals, label='A(T) [hrs·items]')
+    axes[4].set_title('A(T) — cumulative area ∫N(t)dt')
+    axes[4].set_ylabel('A(T) [hrs·items]')
+    axes[4].set_xlabel('Date')
+    axes[4].legend()
+
+    for ax in axes:
+        _format_date_axis(ax)
+
+    fig.suptitle(title)
+    plt.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.savefig(out_path)
+    plt.close(fig)
+
+
+def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
+                                        N_vals: np.ndarray,
+                                        L_vals: np.ndarray,
+                                        Lam_vals: np.ndarray,
+                                        w_vals: np.ndarray,
+                                        title: str,
+                                        out_path: str,
+                                        scatter_times: Optional[List[pd.Timestamp]] = None,
+                                        scatter_values: Optional[np.ndarray] = None,
+                                        scatter_label: str = "Item time in system",
+                                        lambda_pctl_upper: Optional[float] = None,
+                                        lambda_pctl_lower: Optional[float] = None,
+                                        lambda_warmup_hours: Optional[float] = None
+                                        ) -> None:
+    fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
+
+    axes[0].step(times, N_vals, where='post', label='N(t)')
+    axes[0].set_title('N(t) — active processes')
+    axes[0].set_ylabel('N(t)')
+    axes[0].legend()
+
+    axes[1].plot(times, L_vals, label='L(T)')
+    axes[1].set_title('L(T) — time-average number')
+    axes[1].set_ylabel('L(T)')
+    axes[1].legend()
+
+    axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
+    axes[2].set_title('Λ(T) — cumulative arrival rate')
+    axes[2].set_ylabel('Λ(T) [1/hr]')
+    axes[2].legend()
+    _clip_axis_to_percentile(axes[2], times, Lam_vals,
+                             upper_p=lambda_pctl_upper,
+                             lower_p=lambda_pctl_lower,
+                             warmup_hours=lambda_warmup_hours)
+
+    axes[3].plot(times, w_vals, label='w(T) [hrs]')
+    axes[3].set_title('w(T) — average residence time (plain, own scale)')
+    axes[3].set_ylabel('w(T) [hrs]')
+    axes[3].legend()
+
+    axes[4].plot(times, w_vals, label='w(T) [hrs]')
+    if scatter_times is not None and scatter_values is not None and len(scatter_values) > 0:
+        axes[4].scatter(scatter_times, scatter_values, s=16, alpha=0.6, marker='o', label=scatter_label)
+    axes[4].set_title('w(T) — with per-item durations (scatter, combined scale)')
+    axes[4].set_ylabel('w(T) [hrs]')
+    axes[4].set_xlabel('Date')
+    axes[4].legend()
+
+    try:
+        w_min = np.nanmin(w_vals); w_max = np.nanmax(w_vals)
+        if np.isfinite(w_min) and np.isfinite(w_max):
+            pad = 0.05 * max(w_max - w_min, 1.0)
+            axes[3].set_ylim(w_min - pad, w_max + pad)
+        if scatter_values is not None and len(scatter_values) > 0:
+            s_min = np.nanmin(scatter_values); s_max = np.nanmax(scatter_values)
+            cmin = np.nanmin([w_min, s_min]); cmax = np.nanmax([w_max, s_max])
+        else:
+            cmin, cmax = w_min, w_max
+        if np.isfinite(cmin) and np.isfinite(cmax):
+            pad2 = 0.05 * max(cmax - cmin, 1.0)
+            axes[4].set_ylim(cmin - pad2, cmax + pad2)
+    except Exception:
+        pass
+
+    for ax in axes:
+        _format_date_axis(ax)
+
+    fig.suptitle(title)
+    plt.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.savefig(out_path)
+    plt.close(fig)
+
+
+def ensure_output_dir(csv_path: str) -> str:
+    base = os.path.basename(csv_path)
+    stem = os.path.splitext(base)[0]
+    out_dir = os.path.join("charts", stem)
+    os.makedirs(out_dir, exist_ok=True)
+    return out_dir
+
+
+def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
+    # Empirical targets & dynamic baselines
+    horizon_days = args.horizon_days
+    epsilon = args.epsilon
+    lambda_pctl_upper = args.lambda_pctl
+    lambda_pctl_lower = args.lambda_lower_pctl
+    lambda_warmup_hours = args.lambda_warmup
+    mode_label = filter_result.label
+
+    written: List[str] = []
+
+    if len(metrics.times) > 0:
+        W_star_ts, lam_star_ts = compute_dynamic_empirical_series(df, metrics.times)
+    else:
+        W_star_ts = lam_star_ts = np.array([])
+    # Relative errors & coherence
+    eW_ts, eLam_ts, elapsed_ts = compute_tracking_errors(metrics.times, metrics.w, metrics.Lambda, W_star_ts,
+                                                         lam_star_ts)
+    coh_summary_lines: List[str] = []
+    if epsilon is not None and horizon_days is not None:
+        h_hrs = float(horizon_days) * 24.0
+        sc_ts, ok_ts, tot_ts = compute_coherence_score(eW_ts, eLam_ts, elapsed_ts, float(epsilon), h_hrs)
+        coh_summary_lines.append(
+            f"Coherence (timestamp): eps={epsilon:g}, H={horizon_days:g}d -> {ok_ts}/{tot_ts} ({(sc_ts * 100 if sc_ts == sc_ts else 0):.1f}%)")
+    # Convergence diagnostics (timestamp)
+    if len(metrics.times) > 0:
+        ts_conv_dyn = os.path.join(out_dir, 'timestamp_convergence_dynamic.png')
+        draw_dynamic_convergence_panel(metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts,
+                                       f'Dynamic convergence (timestamp, {mode_label})', ts_conv_dyn,
+                                       lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
+                                       lambda_warmup_hours=lambda_warmup_hours)
+        written.append(ts_conv_dyn)
+
+        ts_conv_dyn3 = os.path.join(out_dir, 'timestamp_convergence_dynamic_errors.png')
+        draw_dynamic_convergence_panel_with_errors(metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts,
+                                                   eW_ts, eLam_ts, epsilon,
+                                                   f'Dynamic convergence + errors (timestamp, {mode_label})',
+                                                   ts_conv_dyn3, lambda_pctl_upper=lambda_pctl_upper,
+                                                   lambda_pctl_lower=lambda_pctl_lower,
+                                                   lambda_warmup_hours=lambda_warmup_hours)
+        written.append(ts_conv_dyn3)
+    # --- End-effect diagnostics ---
+    rA_ts, rB_ts, rho_ts = compute_end_effect_series(df, metrics.times, metrics.A, W_star_ts) if len(
+        metrics.times) > 0 else (np.array([]), np.array([]), np.array([]))
+    if len(metrics.times) > 0:
+        ts_conv_dyn4 = os.path.join(out_dir, 'timestamp_convergence_dynamic_errors_endeffects.png')
+        draw_dynamic_convergence_panel_with_errors_and_endeffects(
+            metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts, eW_ts, eLam_ts,
+            rA_ts, rB_ts, rho_ts, epsilon,
+            f'Dynamic convergence + errors + end-effects (timestamp, {mode_label})', ts_conv_dyn4,
+            lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
+            lambda_warmup_hours=lambda_warmup_hours)
+        written.append(ts_conv_dyn4)
+
+        # Write coherence summary (and print)
+        if coh_summary_lines:
+            txt_path = os.path.join(out_dir, "coherence_summary.txt")
+            with open(txt_path, "w") as f:
+                for line in coh_summary_lines:
+                    f.write(line + "\n")
+            print("\n".join(coh_summary_lines))
+            written.append(txt_path)
+
+    return written
+
+
+def plot_core_metrics_stack(args, filter_result, metrics, out_dir):
+    four_col_stack = os.path.join(out_dir, 'timestamp_stack.png')
+    draw_four_panel_column(metrics.times, metrics.N, metrics.L, metrics.Lambda, metrics.w,
+                           f'Finite-window metrics (timestamp, {filter_result.label})', four_col_stack, args.lambda_pctl,
+                           args.lambda_lower_pctl, args.lambda_warmup)
+    return [four_col_stack]
+
+
+def plot_five_column_stacks(df, args, filter_result, metrics, out_dir):
+    t_scatter_times = df["start_ts"].tolist()
+    t_scatter_vals = df["duration_hr"].to_numpy()
+    written = []
+    if args.with_A:
+        col_ts5 = os.path.join(out_dir, 'timestamp_stack_with_A.png')
+        draw_five_panel_column(metrics.times, metrics.N, metrics.Lambda, metrics.Lambda, metrics.w, metrics.A,
+                               f'Finite-window metrics incl. A(T) (timestamp, {filter_result.label})', col_ts5,
+                               scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
+                               lambda_pctl_upper=args.lambda_pctl, lambda_pctl_lower=args.lambda_lower_pctl,
+                               lambda_warmup_hours=args.lambda_warmup)
+        written.append(col_ts5)
+
+    elif args.scatter:
+        col_ts5s = os.path.join(out_dir, 'timestamp_stack_with_scatter.png')
+        draw_five_panel_column_with_scatter(metrics.times, metrics.N, metrics.L, metrics.Lambda, metrics.w,
+                                            f'Finite-window metrics with w(T) plain + w(T)+scatter (timestamp, {filter_result.label})',
+                                            col_ts5s,
+                                            scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
+                                            lambda_pctl_upper=args.lambda_pctl,
+                                            lambda_pctl_lower=args.lambda_lower_pctl,
+                                            lambda_warmup_hours=args.lambda_warmup)
+        written.append(col_ts5s)
+
+    return written

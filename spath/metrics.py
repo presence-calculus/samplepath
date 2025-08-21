@@ -412,17 +412,6 @@ def compute_end_effect_series(df: pd.DataFrame,
     return rA, rB, rho
 
 
-def compute_empirical_targets(df: pd.DataFrame, t0: pd.Timestamp, t_end: pd.Timestamp) -> Tuple[float, float]:
-    comp = df[df["end_ts"].notna()].copy()
-    if not comp.empty:
-        W_emp = float(((comp["end_ts"] - comp["start_ts"]).dt.total_seconds() / 3600.0).mean())
-    else:
-        W_emp = float('nan')
-    arrivals = int((df["start_ts"] <= t_end).sum())
-    elapsed_h = (t_end - t0).total_seconds() / 3600.0 if pd.notna(t_end) and pd.notna(t0) else 0.0
-    lam_emp = float(arrivals / elapsed_h) if elapsed_h > 0 else float('nan')
-    return W_emp, lam_emp
-
 
 def compute_dynamic_empirical_series(df: pd.DataFrame,
                                      times: List[pd.Timestamp]) -> Tuple[np.ndarray, np.ndarray]:
