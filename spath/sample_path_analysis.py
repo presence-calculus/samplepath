@@ -19,7 +19,8 @@ import cli
 from csv_loader import csv_to_dataframe
 from filter import FilterResult, apply_filters
 from metrics import compute_sample_path_metrics, compute_finite_window_flow_metrics, compute_end_effect_series, \
-    compute_empirical_targets, compute_dynamic_empirical_series, compute_tracking_errors, compute_coherence_score
+    compute_empirical_targets, compute_dynamic_empirical_series, compute_tracking_errors, compute_coherence_score, \
+    FlowMetricsResult
 from plots import draw_line_chart, draw_lambda_chart, draw_line_chart_with_scatter, draw_step_chart, \
     draw_four_panel_column, draw_five_panel_column, draw_five_panel_column_with_scatter, draw_convergence_panel, \
     draw_dynamic_convergence_panel, draw_dynamic_convergence_panel_with_errors, \
@@ -49,9 +50,32 @@ def ensure_output_dir(csv_path: str) -> str:
 
 
 
-# -------------------------------
-# Coherence diagnostics
-# -------------------------------
+def plot_core_flow_metrics(metrics: FlowMetricsResult,
+                           out_dir: str,
+                           filter_result:Optional[FilterResult],
+                           lambda_pctl_upper: Optional[float] = None,
+                           lambda_pctl_lower: Optional[float] = None,
+                           lambda_warmup_hours: Optional[float] = None) -> List[str]:
+
+    out_dir = ensure_output_dir(out_dir)
+    filter_label = filter_result.label if filter_result else ""
+
+    path_N = os.path.join(out_dir, "timestamp_N.png")
+    draw_step_chart(metrics.times, metrics.N, f"N(t) — active processes (timestamp, {filter_label})", "N(t)", path_N)
+
+    path_L = os.path.join(out_dir, "timestamp_L.png")
+    draw_line_chart(metrics.times, metrics.L, f"L(T) — time-average number (timestamp, {filter_label})", "L(T)", path_L)
+
+    path_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
+    draw_lambda_chart(metrics.times, metrics.Lambda, f"Λ(T) — cumulative arrivals per hour (timestamp, {filter_label})", "Λ(T) [1/hr]",
+                      path_Lam, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
+
+    path_w = os.path.join(out_dir, "timestamp_w.png")
+    draw_line_chart(metrics.times, metrics.w, f"w(T) — average residence time in window (timestamp, {filter_label})",
+                    "w(T) [hrs]", path_w)
+
+    return [path_N, path_L, path_Lam, path_w]
+
 
 
 # -------------------------------
@@ -78,9 +102,9 @@ def produce_all_charts(csv_path: str,
     mode_label = filter_result.label
 
     # Build arrival departure process
-    arrival_departure_process = to_arrival_departure_process(df)
+    arrival_departure_process: List[Tuple[pd.Timestamp, int, int]] = to_arrival_departure_process(df)
     # Compute core finite window flow metrics
-    metrics = compute_finite_window_flow_metrics(arrival_departure_process)
+    metrics: FlowMetricsResult = compute_finite_window_flow_metrics(arrival_departure_process)
 
     t_times, t_L, t_Lam, t_w, t_N, t_A = (
         metrics.times,
@@ -94,21 +118,11 @@ def produce_all_charts(csv_path: str,
     out_dir = ensure_output_dir(csv_path)
     written: List[str] = []
 
-    # Timestamp charts
-    ts_L = os.path.join(out_dir, "timestamp_L.png")
-    ts_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
-    ts_w = os.path.join(out_dir, "timestamp_w.png")
-    ts_Np = os.path.join(out_dir, "timestamp_N.png")
+    # create plots
+    written += plot_core_flow_metrics(metrics, out_dir, filter_result, lambda_pctl_upper, lambda_pctl_lower,lambda_warmup_hours)
 
-    draw_line_chart(t_times, t_L, f"L(T) — time-average number (timestamp, {mode_label})", "L(T)", ts_L)
-    draw_lambda_chart(t_times, t_Lam, f"Λ(T) — cumulative arrivals per hour (timestamp, {mode_label})", "Λ(T) [1/hr]",
-                      ts_Lam, lambda_pctl_upper, lambda_pctl_lower, lambda_warmup_hours)
-    draw_line_chart(t_times, t_w, f"w(T) — average residence time in window (timestamp, {mode_label})",
-                    "w(T) [hrs]", ts_w)
-
-    draw_step_chart(t_times, t_N, f"N(t) — active processes (timestamp, {mode_label})", "N(t)", ts_Np)
-    written += [ts_L, ts_Lam, ts_w, ts_Np]
-
+    if scatter:
+        written += plot_sojourn_time_scatter(df, filter_result, metrics, incomplete_only, out_dir)
 
     # Empirical targets & dynamic baselines
     if len(t_times) > 0:
@@ -126,27 +140,8 @@ def produce_all_charts(csv_path: str,
         sc_ts, ok_ts, tot_ts = compute_coherence_score(eW_ts, eLam_ts, elapsed_ts, float(epsilon), h_hrs)
         coh_summary_lines.append(f"Coherence (timestamp): eps={epsilon:g}, H={horizon_days:g}d -> {ok_ts}/{tot_ts} ({(sc_ts*100 if sc_ts==sc_ts else 0):.1f}%)")
 
-    # Scatter arrays
-    t_scatter_times: List[pd.Timestamp] = []
-    t_scatter_vals = np.array([])
-    if scatter:
-        if incomplete_only:
-            if len(t_times) > 0:
-                t_end = t_times[-1]
-                t_scatter_times = df["start_ts"].tolist()
-                t_scatter_vals = ((t_end - df["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
-        else:
-            df_c = df[df["end_ts"].notna()].copy()
-            if not df_c.empty:
-                t_scatter_times = df_c["end_ts"].tolist()
-                t_scatter_vals = ((df_c["end_ts"] - df_c["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
 
 
-    if scatter and len(t_scatter_times) > 0:
-        label = "Item age at sweep end" if incomplete_only else "Item time in system"
-        draw_line_chart_with_scatter(t_times, t_w,
-                                     f"w(T) — average residence time in window (timestamp, {mode_label})",
-                                     "w(T) [hrs]", ts_w, t_scatter_times, t_scatter_vals, scatter_label=label)
 
 
     # Convergence diagnostics (timestamp)
@@ -188,6 +183,8 @@ def produce_all_charts(csv_path: str,
 
 
     # 5-panel stacks including A(T)
+    t_scatter_times = df["start_ts"].tolist()
+    t_scatter_vals = df["duration_hr"].to_numpy()
     if with_A:
         col_ts5 = os.path.join(out_dir, 'timestamp_stack_with_A.png')
         draw_five_panel_column(t_times, t_N, t_L, t_Lam, t_w, t_A,
@@ -211,6 +208,33 @@ def produce_all_charts(csv_path: str,
                 f.write(line + "\n")
         print("\n".join(coh_summary_lines))
         written.append(txt_path)
+
+    return written
+
+
+def plot_sojourn_time_scatter(df, filter_result, metrics, incomplete_only, out_dir) -> List[str]:
+    t_scatter_times: List[pd.Timestamp] = []
+    t_scatter_vals = np.array([])
+    written = []
+    if incomplete_only:
+        if len(metrics.times) > 0:
+            t_scatter_times = df["start_ts"].tolist()
+            t_scatter_vals = df["duration_hr"].to_numpy()
+
+    else:
+        df_c = df[df["end_ts"].notna()].copy()
+        if not df_c.empty:
+            t_scatter_times = df_c["end_ts"].tolist()
+            t_scatter_vals = df_c["duration_hr"].to_numpy()
+
+    if len(t_scatter_times) > 0:
+        ts_w_scatter = os.path.join(out_dir, "timestamp_w_with_scatter.png")
+        label = "Item age at sweep end" if incomplete_only else "Item time in system"
+        draw_line_chart_with_scatter(metrics.times, metrics.w,
+                                     f"w(T) — average residence time in window (timestamp, {filter_result.label})",
+                                     "w(T) [hrs]", ts_w_scatter, t_scatter_times, t_scatter_vals, scatter_label=label)
+
+        written += [ts_w_scatter]
 
     return written
 
