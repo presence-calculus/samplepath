@@ -57,10 +57,10 @@ def _parse_classes(s: Optional[str]) -> list[str] | None:
 
 def _completed_base_label(spec: FilterSpec) -> str:
     if spec.completed_only:
-        return "completed work"
+        return "closed elements"
     if spec.incomplete_only:
-        return "incomplete (aging view)"
-    return "all work"
+        return "open elements"
+    return ""
 
 def _comp_mask(df: pd.DataFrame, cur_mask: pd.Series) -> pd.Series:
     return cur_mask & df["end_ts"].notna()
@@ -105,8 +105,8 @@ def _f_classes(
     if spec.raise_on_empty_classes and int(new_mask.sum()) == 0:
         raise ValueError(f"No rows match the requested classes: {norm}")
     dropped["classes"] = int((mask & ~new_mask).sum())
-    applied.append(f"classes={','.join(norm)}")
-    label_add = f", classes: {','.join(norm)}"
+    applied.append(f"Classes={','.join(norm)}")
+    label_add = f", Classes: {','.join(norm)}"
     return new_mask, label_add
 
 def _f_outlier_hours(
@@ -226,7 +226,7 @@ def run_filters(df: pd.DataFrame, spec: FilterSpec) -> FilterResult:
     if outlier_tags:
         # Confirm at least one outlier filter dropped rows
         if any(dropped.get(k, 0) > 0 for k in ("outlier_hours", "outlier_pctl", "outlier_iqr")):
-            label += f", outliers {' & '.join(outlier_tags)} removed"
+            label += f", Outliers {' & '.join(outlier_tags)} removed"
 
     return FilterResult(
         df=df_out,
