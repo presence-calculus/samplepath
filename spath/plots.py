@@ -2,7 +2,7 @@
 # Copyright (c) 2025 Krishna Kumar
 # SPDX-License-Identifier: MIT
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple, Sequence
 
 import numpy as np
 import pandas as pd
@@ -16,12 +16,17 @@ from spath.metrics import FlowMetricsResult, compute_dynamic_empirical_series, c
 
 def _add_caption(fig: Figure, text: str) -> None:
     """Add a caption below the x-axis."""
-    fig.subplots_adjust(bottom=0.31)  # adjust bottom margin
+    fig.subplots_adjust(bottom=0.28)
     fig.text(
-        0.5, 0.02, text,
-        ha="center", va="bottom",
-        fontsize=9, color="gray"
+        0.5,
+        0.005,
+        text,
+        ha="center",
+        va="bottom",
+        fontsize=9,
+        color="gray",
     )
+
 
 def _format_date_axis(ax: Axes, unit: str = "timestamp") -> None:
     """Format the x-axis for dates if possible."""
@@ -31,12 +36,14 @@ def _format_date_axis(ax: Axes, unit: str = "timestamp") -> None:
     except Exception:
         pass
 
+
 def _format_axis(ax: Axes, title: str, unit: str, ylabel: str) -> None:
     """Set axis labels, title, and legend with date formatting."""
     ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.legend()
-    _format_date_axis(ax)
+    _format_date_axis(ax, unit=unit)
+
 
 def _format_fig(caption: Optional[str], fig: Figure) -> None:
     """Finalize figure with optional caption and layout adjustment."""
@@ -45,15 +52,14 @@ def _format_fig(caption: Optional[str], fig: Figure) -> None:
         _add_caption(fig, caption)
 
 
-
 def _format_and_save(
-        fig: Figure,
-        ax: Axes,
-        title: str,
-        ylabel: str,
-        unit: str,
-        caption: Optional[str],
-        out_path: str
+    fig: Figure,
+    ax: Axes,
+    title: str,
+    ylabel: str,
+    unit: str,
+    caption: Optional[str],
+    out_path: str,
 ) -> None:
     """Format the axis, add optional caption, save the figure, and close it."""
     _format_axis(ax, title, unit, ylabel)
@@ -61,43 +67,168 @@ def _format_and_save(
     fig.savefig(out_path)
     plt.close(fig)
 
-def draw_line_chart(times: List[pd.Timestamp], values: np.ndarray, title: str, ylabel: str, out_path: str) -> None:
-    fig, ax = plt.subplots(figsize=(10, 4))
+
+# ── Common plotting engines (de-duplicated) ───────────────────────────────────
+
+
+def _init_fig_ax(figsize: Tuple[float, float] = (10.0, 3.4)) -> Tuple[Figure, Axes]:
+    fig, ax = plt.subplots(figsize=figsize)
+    return fig, ax
+
+
+def _plot_series(
+    ax: Axes,
+    times: Sequence[pd.Timestamp],
+    values: Sequence[float],
+    label: str,
+    style: str = "line",
+    where: str = "post",
+) -> None:
+    if style == "step":
+        ax.step(times, values, where=where, label=label)
+    else:
+        ax.plot(times, values, label=label)
+
+
+def draw_series_chart(
+    times: Sequence[pd.Timestamp],
+    values: Sequence[float],
+    title: str,
+    ylabel: str,
+    out_path: str,
+    unit: str = "timestamp",
+    caption: Optional[str] = None,
+    style: str = "line",
+    figsize: Tuple[float, float] = (10.0, 3.4),
+) -> None:
+    fig, ax = _init_fig_ax(figsize=figsize)
+    _plot_series(ax, times, values, label=ylabel, style=style)
+    _format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
+
+
+def draw_line_chart(
+    times: List[pd.Timestamp],
+    values: np.ndarray,
+    title: str,
+    ylabel: str,
+    out_path: str,
+    unit: str = "timestamp",
+    caption: Optional[str] = None,
+) -> None:
+    draw_series_chart(
+        times, values, title, ylabel, out_path, unit=unit, caption=caption, style="line"
+    )
+
+
+def draw_step_chart(
+    times: List[pd.Timestamp],
+    values: np.ndarray,
+    title: str,
+    ylabel: str,
+    out_path: str,
+    unit: str = "timestamp",
+    caption: Optional[str] = None,
+) -> None:
+    draw_series_chart(
+        times, values, title, ylabel, out_path, unit=unit, caption=caption, style="step"
+    )
+
+
+def draw_lambda_chart(
+    times: List[pd.Timestamp],
+    values: np.ndarray,
+    title: str,
+    ylabel: str,
+    out_path: str,
+    lambda_pctl_upper: Optional[float] = None,
+    lambda_pctl_lower: Optional[float] = None,
+    lambda_warmup_hours: Optional[float] = None,
+    unit: str = "timestamp",
+    caption: Optional[str] = None,
+) -> None:
+    """Line chart with optional percentile-based y-limits and warmup exclusion."""
+    fig, ax = _init_fig_ax(figsize=(10.0, 3.6))
     ax.plot(times, values, label=ylabel)
-    ax.set_title(title)
-    ax.set_ylabel(ylabel)
-    ax.set_xlabel("Date")
-    ax.legend()
-    _format_date_axis(ax)
-    fig.tight_layout()
-    fig.savefig(out_path)
-    plt.close(fig)
+
+    # Inline percentile clipping
+    vals = np.asarray(values, dtype=float)
+    if vals.size > 0:
+        mask = np.isfinite(vals)
+        if lambda_warmup_hours and times:
+            t0 = times[0]
+            ages_hr = np.array([(t - t0).total_seconds() / 3600.0 for t in times])
+            mask &= ages_hr >= float(lambda_warmup_hours)
+        data = vals[mask]
+        if data.size > 0 and np.isfinite(data).any():
+            top = (
+                np.nanpercentile(data, lambda_pctl_upper)
+                if lambda_pctl_upper is not None
+                else np.nanmax(data)
+            )
+            bottom = (
+                np.nanpercentile(data, lambda_pctl_lower)
+                if lambda_pctl_lower is not None
+                else 0.0
+            )
+            if np.isfinite(top) and np.isfinite(bottom) and top > bottom:
+                ax.set_ylim(float(bottom), float(top))
+
+    _format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
 
 
-def draw_lambda_chart(times: List[pd.Timestamp],
-                      values: np.ndarray,
-                      title: str,
-                      ylabel: str,
-                      out_path: str,
-                      lambda_pctl_upper: Optional[float] = None,
-                      lambda_pctl_lower: Optional[float] = None,
-                      lambda_warmup_hours: Optional[float] = None
-                      ) -> None:
+# ── Higher-level plotting functions (unchanged except captions fixed) ─────────
 
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(times, values, label=ylabel)
-    ax.set_title(title)
-    ax.set_ylabel(ylabel)
-    ax.set_xlabel("Date")
-    ax.legend()
-    _clip_axis_to_percentile(ax, times, values,
-                             upper_p=lambda_pctl_upper,
-                             lower_p=lambda_pctl_lower,
-                             warmup_hours=lambda_warmup_hours)
-    _format_date_axis(ax)
-    fig.tight_layout()
-    fig.savefig(out_path)
-    plt.close(fig)
+
+def plot_core_flow_metrics(
+    args,
+    filter_result: Optional[FilterResult],
+    metrics: FlowMetricsResult,
+    out_dir: str,
+) -> List[str]:
+    out_dir = ensure_output_dir(out_dir)
+    filter_label = filter_result.label if filter_result else ""
+    note = f"Filters: {filter_label}"
+
+    path_N = os.path.join(out_dir, "timestamp_N.png")
+    draw_step_chart(
+        metrics.times, metrics.N, "N(t) — Active elements", "N(t)", path_N, caption=note
+    )
+
+    path_L = os.path.join(out_dir, "timestamp_L.png")
+    draw_line_chart(
+        metrics.times,
+        metrics.L,
+        "L(T) — Time-average N(t)",
+        "L(T)",
+        path_L,
+        caption=note,
+    )
+
+    path_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
+    draw_lambda_chart(
+        metrics.times,
+        metrics.Lambda,
+        "Λ(T) — Cumulative arrival rate",
+        "Λ(T) [1/hr]",
+        path_Lam,
+        lambda_pctl_upper=args.lambda_pctl,
+        lambda_pctl_lower=args.lambda_lower_pctl,
+        lambda_warmup_hours=args.lambda_warmup,
+        caption=note,
+    )
+
+    path_w = os.path.join(out_dir, "timestamp_w.png")
+    draw_line_chart(
+        metrics.times,
+        metrics.w,
+        "w(T) — Average residence time",
+        "w(T) [hrs]",
+        path_w,
+        caption=note,
+    )
+
+    return [path_N, path_L, path_Lam, path_w]
+
 
 
 def draw_line_chart_with_scatter(times: List[pd.Timestamp],
@@ -122,27 +253,7 @@ def draw_line_chart_with_scatter(times: List[pd.Timestamp],
     plt.close(fig)
 
 
-def draw_step_chart(times: List[pd.Timestamp], values: np.ndarray, title: str, ylabel: str, out_path: str, unit: str = 'Timestamp', caption:str = "") -> None:
-    fig, ax = plt.subplots(figsize=(10, 3.2))
-    ax.step(times, values, where='post', label=ylabel)
 
-    _format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
-
-
-
-
-
-def draw_bar_chart(times: List[pd.Timestamp], values: np.ndarray, title: str, ylabel: str, out_path: str) -> None:
-    fig, ax = plt.subplots(figsize=(10, 3.2))
-    ax.bar(times, values, label=ylabel)
-    ax.set_title(title)
-    ax.set_ylabel(ylabel)
-    ax.set_xlabel("Date")
-    ax.legend()
-    _format_date_axis(ax)
-    fig.tight_layout()
-    fig.savefig(out_path)
-    plt.close(fig)
 
 
 def draw_convergence_panel(times: List[pd.Timestamp],
@@ -380,31 +491,6 @@ def _clip_axis_to_percentile(ax: plt.Axes,
 
 
 
-def plot_core_flow_metrics(
-        args,
-        filter_result:Optional[FilterResult],
-        metrics: FlowMetricsResult,
-        out_dir: str
-) -> List[str]:
-
-    out_dir = ensure_output_dir(out_dir)
-    filter_label = filter_result.label if filter_result else ""
-
-    path_N = os.path.join(out_dir, "timestamp_N.png")
-    draw_step_chart(metrics.times, metrics.N, f"N(t) — Active elements", "N(t)", path_N, caption=f"Filters: {filter_label}")
-
-    path_L = os.path.join(out_dir, "timestamp_L.png")
-    draw_line_chart(metrics.times, metrics.L, f"L(T) — Time-average N(t) (timestamp, {filter_label})", "L(T)", path_L)
-
-    path_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
-    draw_lambda_chart(metrics.times, metrics.Lambda, f"Λ(T) — Cumulative arrival rate (timestamp, {filter_label})", "Λ(T) [1/hr]",
-                      path_Lam, args.lambda_pctl, args.lambda_lower_pctl, args.lambda_warmup)
-
-    path_w = os.path.join(out_dir, "timestamp_w.png")
-    draw_line_chart(metrics.times, metrics.w, f"w(T) — Average residence time  (timestamp, {filter_label})",
-                    "w(T) [hrs]", path_w)
-
-    return [path_N, path_L, path_Lam, path_w]
 
 
 def plot_sojourn_time_scatter(args, df, filter_result, metrics,out_dir) -> List[str]:
