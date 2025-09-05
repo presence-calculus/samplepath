@@ -226,7 +226,9 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    return [path_N, path_L, path_Lam, path_w]
+    path_LLw = os.path.join(out_dir, "timestamp_LLw.png")
+    draw_L_vs_Lambda_w(metrics.times, metrics.L, metrics.Lambda, metrics.w, title="L(T) vs Λ(T).w(T)", out_path=path_LLw, caption=note)
+    return [path_N, path_L, path_Lam, path_w, path_LLw]
 
 
 
@@ -251,7 +253,59 @@ def draw_line_chart_with_scatter(times: List[pd.Timestamp],
 
 
 
+def draw_L_vs_Lambda_w(
+    times: List[pd.Timestamp],          # kept for symmetry with other draw_* funcs (not used here)
+    L_vals: np.ndarray,
+    Lambda_vals: np.ndarray,
+    w_vals: np.ndarray,
+    title: str,
+    out_path: str,
+    caption: Optional[str] = None,
+) -> None:
+    """
+    Scatter plot of L(T) vs Λ(T)·w(T) with x=y reference line.
+    All valid (finite) points should lie on the x=y line per the finite version of Little's Law
+    This chart is a visual consistency check for the calculations.
+    """
+    # Prepare data and drop non-finite points
+    x = np.asarray(L_vals, dtype=float)
+    y = np.asarray(Lambda_vals, dtype=float) * np.asarray(w_vals, dtype=float)
+    mask = np.isfinite(x) & np.isfinite(y)
+    x, y = x[mask], y[mask]
 
+    # Build figure (square so the x=y line is at 45°)
+    fig: Figure
+    ax: Axes
+    fig, ax = plt.subplots(figsize=(6.0, 6.0))
+
+    # Scatter with slightly larger markers to reveal clusters
+    ax.scatter(x, y, s=18, alpha=0.7)
+
+    # Reference x=y line across the data range with small padding
+    if x.size and y.size:
+        mn = float(np.nanmin([x.min(), y.min()]))
+        mx = float(np.nanmax([x.max(), y.max()]))
+        pad = 0.03 * (mx - mn if mx > mn else 1.0)
+        lo, hi = mn - pad, mx + pad
+        ax.plot([lo, hi], [lo, hi], linestyle="--")  # reference line
+        ax.set_xlim(lo, hi)
+        ax.set_ylim(lo, hi)
+
+    # Make axes comparable visually
+    ax.set_aspect("equal", adjustable="box")
+    ax.grid(True, linewidth=0.5, alpha=0.4)
+
+    # Labels and title
+    ax.set_xlabel("L(T)")
+    ax.set_ylabel("Λ(T)·w(T)")
+    ax.set_title(title)
+
+    # Layout + optional caption (bottom)
+    if caption:
+        _add_caption(fig, caption)  # uses the helper you already have
+    fig.tight_layout(rect=(0.05, 0, 1, 1))
+    fig.savefig(out_path)
+    plt.close(fig)
 
 def draw_convergence_panel(times: List[pd.Timestamp],
                            w_vals: np.ndarray,
