@@ -417,6 +417,7 @@ def draw_convergence_panel(times: List[pd.Timestamp],
 
     fig.suptitle(title)
     plt.tight_layout(rect=(0, 0, 1, 0.96))
+
     fig.savefig(out_path)
     plt.close(fig)
 
@@ -430,19 +431,20 @@ def draw_dynamic_convergence_panel(times: List[pd.Timestamp],
                                    out_path: str,
                                    lambda_pctl_upper: Optional[float] = None,
                                    lambda_pctl_lower: Optional[float] = None,
-                                   lambda_warmup_hours: Optional[float] = None
+                                   lambda_warmup_hours: Optional[float] = None,
+                                   caption: Optional[str] = None
                                    ) -> None:
     fig, axes = plt.subplots(2, 1, figsize=(12, 6.5), sharex=True)
 
     axes[0].plot(times, w_vals, label='w(T) [hrs]')
     axes[0].plot(times, W_star, linestyle='--', label='W*(t) [hrs] (completed ≤ t)')
-    axes[0].set_title('w(T) vs W*(t)  — dynamic')
+    axes[0].set_title('w(T) vs W*(t)')
     axes[0].set_ylabel('hours')
     axes[0].legend()
 
     axes[1].plot(times, lam_vals, label='Λ(T) [1/hr]')
     axes[1].plot(times, lam_star, linestyle='--', label='λ*(t) [1/hr] (arrivals ≤ t)')
-    axes[1].set_title('Λ(T) vs λ*(t)  — arrival rate (dynamic)')
+    axes[1].set_title('Λ(T) vs λ*(t)  — arrival rate')
     axes[1].set_ylabel('1/hr')
     axes[1].set_xlabel('Date')
     axes[1].legend()
@@ -456,7 +458,10 @@ def draw_dynamic_convergence_panel(times: List[pd.Timestamp],
         _format_date_axis(ax)
 
     fig.suptitle(title)
-    plt.tight_layout(rect=(0, 0, 1, 0.96))
+    if caption:
+        _add_caption(fig, caption)  # uses the helper you already have
+    fig.tight_layout(rect=(0.05, 0, 1, 1))
+
     fig.savefig(out_path)
     plt.close(fig)
 
@@ -866,9 +871,10 @@ def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
     if len(metrics.times) > 0:
         ts_conv_dyn = os.path.join(out_dir, 'timestamp_convergence_dynamic.png')
         draw_dynamic_convergence_panel(metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts,
-                                       f'Dynamic convergence (timestamp, {mode_label})', ts_conv_dyn,
+                                       f"Little's Law Empirical Convergence", ts_conv_dyn,
                                        lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
-                                       lambda_warmup_hours=lambda_warmup_hours)
+                                       lambda_warmup_hours=lambda_warmup_hours,
+                                       caption=filter_result.display)
         written.append(ts_conv_dyn)
 
         ts_conv_dyn3 = os.path.join(out_dir, 'timestamp_convergence_dynamic_errors.png')
