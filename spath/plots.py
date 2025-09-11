@@ -947,20 +947,17 @@ def plot_five_column_stacks(df, args, filter_result, metrics, out_dir):
 def plot_rate_stability_charts(
     df: pd.DataFrame,
     args,                 # kept for signature consistency
-    filter_result,        # may provide .title_prefix (optional)
-    metrics,              # FlowMetricsResult with .times, .N, .t0
+    filter_result,        # may provide .title_prefix and .display
+    metrics,              # FlowMetricsResult with .times, .N, .t0, .w
     out_dir: str,
 ) -> List[str]:
     """
-    Produce TWO separate charts (N(T)/T and R(T)/T) and ONE stacked 2-row chart.
-    Only the rate functions are drawn. No secondary y-axis. Reference guides are:
-      - y = 0 (baseline)
-      - y = 1 (unit linear-growth guide; unlabeled, not in legend)
+    Produce:
+      - timestamp_rate_stability_n.png          (N(T)/T)
+      - timestamp_rate_stability_r.png          (R(T)/T)
+      - timestamp_rate_stability_stack.png      (4-row stack: N/T, R/T, λ*(T), W-coherence)
 
-    Filenames:
-      - timestamp_rate_stability_n.png
-      - timestamp_rate_stability_r.png
-      - timestamp_rate_stability_stack.png
+    The stacked figure has suptitle "Equilibrium and Coherence" and a caption with the filter display.
     """
     written: List[str] = []
 
@@ -982,15 +979,20 @@ def plot_rate_stability_charts(
         N_over_T = N_raw / denom
         R_over_T = R_raw / denom
 
+    # Dynamic empirical series (for λ* and W*)
+    W_star_ts, lam_star_ts = compute_dynamic_empirical_series(df, times)
+    w_ts = np.asarray(metrics.w, dtype=float)
+
+    # Optional display bits
     title_prefix = getattr(filter_result, "title_prefix", None)
-    ref_line = 1.0  # unit linear-growth guide in rate space
+    caption_text = getattr(filter_result, "display", None)
 
     # --------------------- Chart 1: N(T)/T ---------------------
     out_path_N = os.path.join(out_dir, "timestamp_rate_stability_n.png")
     fig, ax = plt.subplots(figsize=(10, 5.2))
     ax.plot(times, N_over_T, label="N(T)/T", linewidth=1.9, zorder=3)
     ax.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    ax.axhline(ref_line, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)  # unlabeled guide
+    ax.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)  # reference guide
 
     _format_date_axis(ax)
     ax.set_xlabel("time")
@@ -1014,7 +1016,7 @@ def plot_rate_stability_charts(
     fig, ax = plt.subplots(figsize=(10, 5.2))
     ax.plot(times, R_over_T, label="R(T)/T", linewidth=1.9, zorder=3)
     ax.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    ax.axhline(ref_line, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)  # unlabeled guide
+    ax.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)  # reference guide
 
     _format_date_axis(ax)
     ax.set_xlabel("time")
@@ -1033,42 +1035,77 @@ def plot_rate_stability_charts(
     plt.close(fig)
     written.append(out_path_R)
 
-    # --------------------- Stacked 2-row chart ---------------------
+    # --------------------- 4-row stack: Equilibrium and Coherence --------------
     out_path_stack = os.path.join(out_dir, "timestamp_rate_stability_stack.png")
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 10.4), sharex=True)
+    fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(12, 13.5), sharex=True)
 
-    # Top: N(T)/T
+    # Panel 1: N(T)/T
     axN = axes[0]
     axN.plot(times, N_over_T, label="N(T)/T", linewidth=1.9, zorder=3)
     axN.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    axN.axhline(ref_line, linewidth=1.0, alpha=0.6, linestyle=":", zorder=1)
+    axN.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)
     _format_date_axis(axN)
     axN.set_ylabel("rate")
-    axN.set_title(f"{title_prefix}: N(T)/T" if title_prefix else "N(T)/T")
+    axN.set_title("N(T)/T")
     axN.legend(loc="best")
-
-    # Bottom: R(T)/T
-    axR = axes[1]
-    axR.plot(times, R_over_T, label="R(T)/T", linewidth=1.9, zorder=3)
-    axR.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    axR.axhline(ref_line, linewidth=1.0, alpha=0.6, linestyle=":", zorder=1)
-    _format_date_axis(axR)
-    axR.set_xlabel("time")
-    axR.set_ylabel("rate")
-    axR.set_title(f"{title_prefix}: R(T)/T" if title_prefix else "R(T)/T")
-    axR.legend(loc="best")
-
-    # Robust y-lims for each axis
     if finite_vals_N.size:
         topN = float(np.nanpercentile(finite_vals_N, 99.5))
         botN = float(np.nanmin(finite_vals_N))
         axN.set_ylim(bottom=min(0.0, botN * 1.05), top=topN * 1.05)
+
+    # Panel 2: R(T)/T
+    axR = axes[1]
+    axR.plot(times, R_over_T, label="R(T)/T", linewidth=1.9, zorder=3)
+    axR.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
+    axR.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)
+    _format_date_axis(axR)
+    axR.set_ylabel("rate")
+    axR.set_title("R(T)/T")
+    axR.legend(loc="best")
     if finite_vals_R.size:
         topR = float(np.nanpercentile(finite_vals_R, 99.5))
         botR = float(np.nanmin(finite_vals_R))
         axR.set_ylim(bottom=min(0.0, botR * 1.05), top=topR * 1.05)
 
-    fig.tight_layout()
+    # Panel 3: λ*(T)
+    axLam = axes[2]
+    axLam.plot(times, lam_star_ts, label="λ*(T) [1/hr]", linewidth=1.9, zorder=3)
+    axLam.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
+    _format_date_axis(axLam)
+    axLam.set_ylabel("[1/hr]")
+    axLam.set_title("λ*(T) — running arrival rate")
+    axLam.legend(loc="best")
+    # Clip like other charts
+    try:
+        _clip_axis_to_percentile(
+            axLam, times, lam_star_ts,
+            upper_p=getattr(args, "lambda_pctl", None),
+            lower_p=getattr(args, "lambda_lower_pctl", None),
+            warmup_hours=float(getattr(args, "lambda_warmup", 0.0) or 0.0),
+        )
+    except Exception:
+        pass
+
+    # Panel 4: W-coherence overlay
+    axW = axes[3]
+    axW.plot(times, w_ts,        label="w(T) [hrs] (finite-window)", linewidth=1.9, zorder=3)
+    axW.plot(times, W_star_ts,   label="W*(T) [hrs] (completed mean)", linewidth=1.9, linestyle="--", zorder=3)
+    axW.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
+    _format_date_axis(axW)
+    axW.set_xlabel("time")
+    axW.set_ylabel("hours")
+    axW.set_title("w(T) vs W*(T) — coherence")
+    axW.legend(loc="best")
+
+    # Subtitle + caption
+    fig.suptitle("Equilibrium and Coherence", fontsize=14, y=0.98)
+    try:
+        if caption_text:
+            _add_caption(fig, caption_text)
+    except Exception:
+        pass
+
+    fig.tight_layout(rect=(0, 0.06, 1, 0.96))
     fig.savefig(out_path_stack, dpi=200)
     plt.close(fig)
     written.append(out_path_stack)
