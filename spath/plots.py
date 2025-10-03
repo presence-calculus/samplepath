@@ -714,6 +714,103 @@ def plot_arrival_departure_convergence(
     )
     return [out_path]
 
+# ── Residence vs Sojourn: two-panel stack ────────────────────────────────────
+
+def draw_residence_vs_sojourn_stack(
+    times: List[pd.Timestamp],
+    w_series_hours: np.ndarray,         # w(T) aligned to `times` (avg residence time, hours)
+    df: pd.DataFrame,                   # original events with start_ts / end_ts
+    title: str,
+    out_path: str,
+    caption: Optional[str] = None,
+) -> None:
+    """
+    Top panel:  w(T) vs W*(t)  — average residence time vs empirical average sojourn time
+    Bottom:     Sojourn-time scatter vs w(T)
+
+    Assumptions:
+      • df has 'start_ts' and 'end_ts' columns (tz-aware OK).
+      • W*(t) is computed via your existing helper:
+          compute_dynamic_empirical_series(df, times) -> (W_star, lam_star)
+        We use only W_star here.
+      • w_series_hours is aligned to `times` and in HOURS.
+    """
+    # --- Compute W*(t) aligned to `times`
+    if len(times) > 0:
+        W_star_hours, _lam_star = compute_dynamic_empirical_series(df, times)
+    else:
+        W_star_hours = np.array([])
+
+    # --- Build scatter (completed items only)
+    df_c = df[df["end_ts"].notna()].copy()
+    if not df_c.empty:
+        soj_times = df_c["end_ts"].tolist()
+        soj_vals_h = ((df_c["end_ts"] - df_c["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
+    else:
+        soj_times, soj_vals_h = [], np.array([])
+
+    # --- Figure
+    fig, axes = plt.subplots(2, 1, figsize=(12, 6.5), sharex=True)
+
+    # Panel 1: w(T) vs W*(t)
+    axes[0].plot(times, w_series_hours, label='w(T) [hrs]')
+    axes[0].plot(times, W_star_hours, linestyle='--', label='W*(t) [hrs] (completed ≤ t)')
+    axes[0].set_title('w(T) vs W*(t) — residence vs sojourn')
+    axes[0].set_ylabel('hours')
+    axes[0].legend(loc='best')
+    _format_date_axis(axes[0])
+
+    # Panel 2: Sojourn scatter vs w(T)
+    if len(soj_times) > 0:
+        axes[1].scatter(soj_times, soj_vals_h, s=18, alpha=0.55, label='element sojourn time')
+    axes[1].plot(times, w_series_hours, label='average residence time', zorder=3)
+    axes[1].set_title('Element sojourn time vs Average residence time')
+    axes[1].set_ylabel('Time [hrs]')
+    axes[1].legend(loc='best')
+    _format_date_axis(axes[1])
+
+    fig.suptitle(title)
+    if caption:
+        fig.text(0.5, 0.01, caption, ha='center', va='bottom', fontsize=9)
+        plt.tight_layout(rect=(0, 0.03, 1, 0.96))
+    else:
+        plt.tight_layout(rect=(0, 0, 1, 0.96))
+
+    fig.savefig(out_path)
+    plt.close(fig)
+
+
+def plot_residence_vs_sojourn_stack(
+    df: pd.DataFrame,
+    args,
+    filter_result: Optional[FilterResult],
+    metrics: FlowMetricsResult,
+    out_dir: str,
+) -> List[str]:
+    """
+    Orchestrator mirroring your other plot_* wrappers.
+
+    Expects from FlowMetricsResult:
+      • metrics.times              : List[pd.Timestamp]
+      • metrics.w                  : np.ndarray (average residence time series in HOURS)
+
+    Uses compute_dynamic_empirical_series(df, metrics.times) for W*(t).
+    Writes: timestamp_residence_vs_sojourn_stack.png
+    """
+    out_dir = ensure_output_dir(out_dir)
+    caption = (filter_result.display if filter_result else None)
+
+    out_path = os.path.join(out_dir, "timestamp_residence_vs_sojourn_stack.png")
+    draw_residence_vs_sojourn_stack(
+        metrics.times,
+        metrics.w,            # w(T) [hrs] aligned to times
+        df,
+        title="Residence vs Sojourn: Convergence and Scatter",
+        out_path=out_path,
+        caption=caption,
+    )
+    return [out_path]
+
 def _clip_axis_to_percentile(ax: plt.Axes,
                              times: List[pd.Timestamp],
                              values: np.ndarray,
