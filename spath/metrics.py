@@ -29,7 +29,7 @@ def compute_sample_path_metrics(
     Outputs (aligned to sorted sample_times)
     -------
     T_sorted : list[pd.Timestamp]
-    L(T)     : np.ndarray  (processes)            time-average WIP since t0
+    L(T)     : np.ndarray  (processes)            Time-Average WIP since t0
     Lambda(T): np.ndarray  (processes/hour)       average arrival rate since t0
     w(T)     : np.ndarray  (hours)                finite-window average residence contribution per arrival
     N(T)     : np.ndarray  (processes)            number in system right after events ≤ T

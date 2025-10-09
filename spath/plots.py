@@ -253,7 +253,7 @@ def draw_line_chart_with_scatter(times: List[pd.Timestamp],
                                  out_path: str,
                                  scatter_times: List[pd.Timestamp],
                                  scatter_values: np.ndarray,
-                                 line_label: str = 'average residence time',
+                                 line_label: str = 'Average Residence Time',
                                  scatter_label: str = "element sojourn time",
                                  unit: str = "timestamp",
                                  caption: Optional[str] = None
@@ -688,7 +688,7 @@ def plot_arrival_departure_convergence(
       - metrics.times                : List[pd.Timestamp]
       - metrics.Arrivals             : cumulative arrivals A(t)
       - metrics.Departures           : cumulative departures D(t)
-      - metrics.Lambda               : cumulative arrival rate Λ(T) [1/hr]
+      - metrics.Lambda               : Cumulative Arrival Rate Λ(T) [1/hr]
 
     Returns list of written image paths.
     """
@@ -725,7 +725,7 @@ def draw_residence_vs_sojourn_stack(
     caption: Optional[str] = None,
 ) -> None:
     """
-    Top panel:  w(T) vs W*(t)  — average residence time vs empirical average sojourn time
+    Top panel:  w(T) vs W*(t)  — Average Residence Time vs empirical average sojourn time
     Bottom:     Sojourn-time scatter vs w(T)
 
     Assumptions:
@@ -763,7 +763,7 @@ def draw_residence_vs_sojourn_stack(
     # Panel 2: Sojourn scatter vs w(T)
     if len(soj_times) > 0:
         axes[1].scatter(soj_times, soj_vals_h, s=18, alpha=0.55, label='element sojourn time')
-    axes[1].plot(times, w_series_hours, label='average residence time', zorder=3)
+    axes[1].plot(times, w_series_hours, label='Average Residence Time', zorder=3)
     axes[1].set_title('Element sojourn time vs Average residence time')
     axes[1].set_ylabel('Time [hrs]')
     axes[1].legend(loc='best')
@@ -792,7 +792,7 @@ def plot_residence_vs_sojourn_stack(
 
     Expects from FlowMetricsResult:
       • metrics.times              : List[pd.Timestamp]
-      • metrics.w                  : np.ndarray (average residence time series in HOURS)
+      • metrics.w                  : np.ndarray (Average Residence Time series in HOURS)
 
     Uses compute_dynamic_empirical_series(df, metrics.times) for W*(t).
     Writes: timestamp_residence_vs_sojourn_stack.png
@@ -1045,17 +1045,17 @@ def draw_four_panel_column(times: List[pd.Timestamp],
     fig, axes = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
 
     axes[0].step(times, N_vals, where='post', label='N(t)')
-    axes[0].set_title('N(t) — active elements')
+    axes[0].set_title('N(t) — Sample Path')
     axes[0].set_ylabel('N(t)')
     axes[0].legend()
 
     axes[1].plot(times, L_vals, label='L(T)')
-    axes[1].set_title('L(T) — time-average of N(t)')
+    axes[1].set_title('L(T) — Time-Average of N(t)')
     axes[1].set_ylabel('L(T)')
     axes[1].legend()
 
     axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
-    axes[2].set_title('Λ(T) — cumulative arrival rate')
+    axes[2].set_title('Λ(T) — Cumulative Arrival Rate')
     axes[2].set_ylabel('Λ(T) [1/hr]')
     axes[2].legend()
     _clip_axis_to_percentile(axes[2], times, Lam_vals,
@@ -1064,7 +1064,7 @@ def draw_four_panel_column(times: List[pd.Timestamp],
                              warmup_hours=lambda_warmup_hours)
 
     axes[3].plot(times, w_vals, label='w(T) [hrs]')
-    axes[3].set_title('w(T) — average residence time')
+    axes[3].set_title('w(T) — Average Residence Time')
     axes[3].set_ylabel('w(T) [hrs]')
     axes[3].set_xlabel('Date')
     axes[3].legend()
@@ -1103,17 +1103,17 @@ def draw_five_panel_column(times: List[pd.Timestamp],
     fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
 
     axes[0].step(times, N_vals, where='post', label='N(t)')
-    axes[0].set_title('N(t) — active elements')
+    axes[0].set_title('N(t) — Sample Path')
     axes[0].set_ylabel('N(t)')
     axes[0].legend()
 
     axes[1].plot(times, L_vals, label='L(T)')
-    axes[1].set_title('L(T) — time-average of N(t)')
+    axes[1].set_title('L(T) — Time-Average of N(t)')
     axes[1].set_ylabel('L(T)')
     axes[1].legend()
 
     axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
-    axes[2].set_title('Λ(T) — cumulative arrival rate')
+    axes[2].set_title('Λ(T) — Cumulative Arrival Rate')
     axes[2].set_ylabel('Λ(T) [1/hr]')
     axes[2].legend()
     _clip_axis_to_percentile(axes[2], times, Lam_vals,
@@ -1124,7 +1124,7 @@ def draw_five_panel_column(times: List[pd.Timestamp],
     axes[3].plot(times, w_vals, label='w(T) [hrs]')
     if scatter_times is not None and scatter_values is not None and len(scatter_times) > 0:
         axes[3].scatter(scatter_times, scatter_values, s=16, alpha=0.6, marker='o', label=scatter_label)
-    axes[3].set_title('w(T) — average residence time')
+    axes[3].set_title('w(T) — Average Residence Time')
     axes[3].set_ylabel('w(T) [hrs]')
     axes[3].legend()
 
@@ -1160,17 +1160,17 @@ def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
     fig, axes = plt.subplots(5, 1, figsize=(12, 14), sharex=True)
 
     axes[0].step(times, N_vals, where='post', label='N(t)')
-    axes[0].set_title('N(t) — active elements')
+    axes[0].set_title('N(t) — Sample Path')
     axes[0].set_ylabel('N(t)')
     axes[0].legend()
 
     axes[1].plot(times, L_vals, label='L(T)')
-    axes[1].set_title('L(T) — time-average of N(t)')
+    axes[1].set_title('L(T) — Time-Average of N(t)')
     axes[1].set_ylabel('L(T)')
     axes[1].legend()
 
     axes[2].plot(times, Lam_vals, label='Λ(T) [1/hr]')
-    axes[2].set_title('Λ(T) — cumulative arrival rate')
+    axes[2].set_title('Λ(T) — Cumulative Arrival Rate')
     axes[2].set_ylabel('Λ(T) [1/hr]')
     axes[2].legend()
     _clip_axis_to_percentile(axes[2], times, Lam_vals,
@@ -1179,7 +1179,7 @@ def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
                              warmup_hours=lambda_warmup_hours)
 
     axes[3].plot(times, w_vals, label='w(T) [hrs]')
-    axes[3].set_title('w(T) — average residence time (plain, own scale)')
+    axes[3].set_title('w(T) — Average Residence Time (plain, own scale)')
     axes[3].set_ylabel('w(T) [hrs]')
     axes[3].legend()
 
