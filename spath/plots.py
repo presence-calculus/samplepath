@@ -1368,18 +1368,28 @@ def plot_rate_stability_charts(
     title_prefix = getattr(filter_result, "title_prefix", None)
     caption_text = getattr(filter_result, "display", None)
 
-    # --------------------- Chart 1: N(T)/T ---------------------
+    # --------------------- Chart 1: N(t) sample path + N(T)/T ---------------------
     out_path_N = os.path.join(out_dir, "timestamp_rate_stability_n.png")
-    fig, ax = plt.subplots(figsize=(10, 5.2))
-    ax.plot(times, N_over_T, label="N(T)/T", linewidth=1.9, zorder=3)
-    ax.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    ax.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)  # reference guide
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 7.8), sharex=True)
 
+    # Top: N(t) sample path (step plot)
+    ax_top = axes[0]
+    ax_top.step(times, N_raw, where='post', label='N(t)', linewidth=1.5)
+    ax_top.set_ylabel('count')
+    ax_top.set_title('N(t) — Sample Path')
+    ax_top.legend(loc='best')
+    _format_date_axis(ax_top)
+
+    # Bottom: WIP Growth Rate N(T)/T
+    ax = axes[1]
+    ax.plot(times, N_over_T, label='N(t)/T', linewidth=1.9, zorder=3)
+    ax.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
+    ax.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=':', zorder=1)
     _format_date_axis(ax)
-    ax.set_xlabel("time")
-    ax.set_ylabel("rate")
-    ax.set_title(f"{title_prefix}: N(T)/T" if title_prefix else "N(T)/T")
-    ax.legend(loc="best")
+    ax.set_xlabel('time')
+    ax.set_ylabel('rate')
+    ax.set_title(f"{title_prefix}: WIP Growth Rate - N(t)/T" if title_prefix else 'WIP Growth Rate - N(t)/T')
+    ax.legend(loc='best')
 
     finite_vals_N = N_over_T[np.isfinite(N_over_T)]
     if finite_vals_N.size:
@@ -1402,7 +1412,7 @@ def plot_rate_stability_charts(
     _format_date_axis(ax)
     ax.set_xlabel("time")
     ax.set_ylabel("rate")
-    ax.set_title(f"{title_prefix}: R(T)/T" if title_prefix else "R(T)/T")
+    ax.set_title(f"{title_prefix}: Total Age Growth Rate - R(T)/T" if title_prefix else "Total Age Growth Rate - R(T)/T")
     ax.legend(loc="best")
 
     finite_vals_R = R_over_T[np.isfinite(R_over_T)]
@@ -1427,7 +1437,7 @@ def plot_rate_stability_charts(
     axN.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)
     _format_date_axis(axN)
     axN.set_ylabel("rate")
-    axN.set_title("N(T)/T")
+    axN.set_title("WIP Growth Rate: N(T)/T")
     axN.legend(loc="best")
     if finite_vals_N.size:
         topN = float(np.nanpercentile(finite_vals_N, 99.5))
@@ -1441,7 +1451,7 @@ def plot_rate_stability_charts(
     axR.axhline(1.0, linewidth=1.0, alpha=0.35, linestyle=":", zorder=1)
     _format_date_axis(axR)
     axR.set_ylabel("rate")
-    axR.set_title("R(T)/T")
+    axR.set_title("Total Age Growth Rate: R(T)/T")
     axR.legend(loc="best")
     if finite_vals_R.size:
         topR = float(np.nanpercentile(finite_vals_R, 99.5))
