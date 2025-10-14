@@ -186,16 +186,16 @@ def plot_core_flow_metrics(
     metrics: FlowMetricsResult,
     out_dir: str,
 ) -> List[str]:
-    out_dir = ensure_output_dirs(out_dir)
+    core_dir = os.path.join(out_dir, "core")
     filter_label = filter_result.label if filter_result else ""
     note = f"Filters: {filter_label}"
 
-    path_N = os.path.join(out_dir, "timestamp_N.png")
+    path_N = os.path.join(core_dir, "timestamp_N.png")
     draw_step_chart(
-        metrics.times, metrics.N, "N(t) — Active elements", "N(t)", path_N, caption=note
+        metrics.times, metrics.N, "N(t) — Sample Path", "N(t)", path_N, caption=note
     )
 
-    path_L = os.path.join(out_dir, "timestamp_L.png")
+    path_L = os.path.join(core_dir, "timestamp_L.png")
     draw_line_chart(
         metrics.times,
         metrics.L,
@@ -205,7 +205,7 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    path_Lam = os.path.join(out_dir, "timestamp_Lambda.png")
+    path_Lam = os.path.join(core_dir, "timestamp_Lambda.png")
     draw_lambda_chart(
         metrics.times,
         metrics.Lambda,
@@ -218,7 +218,7 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    path_w = os.path.join(out_dir, "timestamp_w.png")
+    path_w = os.path.join(core_dir, "timestamp_w.png")
     draw_line_chart(
         metrics.times,
         metrics.w,
@@ -228,7 +228,7 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    path_LLw = os.path.join(out_dir, "timestamp_LLw.png")
+    path_LLw = os.path.join(core_dir, "timestamp_LLw.png")
     draw_L_vs_Lambda_w(
         metrics.times,
         metrics.L,
@@ -239,7 +239,7 @@ def plot_core_flow_metrics(
         caption=note
     )
 
-    path_little_law = os.path.join(out_dir, "timestamp_little_law.png")
+    path_little_law = os.path.join(core_dir, "timestamp_little_law.png")
     draw_L_vs_lambdaW(df, metrics.times, metrics.L, "Little's Law Empirical Convergence", out_path=path_little_law,
                       caption=note)
     return [path_N, path_L, path_Lam, path_w, path_LLw, path_little_law]
@@ -1222,10 +1222,10 @@ def ensure_output_dirs(csv_path: str) -> str:
     stem = os.path.splitext(base)[0]
     out_dir = os.path.join("charts", stem)
     os.makedirs(out_dir, exist_ok=True)
-    stacks_dir = os.path.join(out_dir, "panels")
-    os.makedirs(stacks_dir, exist_ok=True)
-    stacks_dir = os.path.join(out_dir, "stacks")
-    os.makedirs(stacks_dir, exist_ok=True)
+    for dir in ['core', 'convergence', 'stability', 'advanced', 'misc']:
+        sub_dir = os.path.join(out_dir, dir)
+        os.makedirs(sub_dir, exist_ok=True)
+
     return out_dir
 
 
@@ -1297,7 +1297,7 @@ def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
 
 
 def plot_core_metrics_stack(args, filter_result, metrics, out_dir):
-    four_col_stack = os.path.join(out_dir, 'timestamp_stack.png')
+    four_col_stack = os.path.join(out_dir, 'core/timestamp_stack.png')
     draw_four_panel_column(metrics.times, metrics.N, metrics.L, metrics.Lambda, metrics.w,
                            f'Sample Path Flow Metrics', four_col_stack, args.lambda_pctl,
                            args.lambda_lower_pctl, args.lambda_warmup, caption=f"{filter_result.display}")
@@ -1308,25 +1308,25 @@ def plot_five_column_stacks(df, args, filter_result, metrics, out_dir):
     t_scatter_times = df["start_ts"].tolist()
     t_scatter_vals = df["duration_hr"].to_numpy()
     written = []
-    if args.with_A:
-        col_ts5 = os.path.join(out_dir, 'timestamp_stack_with_A.png')
-        draw_five_panel_column(metrics.times, metrics.N, metrics.Lambda, metrics.Lambda, metrics.w, metrics.A,
-                               f'Finite-window metrics incl. A(T) (timestamp, {filter_result.label})', col_ts5,
-                               scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
-                               lambda_pctl_upper=args.lambda_pctl, lambda_pctl_lower=args.lambda_lower_pctl,
-                               lambda_warmup_hours=args.lambda_warmup)
-        written.append(col_ts5)
 
-    elif args.scatter:
-        col_ts5s = os.path.join(out_dir, 'timestamp_stack_with_scatter.png')
-        draw_five_panel_column_with_scatter(metrics.times, metrics.N, metrics.L, metrics.Lambda, metrics.w,
-                                            f'Finite-window metrics with w(T) plain + w(T)+scatter (timestamp, {filter_result.label})',
-                                            col_ts5s,
-                                            scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
-                                            lambda_pctl_upper=args.lambda_pctl,
-                                            lambda_pctl_lower=args.lambda_lower_pctl,
-                                            lambda_warmup_hours=args.lambda_warmup)
-        written.append(col_ts5s)
+    col_ts5 = os.path.join(out_dir, 'misc/timestamp_stack_with_A.png')
+    draw_five_panel_column(metrics.times, metrics.N, metrics.Lambda, metrics.Lambda, metrics.w, metrics.A,
+                           f'Finite-window metrics incl. A(T) (timestamp, {filter_result.label})', col_ts5,
+                           scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
+                           lambda_pctl_upper=args.lambda_pctl, lambda_pctl_lower=args.lambda_lower_pctl,
+                           lambda_warmup_hours=args.lambda_warmup)
+    written.append(col_ts5)
+
+
+    col_ts5s = os.path.join(out_dir, 'misc/timestamp_stack_with_scatter.png')
+    draw_five_panel_column_with_scatter(metrics.times, metrics.N, metrics.L, metrics.Lambda, metrics.w,
+                                        f'Finite-window metrics with w(T) plain + w(T)+scatter (timestamp, {filter_result.label})',
+                                        col_ts5s,
+                                        scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
+                                        lambda_pctl_upper=args.lambda_pctl,
+                                        lambda_pctl_lower=args.lambda_lower_pctl,
+                                        lambda_warmup_hours=args.lambda_warmup)
+    written.append(col_ts5s)
 
     return written
 
