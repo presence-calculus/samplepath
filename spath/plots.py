@@ -178,7 +178,7 @@ def draw_lambda_chart(
 # ── Higher-level plotting functions (unchanged except captions fixed) ─────────
 
 
-def plot_core_flow_metrics(
+def plot_core_flow_metrics_charts(
     df: pd.DataFrame,
     args,
     filter_result: Optional[FilterResult],
@@ -244,7 +244,7 @@ def plot_core_flow_metrics(
     path_sample_path_analysis = plot_core_sample_path_analysis_stack(args, filter_result, metrics, out_dir)
     return [path_N, path_L, path_Lam, path_w, path_invariant, path_sample_path_analysis, path_w_scatter]
 
-def plot_convergence_metrics(
+def plot_convergence_charts(
     df: pd.DataFrame,
     args,
     filter_result: Optional[FilterResult],
@@ -261,8 +261,28 @@ def plot_convergence_metrics(
 
     written += plot_sample_path_convergence(df, args, filter_result, metrics, out_dir)
 
+    return written
 
+def plot_stability_charts(
+    df: pd.DataFrame,
+    args,
+    filter_result: Optional[FilterResult],
+    metrics: FlowMetricsResult,
+    out_dir: str,
+) -> List[str]:
+    written = []
+    written += plot_rate_stability_charts(df, args, filter_result, metrics, out_dir)
+    return written
 
+def plot_advanced_charts(
+    df: pd.DataFrame,
+    args,
+    filter_result: Optional[FilterResult],
+    metrics: FlowMetricsResult,
+    out_dir: str,
+) -> List[str]:
+    written = []
+    written += plot_llaw_manifold_3d(df, metrics, out_dir)
     return written
 
 def plot_misc_charts(df: pd.DataFrame,
@@ -1390,7 +1410,7 @@ def plot_rate_stability_charts(
     caption_text = getattr(filter_result, "display", None)
 
     # --------------------- Chart 1: N(t) sample path + N(T)/T ---------------------
-    out_path_N = os.path.join(out_dir, "timestamp_rate_stability_n.png")
+    out_path_N = os.path.join(out_dir, "stability/panels/wip_growth_rate.png")
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 7.8), sharex=True)
 
     # Top: N(t) sample path (step plot)
@@ -1424,7 +1444,7 @@ def plot_rate_stability_charts(
     written.append(out_path_N)
 
     # --------------------- Chart 2: R(t) sample path + R(T)/T ---------------------
-    out_path_R = os.path.join(out_dir, "timestamp_rate_stability_r.png")
+    out_path_R = os.path.join(out_dir, "stability/panels/total_age_growth_rate.png")
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 7.8), sharex=True)
 
     # Top: R(t) — total age of WIP at time t
@@ -1460,7 +1480,7 @@ def plot_rate_stability_charts(
     written.append(out_path_R)
 
     # --------------------- 4-row stack: Equilibrium and Coherence --------------
-    out_path_stack = os.path.join(out_dir, "timestamp_rate_stability_stack.png")
+    out_path_stack = os.path.join(out_dir, "stability/rate_stability.png")
     fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(12, 13.5), sharex=True)
 
     # Panel 1: N(T)/T
@@ -1649,7 +1669,7 @@ def plot_llaw_manifold_3d(
         ax.set_zlim(z_lo, z_hi)
 
     plt.tight_layout()
-    out_path = os.path.join(out_dir, "timestamp_manifold3D_log.png")
+    out_path = os.path.join(out_dir, "advanced/invariant_manifold3D_log.png")
     fig.savefig(out_path, dpi=180, bbox_inches="tight")
     plt.close(fig)
 

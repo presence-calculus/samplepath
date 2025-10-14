@@ -19,8 +19,8 @@ from filter import FilterResult, apply_filters
 from metrics import compute_finite_window_flow_metrics, FlowMetricsResult
 from point_process import to_arrival_departure_process
 from spath.file_utils import ensure_output_dirs
-from spath.plots import plot_core_flow_metrics, plot_convergence_metrics, \
-    plot_rate_stability_charts, plot_llaw_manifold_3d, plot_misc_charts
+from spath.plots import plot_core_flow_metrics_charts, plot_convergence_charts, \
+    plot_misc_charts, plot_advanced_charts, plot_stability_charts
 
 
 # -------------------------------
@@ -55,15 +55,13 @@ def produce_all_charts(csv_path: str,
     written: List[str] = []
 
     # create plots
-    written += plot_core_flow_metrics(df, args, filter_result, metrics, out_dir)
+    written += plot_core_flow_metrics_charts(df, args, filter_result, metrics, out_dir)
 
-    written += plot_convergence_metrics(df, args, filter_result, metrics, out_dir)
+    written += plot_convergence_charts(df, args, filter_result, metrics, out_dir)
 
+    written += plot_stability_charts(df, args, filter_result, metrics, out_dir)
 
-    written += plot_rate_stability_charts(df, args, filter_result, metrics, out_dir)
-
-
-    written += plot_llaw_manifold_3d(df, metrics, out_dir)
+    written += plot_advanced_charts(df, args, filter_result, metrics, out_dir)
 
     written += plot_misc_charts(df, args, filter_result, metrics, out_dir)
 
