@@ -978,7 +978,7 @@ def plot_sample_path_convergence(
 
     Outputs:
       • PNG: timestamp_sample_path_coherence.png
-      • TXT: ll_empirical_coherence_summary.txt
+
     """
 
     caption = (filter_result.display if filter_result else None)
@@ -1007,18 +1007,13 @@ def plot_sample_path_convergence(
         horizon_days=horizon_days,
     )
 
-    # write a small summary alongside
-    txt_path = os.path.join(out_dir, "ll_sample_path_coherence_summary.txt")
-    with open(txt_path, "w") as f:
-        if np.isnan(score):
-            f.write(f"Sample Path Coherence: ε={epsilon}, H={horizon_days}d -> n/a (no valid points)\n")
-        else:
-            f.write(
-                f"Sample Path Coherence: ε={epsilon}, H={horizon_days}d -> "
-                f"{ok_count}/{total_count} ({score*100:.1f}%)\n"
-            )
-
-    return [png_path, txt_path]
+    # wri
+    if np.isnan(score):
+        print(f"Sample Path Convergence: ε={epsilon}, H={horizon_days}d -> n/a (no valid points)\n")
+    else:
+        print(f"Sample Path Convergence: ε={epsilon}, H={horizon_days}d -> "
+                f"{ok_count}/{total_count} ({score*100:.1f}%)\n")
+    return [png_path]
 
 def _clip_axis_to_percentile(ax: plt.Axes,
                              times: List[pd.Timestamp],
@@ -1319,15 +1314,6 @@ def plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, m
             lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
             lambda_warmup_hours=lambda_warmup_hours)
         written.append(ts_conv_dyn4)
-
-        # Write coherence summary (and print)
-        if coh_summary_lines:
-            txt_path = os.path.join(out_dir, "coherence_summary.txt")
-            with open(txt_path, "w") as f:
-                for line in coh_summary_lines:
-                    f.write(line + "\n")
-            print("\n".join(coh_summary_lines))
-            written.append(txt_path)
 
     return written
 
