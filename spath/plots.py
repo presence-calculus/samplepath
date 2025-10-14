@@ -3,13 +3,12 @@
 # SPDX-License-Identifier: MIT
 import os
 from typing import List, Optional, Tuple, Sequence
-
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
-from mpl_toolkits.mplot3d import Axes3D
+
 
 from spath.filter import FilterResult
 from spath.metrics import FlowMetricsResult, compute_dynamic_empirical_series, compute_tracking_errors, \
@@ -190,12 +189,12 @@ def plot_core_flow_metrics(
     filter_label = filter_result.label if filter_result else ""
     note = f"Filters: {filter_label}"
 
-    path_N = os.path.join(core_dir, "timestamp_N.png")
+    path_N = os.path.join(core_dir, "N.png")
     draw_step_chart(
         metrics.times, metrics.N, "N(t) — Sample Path", "N(t)", path_N, caption=note
     )
 
-    path_L = os.path.join(core_dir, "timestamp_L.png")
+    path_L = os.path.join(core_dir, "L.png")
     draw_line_chart(
         metrics.times,
         metrics.L,
@@ -205,7 +204,7 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    path_Lam = os.path.join(core_dir, "timestamp_Lambda.png")
+    path_Lam = os.path.join(core_dir, "Lambda.png")
     draw_lambda_chart(
         metrics.times,
         metrics.Lambda,
@@ -218,7 +217,7 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    path_w = os.path.join(core_dir, "timestamp_w.png")
+    path_w = os.path.join(core_dir, "w.png")
     draw_line_chart(
         metrics.times,
         metrics.w,
@@ -228,21 +227,17 @@ def plot_core_flow_metrics(
         caption=note,
     )
 
-    path_LLw = os.path.join(core_dir, "timestamp_LLw.png")
+    path_invariant = os.path.join(core_dir, "ll_invariant.png")
     draw_L_vs_Lambda_w(
         metrics.times,
         metrics.L,
         metrics.Lambda,
         metrics.w,
         title="L(T) vs Λ(T).w(T)",
-        out_path=path_LLw,
+        out_path=path_invariant,
         caption=note
     )
-
-    path_little_law = os.path.join(core_dir, "timestamp_little_law.png")
-    draw_L_vs_lambdaW(df, metrics.times, metrics.L, "Little's Law Empirical Convergence", out_path=path_little_law,
-                      caption=note)
-    return [path_N, path_L, path_Lam, path_w, path_LLw, path_little_law]
+    return [path_N, path_L, path_Lam, path_w, path_invariant]
 
 
 
@@ -692,7 +687,7 @@ def plot_arrival_departure_convergence(
 
     Returns list of written image paths.
     """
-    out_dir = ensure_output_dirs(out_dir)
+
     caption = (filter_result.display if filter_result else None)
 
     pctl_upper = getattr(args, "lambda_pctl", None)
@@ -797,7 +792,7 @@ def plot_residence_vs_sojourn_stack(
     Uses compute_dynamic_empirical_series(df, metrics.times) for W*(t).
     Writes: timestamp_residence_vs_sojourn_stack.png
     """
-    out_dir = ensure_output_dirs(out_dir)
+    
     caption = (filter_result.display if filter_result else None)
 
     out_path = os.path.join(out_dir, "timestamp_residence_vs_sojourn_stack.png")
@@ -932,7 +927,7 @@ def plot_sample_path_coherence(
       • PNG: timestamp_sample_path_coherence.png
       • TXT: ll_empirical_coherence_summary.txt
     """
-    out_dir = ensure_output_dirs(out_dir)
+
     caption = (filter_result.display if filter_result else None)
 
     # derive W*(t), λ*(t) aligned to times
@@ -1215,18 +1210,6 @@ def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
     plt.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(out_path)
     plt.close(fig)
-
-
-def ensure_output_dirs(csv_path: str) -> str:
-    base = os.path.basename(csv_path)
-    stem = os.path.splitext(base)[0]
-    out_dir = os.path.join("charts", stem)
-    os.makedirs(out_dir, exist_ok=True)
-    for dir in ['core', 'convergence', 'stability', 'advanced', 'misc']:
-        sub_dir = os.path.join(out_dir, dir)
-        os.makedirs(sub_dir, exist_ok=True)
-
-    return out_dir
 
 
 def plot_coherence_charts(df, args, filter_result, metrics, out_dir):

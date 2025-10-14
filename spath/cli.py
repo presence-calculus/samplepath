@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import sys
+from pathlib import Path
 
 def validate_args(args):
     error = False
@@ -44,6 +45,10 @@ def parse_args():
     parser.add_argument("--horizon-days", type=float, default=28.0,
                         help="Minimum horizon in days when assessing coherence (default 28)")
     parser.add_argument("csv", type=str, help="Path to CSV (id,start_ts,end_ts[,class])")
+
+    parser.add_argument("--output-dir", type=lambda p: Path(p).expanduser().resolve(), default='charts',  help="Root directory where charts will be written")
+
+    parser.add_argument("--clean", action="store_true", default=False, help="removing existing charts in output directory")
 
     parser.add_argument(
         "--date-format",
