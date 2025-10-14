@@ -185,7 +185,7 @@ def plot_core_flow_metrics_charts(
     metrics: FlowMetricsResult,
     out_dir: str,
 ) -> List[str]:
-    core_panels_dir = os.path.join(out_dir, "core/panels")
+    core_panels_dir = os.path.join(out_dir, "core")
     filter_label = filter_result.label if filter_result else ""
     note = f"Filters: {filter_label}"
 
