@@ -244,7 +244,35 @@ def plot_core_flow_metrics(
     path_sample_path_analysis = plot_core_sample_path_analysis_stack(args, filter_result, metrics, out_dir)
     return [path_N, path_L, path_Lam, path_w, path_invariant, path_sample_path_analysis, path_w_scatter]
 
+def plot_convergence_metrics(
+    df: pd.DataFrame,
+    args,
+    filter_result: Optional[FilterResult],
+    metrics: FlowMetricsResult,
+    out_dir: str,
+) -> List[str]:
+    written = []
 
+    written += plot_arrival_departure_convergence(args, filter_result, metrics, out_dir)
+
+    written += plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, metrics, out_dir)
+
+    written += plot_residence_vs_sojourn_stack(df, args, filter_result, metrics, out_dir)
+
+    written += plot_sample_path_convergence(df, args, filter_result, metrics, out_dir)
+
+
+
+    return written
+
+def plot_misc_charts(df: pd.DataFrame,
+    args,
+    filter_result: Optional[FilterResult],
+    metrics: FlowMetricsResult,
+    out_dir: str,
+) -> List[str]:
+    # 5-panel stacks including scatter
+    return  plot_five_column_stacks(df, args, filter_result, metrics, out_dir)
 
 def draw_line_chart_with_scatter(times: List[pd.Timestamp],
                                  values: np.ndarray,
@@ -682,7 +710,7 @@ def plot_arrival_departure_convergence(
     out_dir: str,
 ) -> List[str]:
     """
-    Orchestrator mirroring your other plot_* wrappers.
+
 
     Inputs expected from FlowMetricsResult:
       - metrics.times                : List[pd.Timestamp]
@@ -699,13 +727,13 @@ def plot_arrival_departure_convergence(
     pctl_lower = getattr(args, "lambda_lower_pctl", None)
     warmup_hrs = getattr(args, "lambda_warmup", None)
 
-    out_path = os.path.join(out_dir, "timestamp_arrival_departure_convergence_stack.png")
+    out_path = os.path.join(out_dir, "convergence/arrival_departure_equilibrium.png")
     draw_arrival_departure_convergence_stack(
         metrics.times,
         metrics.Arrivals,
         metrics.Departures,
         metrics.Lambda,
-        title="λ equals Throughput (Stable Systems)",
+        title="Floqw Equilibrium: Arrival/Departure Convergence",
         out_path=out_path,
         lambda_pctl_upper=pctl_upper,
         lambda_pctl_lower=pctl_lower,
@@ -800,12 +828,12 @@ def plot_residence_vs_sojourn_stack(
     
     caption = (filter_result.display if filter_result else None)
 
-    out_path = os.path.join(out_dir, "timestamp_residence_vs_sojourn_stack.png")
+    out_path = os.path.join(out_dir, "convergence/residence_sojourn_coherence.png")
     draw_residence_vs_sojourn_stack(
         metrics.times,
         metrics.w,            # w(T) [hrs] aligned to times
         df,
-        title="Residence vs Sojourn: Convergence and Scatter",
+        title="Flow Coherence: Residence Time/Sojourn Time Convergence",
         out_path=out_path,
         caption=caption,
     )
@@ -909,7 +937,7 @@ def draw_ll_scatter_coherence(
     return score, ok_count, total_count
 
 
-def plot_sample_path_coherence(
+def plot_sample_path_convergence(
     df: pd.DataFrame,
     args,
     filter_result: Optional[FilterResult],
@@ -946,7 +974,7 @@ def plot_sample_path_coherence(
     horizon_days = getattr(args, "horizon_days", 28)
 
 
-    png_path = os.path.join(out_dir, "timestamp_sample_path_coherence.png")
+    png_path = os.path.join(out_dir, "convergence/sample_path_convergence.png")
     score, ok_count, total_count = draw_ll_scatter_coherence(
         metrics.L,
         lam_star,
@@ -954,7 +982,7 @@ def plot_sample_path_coherence(
         metrics.times,
         epsilon=epsilon,
         out_png=png_path,
-        title="Sample Path Coherence: L(T) vs λ*(t)·W*(t)",
+        title="Sample Path Convergence: L(T) vs λ*(t)·W*(t)",
         caption=caption,
         horizon_days=horizon_days,
     )
@@ -1217,7 +1245,7 @@ def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
     plt.close(fig)
 
 
-def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
+def plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, metrics, out_dir):
     # Empirical targets & dynamic baselines
     horizon_days = args.horizon_days
     epsilon = args.epsilon
@@ -1243,7 +1271,7 @@ def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
             f"Coherence (timestamp): eps={epsilon:g}, H={horizon_days:g}d -> {ok_ts}/{tot_ts} ({(sc_ts * 100 if sc_ts == sc_ts else 0):.1f}%)")
     # Convergence diagnostics (timestamp)
     if len(metrics.times) > 0:
-        ts_conv_dyn = os.path.join(out_dir, 'timestamp_convergence_dynamic.png')
+        ts_conv_dyn = os.path.join(out_dir, 'convergence/panels/residence_time_sojourn_time_convergence.png')
         draw_dynamic_convergence_panel(metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts,
                                        f"Little's Law Empirical Convergence", ts_conv_dyn,
                                        lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
@@ -1251,10 +1279,10 @@ def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
                                        caption=filter_result.display)
         written.append(ts_conv_dyn)
 
-        ts_conv_dyn3 = os.path.join(out_dir, 'timestamp_convergence_dynamic_errors.png')
+        ts_conv_dyn3 = os.path.join(out_dir, 'advanced/residence_convergence_errors.png')
         draw_dynamic_convergence_panel_with_errors(metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts,
                                                    eW_ts, eLam_ts, epsilon,
-                                                   f'Dynamic convergence + errors (timestamp, {mode_label})',
+                                                   f'Residence time convergence + errors (timestamp, {mode_label})',
                                                    ts_conv_dyn3, lambda_pctl_upper=lambda_pctl_upper,
                                                    lambda_pctl_lower=lambda_pctl_lower,
                                                    lambda_warmup_hours=lambda_warmup_hours)
@@ -1263,11 +1291,11 @@ def plot_coherence_charts(df, args, filter_result, metrics, out_dir):
     rA_ts, rB_ts, rho_ts = compute_end_effect_series(df, metrics.times, metrics.A, W_star_ts) if len(
         metrics.times) > 0 else (np.array([]), np.array([]), np.array([]))
     if len(metrics.times) > 0:
-        ts_conv_dyn4 = os.path.join(out_dir, 'timestamp_convergence_dynamic_errors_endeffects.png')
+        ts_conv_dyn4 = os.path.join(out_dir, 'advanced/residence_time_convergence_errors_endeffects.png')
         draw_dynamic_convergence_panel_with_errors_and_endeffects(
             metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts, eW_ts, eLam_ts,
             rA_ts, rB_ts, rho_ts, epsilon,
-            f'Dynamic convergence + errors + end-effects (timestamp, {mode_label})', ts_conv_dyn4,
+            f'Residence time convergence + errors + end-effects (timestamp, {mode_label})', ts_conv_dyn4,
             lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
             lambda_warmup_hours=lambda_warmup_hours)
         written.append(ts_conv_dyn4)

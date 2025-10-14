@@ -19,9 +19,8 @@ from filter import FilterResult, apply_filters
 from metrics import compute_finite_window_flow_metrics, FlowMetricsResult
 from point_process import to_arrival_departure_process
 from spath.file_utils import ensure_output_dirs
-from spath.plots import plot_core_flow_metrics, plot_coherence_charts, \
-    plot_five_column_stacks, plot_rate_stability_charts, plot_llaw_manifold_3d, plot_arrival_departure_convergence, \
-    plot_residence_vs_sojourn_stack, plot_sample_path_coherence
+from spath.plots import plot_core_flow_metrics, plot_convergence_metrics, \
+    plot_rate_stability_charts, plot_llaw_manifold_3d, plot_misc_charts
 
 
 # -------------------------------
@@ -58,20 +57,16 @@ def produce_all_charts(csv_path: str,
     # create plots
     written += plot_core_flow_metrics(df, args, filter_result, metrics, out_dir)
 
-    # 5-panel stacks including scatter
-    plot_five_column_stacks(df, args, filter_result, metrics, out_dir)
+    written += plot_convergence_metrics(df, args, filter_result, metrics, out_dir)
 
-    written += plot_coherence_charts(df, args, filter_result, metrics, out_dir)
-
-    written += plot_arrival_departure_convergence(args, filter_result, metrics, out_dir)
 
     written += plot_rate_stability_charts(df, args, filter_result, metrics, out_dir)
 
-    written += plot_residence_vs_sojourn_stack(df, args, filter_result, metrics, out_dir)
-
-    written += plot_sample_path_coherence(df, args, filter_result, metrics, out_dir)
 
     written += plot_llaw_manifold_3d(df, metrics, out_dir)
+
+    written += plot_misc_charts(df, args, filter_result, metrics, out_dir)
+
     return written
 
 
