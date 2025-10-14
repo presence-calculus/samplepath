@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-
+from spath.file_utils import ensure_output_dirs
 from spath.filter import FilterResult
 from spath.metrics import FlowMetricsResult, compute_dynamic_empirical_series, compute_tracking_errors, \
     compute_coherence_score, compute_end_effect_series, compute_total_active_age_series
@@ -1675,3 +1675,14 @@ def plot_llaw_manifold_3d(
 
     return [out_path]
 
+
+def produce_all_charts(df, csv_path, args, filter_result, metrics):
+    out_dir = ensure_output_dirs(csv_path, output_dir=args.output_dir, clean=args.clean)
+    written: List[str] = []
+    # create plots
+    written += plot_core_flow_metrics_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_convergence_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_stability_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_advanced_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_misc_charts(df, args, filter_result, metrics, out_dir)
+    return written

@@ -9,7 +9,7 @@ See README.md for context.
 
 import sys
 from argparse import Namespace
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import pandas as pd
 
@@ -18,72 +18,30 @@ from csv_loader import csv_to_dataframe
 from filter import FilterResult, apply_filters
 from metrics import compute_finite_window_flow_metrics, FlowMetricsResult
 from point_process import to_arrival_departure_process
-from spath.file_utils import ensure_output_dirs
-from spath.plots import plot_core_flow_metrics_charts, plot_convergence_charts, \
-    plot_misc_charts, plot_advanced_charts, plot_stability_charts
+from spath.plots import produce_all_charts
 
 
 # -------------------------------
 # Orchestration
 # -------------------------------
-def produce_all_charts(csv_path: str,
-                       args: Namespace,
-                       completed_only: bool = False,
-                       incomplete_only: bool = False,
-                       with_A: bool = False,
-                       with_daily_breakdown: bool = False,
-                       scatter: bool = False,
-                       epsilon: Optional[float] = None,
-                       horizon_days: Optional[float] = None,
-                       lambda_pctl_upper: Optional[float] = None,
-                       lambda_pctl_lower: Optional[float] = None,
-                       lambda_warmup_hours: Optional[float] = None,
-                       ) -> List[str]:
-
+def run_analysis(csv_path: str, args: Namespace) -> List[str]:
     df = csv_to_dataframe(csv_path, args=args)
-
     filter_result: FilterResult = apply_filters(df, args)
     df = filter_result.df
-    mode_label = filter_result.label
-
     # Build arrival departure process
     arrival_departure_process: List[Tuple[pd.Timestamp, int, int]] = to_arrival_departure_process(df)
     # Compute core finite window flow metrics
     metrics: FlowMetricsResult = compute_finite_window_flow_metrics(arrival_departure_process)
 
-    out_dir = ensure_output_dirs(csv_path, output_dir=args.output_dir, clean=args.clean)
-    written: List[str] = []
-
-    # create plots
-    written += plot_core_flow_metrics_charts(df, args, filter_result, metrics, out_dir)
-
-    written += plot_convergence_charts(df, args, filter_result, metrics, out_dir)
-
-    written += plot_stability_charts(df, args, filter_result, metrics, out_dir)
-
-    written += plot_advanced_charts(df, args, filter_result, metrics, out_dir)
-
-    written += plot_misc_charts(df, args, filter_result, metrics, out_dir)
-
-    return written
+    return produce_all_charts(df, csv_path, args, filter_result, metrics)
 
 
 def main():
     args = cli.parse_args()
     try:
-        paths = produce_all_charts(
+        paths = run_analysis(
             args.csv,
-            args,
-            completed_only=args.completed,
-            incomplete_only=args.incomplete,
-            with_A=args.with_A,
-            with_daily_breakdown=args.with_daily_breakdown,
-            scatter=args.scatter,
-            epsilon=args.epsilon,
-            horizon_days=args.horizon_days,
-            lambda_pctl_upper=args.lambda_pctl,
-            lambda_pctl_lower=args.lambda_lower_pctl,
-            lambda_warmup_hours=float(args.lambda_warmup)
+            args
         )
         print("Wrote charts:\n" + "\n".join(paths))
     except Exception as e:
