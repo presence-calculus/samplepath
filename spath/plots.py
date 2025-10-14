@@ -428,50 +428,33 @@ def draw_L_vs_lambdaW(
     plt.close(fig)
 
 
-def draw_convergence_panel(times: List[pd.Timestamp],
-                           w_vals: np.ndarray,
-                           lam_vals: np.ndarray,
-                           W_emp: float,
-                           lam_emp: float,
-                           title: str,
-                           out_path: str,
-                           lambda_pctl_upper: Optional[float] = None,
-                           lambda_pctl_lower: Optional[float] = None,
-                           lambda_warmup_hours: Optional[float] = None
-                           ) -> None:
-    fig, axes = plt.subplots(2, 1, figsize=(12, 6.5), sharex=True)
+def draw_residence_time_convergence_panel(times: List[pd.Timestamp],
+                                          w_vals: np.ndarray,
+                                          W_star: np.ndarray,
+                                          title: str,
+                                          out_path: str,
+                                          caption: Optional[str] = None
+                                          ) -> None:
+    fig, ax = plt.subplots(figsize=(12, 6.5))
 
-    axes[0].plot(times, w_vals, label='w(T) [hrs]')
-    if np.isfinite(W_emp):
-        axes[0].axhline(W_emp, linestyle='--', label=f'W* ≈ {W_emp:.2f} h')
-    axes[0].set_title('w(T) vs W*  — residence time convergence')
-    axes[0].set_ylabel('hours')
-    axes[0].legend()
+    ax.plot(times, w_vals, label='w(T) [hrs]')
+    ax.plot(times, W_star, linestyle='--', label='W*(t) [hrs] (completed ≤ t)')
+    ax.set_title('w(T) vs W*(t)')
+    ax.set_ylabel('hours')
+    ax.legend()
 
-    axes[1].plot(times, lam_vals, label='Λ(T) [1/hr]')
-    if np.isfinite(lam_emp):
-        axes[1].axhline(lam_emp, linestyle='--', label=f'λ* ≈ {lam_emp:.4f} 1/hr')
-    axes[1].set_title('Λ(T) vs λ*  — arrival rate convergence')
-    axes[1].set_ylabel('1/hr')
-    axes[1].set_xlabel('Date')
-    axes[1].legend()
-
-    _clip_axis_to_percentile(axes[1], times, lam_vals,
-                             upper_p=lambda_pctl_upper,
-                             lower_p=lambda_pctl_lower,
-                             warmup_hours=lambda_warmup_hours)
-
-    for ax in axes:
-        _format_date_axis(ax)
+    _format_date_axis(ax)
 
     fig.suptitle(title)
-    plt.tight_layout(rect=(0, 0, 1, 0.96))
+    if caption:
+        _add_caption(fig, caption)  # uses the helper
+    fig.tight_layout(rect=(0, 0, 1, 1))
 
     fig.savefig(out_path)
     plt.close(fig)
 
 
-def draw_dynamic_convergence_panel(times: List[pd.Timestamp],
+def draw_cumulative_arrival_rate_convergence_panel(times: List[pd.Timestamp],
                                    w_vals: np.ndarray,
                                    lam_vals: np.ndarray,
                                    W_star: np.ndarray,
@@ -483,33 +466,26 @@ def draw_dynamic_convergence_panel(times: List[pd.Timestamp],
                                    lambda_warmup_hours: Optional[float] = None,
                                    caption: Optional[str] = None
                                    ) -> None:
-    fig, axes = plt.subplots(2, 1, figsize=(12, 6.5), sharex=True)
+    fig, ax = plt.subplots(figsize=(12, 6.5))
 
-    axes[0].plot(times, w_vals, label='w(T) [hrs]')
-    axes[0].plot(times, W_star, linestyle='--', label='W*(t) [hrs] (completed ≤ t)')
-    axes[0].set_title('w(T) vs W*(t)')
-    axes[0].set_ylabel('hours')
-    axes[0].legend()
+    ax.plot(times, lam_vals, label='Λ(T) [1/hr]')
+    ax.plot(times, lam_star, linestyle='--', label='λ*(t) [1/hr] (arrivals ≤ t)')
+    ax.set_title('Λ(T) vs λ*(t)  — arrival rate')
+    ax.set_ylabel('1/hr')
+    ax.set_xlabel('Date')
+    ax.legend()
 
-    axes[1].plot(times, lam_vals, label='Λ(T) [1/hr]')
-    axes[1].plot(times, lam_star, linestyle='--', label='λ*(t) [1/hr] (arrivals ≤ t)')
-    axes[1].set_title('Λ(T) vs λ*(t)  — arrival rate')
-    axes[1].set_ylabel('1/hr')
-    axes[1].set_xlabel('Date')
-    axes[1].legend()
-
-    _clip_axis_to_percentile(axes[1], times, lam_vals,
+    _clip_axis_to_percentile(ax, times, lam_vals,
                              upper_p=lambda_pctl_upper,
                              lower_p=lambda_pctl_lower,
                              warmup_hours=lambda_warmup_hours)
 
-    for ax in axes:
-        _format_date_axis(ax)
+    _format_date_axis(ax)
 
     fig.suptitle(title)
     if caption:
         _add_caption(fig, caption)  # uses the helper you already have
-    fig.tight_layout(rect=(0.05, 0, 1, 1))
+    fig.tight_layout(rect=(0, 0, 1, 1))
 
     fig.savefig(out_path)
     plt.close(fig)
@@ -753,7 +729,7 @@ def plot_arrival_departure_convergence(
         metrics.Arrivals,
         metrics.Departures,
         metrics.Lambda,
-        title="Floqw Equilibrium: Arrival/Departure Convergence",
+        title="Flow Equilibrium: Arrival/Departure Convergence",
         out_path=out_path,
         lambda_pctl_upper=pctl_upper,
         lambda_pctl_lower=pctl_lower,
@@ -1286,12 +1262,10 @@ def plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, m
             f"Coherence (timestamp): eps={epsilon:g}, H={horizon_days:g}d -> {ok_ts}/{tot_ts} ({(sc_ts * 100 if sc_ts == sc_ts else 0):.1f}%)")
     # Convergence diagnostics (timestamp)
     if len(metrics.times) > 0:
-        ts_conv_dyn = os.path.join(out_dir, 'convergence/panels/residence_time_sojourn_time_convergence.png')
-        draw_dynamic_convergence_panel(metrics.times, metrics.w, metrics.Lambda, W_star_ts, lam_star_ts,
-                                       f"Little's Law Empirical Convergence", ts_conv_dyn,
-                                       lambda_pctl_upper=lambda_pctl_upper, lambda_pctl_lower=lambda_pctl_lower,
-                                       lambda_warmup_hours=lambda_warmup_hours,
-                                       caption=filter_result.display)
+        ts_conv_dyn = os.path.join(out_dir, 'convergence/panels/residence_time_convergence.png')
+        draw_residence_time_convergence_panel(metrics.times, metrics.w, W_star_ts,
+                                               title=f"Residence Time Convergence", out_path=ts_conv_dyn,
+                                              caption=filter_result.display)
         written.append(ts_conv_dyn)
 
         ts_conv_dyn3 = os.path.join(out_dir, 'advanced/residence_convergence_errors.png')
