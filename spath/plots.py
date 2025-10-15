@@ -11,7 +11,7 @@ from matplotlib.axes import Axes
 
 from spath.file_utils import ensure_output_dirs
 from spath.filter import FilterResult
-from spath.metrics import FlowMetricsResult, compute_elementwise_empirical_metrics, compute_tracking_errors, \
+from spath.metrics import FlowMetricsResult, compute_elementwise_empirical_metrics_old, compute_tracking_errors, \
     compute_coherence_score, compute_end_effect_series, compute_total_active_age_series, ElementWiseEmpiricalMetrics
 
 
@@ -255,7 +255,7 @@ def plot_convergence_charts(
 ) -> List[str]:
     written = []
 
-    written += plot_arrival_departure_convergence(args, filter_result, metrics, out_dir)
+    written += plot_arrival_rate_convergence(args, filter_result, metrics, empirical_metrics, out_dir)
 
     written += plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, metrics, out_dir)
 
@@ -388,7 +388,7 @@ def draw_L_vs_lambdaW(
       • caption added after tight_layout, with extra bottom space
     """
     # Empirical series
-    W_star, lam_star = compute_elementwise_empirical_metrics(df, times)
+    W_star, lam_star = compute_elementwise_empirical_metrics_old(df, times)
 
     # x = L(T), y = λ*(T)·W*(T)
     x = np.asarray(L_vals, dtype=float)
@@ -701,10 +701,11 @@ def draw_arrival_departure_convergence_stack(
     plt.close(fig)
 
 
-def plot_arrival_departure_convergence(
+def plot_arrival_rate_convergence(
     args,
     filter_result: Optional[FilterResult],
     metrics: FlowMetricsResult,
+    empirical_metrics: ElementWiseEmpiricalMetrics,
     out_dir: str,
 ) -> List[str]:
     """
@@ -722,20 +723,34 @@ def plot_arrival_departure_convergence(
     pctl_lower = getattr(args, "lambda_lower_pctl", None)
     warmup_hrs = getattr(args, "lambda_warmup", None)
 
-    out_path = os.path.join(out_dir, "convergence/arrival_departure_equilibrium.png")
+    eq_path = os.path.join(out_dir, "convergence/arrival_departure_equilibrium.png")
     draw_arrival_departure_convergence_stack(
         metrics.times,
         metrics.Arrivals,
         metrics.Departures,
         metrics.Lambda,
         title="Flow Equilibrium: Arrival/Departure Convergence",
-        out_path=out_path,
+        out_path=eq_path,
         lambda_pctl_upper=pctl_upper,
         lambda_pctl_lower=pctl_lower,
         lambda_warmup_hours=warmup_hrs,
         caption=caption,
     )
-    return [out_path]
+    lambda_path = os.path.join(out_dir, "convergence/panels/arrival_rate_convergence.png")
+    draw_cumulative_arrival_rate_convergence_panel(
+        metrics.times,
+        metrics.w,
+        metrics.Lambda,
+        empirical_metrics.W_star,
+        empirical_metrics.lam_star,
+        title="Flow Equilibrium: Arrival/Departure Convergence",
+        out_path=lambda_path,
+        lambda_pctl_upper=pctl_upper,
+        lambda_pctl_lower=pctl_lower,
+        lambda_warmup_hours=warmup_hrs,
+        caption=caption,
+    )
+    return [eq_path, lambda_path]
 
 # ── Residence vs Sojourn: two-panel stack ────────────────────────────────────
 
@@ -760,7 +775,7 @@ def draw_residence_vs_sojourn_stack(
     """
     # --- Compute W*(t) aligned to `times`
     if len(times) > 0:
-        W_star_hours, _lam_star = compute_elementwise_empirical_metrics(df, times)
+        W_star_hours, _lam_star = compute_elementwise_empirical_metrics_old(df, times)
     else:
         W_star_hours = np.array([])
 
@@ -960,7 +975,7 @@ def plot_sample_path_convergence(
 
     # derive W*(t), λ*(t) aligned to times
     if len(metrics.times) > 0:
-        W_star_hours, lam_star = compute_elementwise_empirical_metrics(df, metrics.times)
+        W_star_hours, lam_star = compute_elementwise_empirical_metrics_old(df, metrics.times)
     else:
         W_star_hours = np.array([])
         lam_star = np.array([])
@@ -1247,7 +1262,7 @@ def plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, m
     written: List[str] = []
 
     if len(metrics.times) > 0:
-        W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics(df, metrics.times)
+        W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics_old(df, metrics.times)
     else:
         W_star_ts = np.array([])
     # Relative errors & coherence
@@ -1361,7 +1376,7 @@ def plot_rate_stability_charts(
         R_over_T = R_raw / denom
 
     # Dynamic empirical series (for λ* and W*)
-    W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics(df, times)
+    W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics_old(df, times)
     w_ts = np.asarray(metrics.w, dtype=float)
 
     # Optional display bits

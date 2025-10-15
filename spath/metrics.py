@@ -455,9 +455,16 @@ class ElementWiseEmpiricalMetrics:
 
 
 
+def compute_elementwise_empirical_metrics(df: pd.DataFrame, times: List[pd.Timestamp]) -> ElementWiseEmpiricalMetrics:
+    W_star, lam_star = compute_elementwise_empirical_metrics_old(df, times)
+    return ElementWiseEmpiricalMetrics(
+        times=times,
+        W_star=W_star,
+        lam_star=lam_star
+    )
 
-def compute_elementwise_empirical_metrics(df: pd.DataFrame,
-                                          times: List[pd.Timestamp]) -> Tuple[np.ndarray, np.ndarray]:
+def compute_elementwise_empirical_metrics_old(df: pd.DataFrame,
+                                              times: List[pd.Timestamp]) -> Tuple[np.ndarray, np.ndarray]:
     """Return W*(t) and λ*(t) aligned to `times`."""
     n = len(times)
     W_star = np.full(n, np.nan, dtype=float)
