@@ -20,8 +20,7 @@ def parse_args():
     parser.add_argument("--incomplete", action="store_true", help="Only include items without an end_ts (aging view)")
     parser.add_argument("--with-A", action="store_true",
                         help="Also render cumulative area A(T)=∫N(t)dt charts and 5-panel stacks")
-    parser.add_argument("--with-daily-breakdown", action="store_true",
-                        help="Add daily ΔA (WIP-hours/day) and daily average WIP charts")
+
     parser.add_argument("--classes", type=str, default=None,
                         help="Comma-separated list of class tags to include (requires a 'class' column)")
     parser.add_argument("--outlier-hours", type=float, default=None,
@@ -73,7 +72,7 @@ def parse_args():
 
     args = parser.parse_args()
     validate_args(args)
-    return args
+    return parser, args
 
 
 def get_class_filters(classes):

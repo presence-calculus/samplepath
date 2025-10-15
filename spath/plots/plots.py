@@ -388,8 +388,7 @@ def plot_misc_charts(df: pd.DataFrame,
 
 # ---- MAIN Driver -----
 
-def produce_all_charts(df, csv_path, args, filter_result, metrics, empirical_metrics):
-    out_dir = ensure_output_dirs(csv_path, output_dir=args.output_dir, clean=args.clean)
+def produce_all_charts(df,  args, filter_result, metrics, empirical_metrics, out_dir):
     written: List[str] = []
     # create plots
     written += plot_core_flow_metrics_charts(df, args, filter_result, metrics, out_dir)
