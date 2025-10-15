@@ -2,7 +2,7 @@
 # Copyright (c) 2025 Krishna Kumar
 # SPDX-License-Identifier: MIT
 import os
-from typing import List, Optional, Tuple, Sequence
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -14,125 +14,9 @@ from spath.file_utils import ensure_output_dirs
 from spath.filter import FilterResult
 from spath.metrics import FlowMetricsResult, compute_elementwise_empirical_metrics, compute_tracking_errors, \
     compute_coherence_score, compute_end_effect_series, compute_total_active_age_series, ElementWiseEmpiricalMetrics
+from spath.plots.helpers import add_caption, format_date_axis, format_and_save, init_fig_ax, draw_line_chart, \
+    draw_step_chart
 
-
-def _add_caption(fig: Figure, text: str) -> None:
-    """Add a caption below the x-axis."""
-    fig.subplots_adjust(bottom=0.28)
-    fig.text(
-        0.5,
-        0.005,
-        text,
-        ha="center",
-        va="bottom",
-        fontsize=9,
-    )
-
-
-def _format_date_axis(ax: Axes, unit: str = "timestamp") -> None:
-    """Format the x-axis for dates if possible."""
-    ax.set_xlabel(f"Date ({unit})")
-    try:
-        ax.figure.autofmt_xdate()
-    except Exception:
-        pass
-
-
-def _format_axis(ax: Axes, title: str, unit: str, ylabel: str) -> None:
-    """Set axis labels, title, and legend with date formatting."""
-    ax.set_title(title)
-    ax.set_ylabel(ylabel)
-    ax.legend()
-    _format_date_axis(ax, unit=unit)
-
-
-def _format_fig(caption: Optional[str], fig: Figure) -> None:
-    """Finalize figure with optional caption and layout adjustment."""
-    fig.tight_layout()
-    if caption:
-        _add_caption(fig, caption)
-
-
-def _format_and_save(
-    fig: Figure,
-    ax: Axes,
-    title: str,
-    ylabel: str,
-    unit: str,
-    caption: Optional[str],
-    out_path: str,
-) -> None:
-    """Format the axis, add optional caption, save the figure, and close it."""
-    _format_axis(ax, title, unit, ylabel)
-    _format_fig(caption, fig)
-    fig.savefig(out_path)
-    plt.close(fig)
-
-
-# ── Common plotting engines (de-duplicated) ───────────────────────────────────
-
-
-def _init_fig_ax(figsize: Tuple[float, float] = (10.0, 3.4)) -> Tuple[Figure, Axes]:
-    fig, ax = plt.subplots(figsize=figsize)
-    return fig, ax
-
-
-def _plot_series(
-    ax: Axes,
-    times: Sequence[pd.Timestamp],
-    values: Sequence[float],
-    label: str,
-    style: str = "line",
-    where: str = "post",
-) -> None:
-    if style == "step":
-        ax.step(times, values, where=where, label=label)
-    else:
-        ax.plot(times, values, label=label)
-
-
-def draw_series_chart(
-    times: Sequence[pd.Timestamp],
-    values: Sequence[float],
-    title: str,
-    ylabel: str,
-    out_path: str,
-    unit: str = "timestamp",
-    caption: Optional[str] = None,
-    style: str = "line",
-    figsize: Tuple[float, float] = (10.0, 3.4),
-) -> None:
-    fig, ax = _init_fig_ax(figsize=figsize)
-    _plot_series(ax, times, values, label=ylabel, style=style)
-    _format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
-
-
-def draw_line_chart(
-    times: List[pd.Timestamp],
-    values: np.ndarray,
-    title: str,
-    ylabel: str,
-    out_path: str,
-    unit: str = "timestamp",
-    caption: Optional[str] = None,
-) -> None:
-    draw_series_chart(
-        times, values, title, ylabel, out_path, unit=unit, caption=caption, style="line"
-    )
-
-
-def draw_step_chart(
-    times: List[pd.Timestamp],
-    values: np.ndarray,
-    title: str,
-    ylabel: str,
-    out_path: str,
-    unit: str = "timestamp",
-    caption: Optional[str] = None,
-) -> None:
-    draw_series_chart(
-        times, values, title, ylabel, out_path, unit=unit, caption=caption, style="step"
-    )
 
 
 def draw_lambda_chart(
@@ -148,7 +32,7 @@ def draw_lambda_chart(
     caption: Optional[str] = None,
 ) -> None:
     """Line chart with optional percentile-based y-limits and warmup exclusion."""
-    fig, ax = _init_fig_ax(figsize=(10.0, 3.6))
+    fig, ax = init_fig_ax(figsize=(10.0, 3.6))
     ax.plot(times, values, label=ylabel)
 
     # Inline percentile clipping
@@ -174,7 +58,7 @@ def draw_lambda_chart(
             if np.isfinite(top) and np.isfinite(bottom) and top > bottom:
                 ax.set_ylim(float(bottom), float(top))
 
-    _format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
+    format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
 
 
 # ── Higher-level plotting functions (unchanged except captions fixed) ─────────
@@ -314,7 +198,7 @@ def draw_line_chart_with_scatter(times: List[pd.Timestamp],
     if scatter_times is not None and scatter_values is not None and len(scatter_times) > 0:
         ax.scatter(scatter_times, scatter_values, s=16, alpha=0.6, marker='o', label=scatter_label)
 
-    _format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
+    format_and_save(fig, ax, title, ylabel, unit, caption, out_path)
 
 
 
@@ -367,7 +251,7 @@ def draw_L_vs_Lambda_w(
 
     # Layout + optional caption (bottom)
     if caption:
-        _add_caption(fig, caption)  # uses the helper you already have
+        add_caption(fig, caption)  # uses the helper you already have
     fig.tight_layout(rect=(0.05, 0, 1, 1))
     fig.savefig(out_path)
     plt.close(fig)
@@ -389,11 +273,11 @@ def draw_residence_time_convergence_panel(times: List[pd.Timestamp],
     ax.set_ylabel('hours')
     ax.legend()
 
-    _format_date_axis(ax)
+    format_date_axis(ax)
 
     fig.suptitle(title)
     if caption:
-        _add_caption(fig, caption)  # uses the helper
+        add_caption(fig, caption)  # uses the helper
     fig.tight_layout(rect=(0, 0, 1, 1))
 
     fig.savefig(out_path)
@@ -426,11 +310,11 @@ def draw_cumulative_arrival_rate_convergence_panel(times: List[pd.Timestamp],
                              lower_p=lambda_pctl_lower,
                              warmup_hours=lambda_warmup_hours)
 
-    _format_date_axis(ax)
+    format_date_axis(ax)
 
     fig.suptitle(title)
     if caption:
-        _add_caption(fig, caption)  # uses the helper you already have
+        add_caption(fig, caption)  # uses the helper you already have
     fig.tight_layout(rect=(0, 0, 1, 1))
 
     fig.savefig(out_path)
@@ -484,7 +368,7 @@ def draw_dynamic_convergence_panel_with_errors(times: List[pd.Timestamp],
         axes[2].set_ylim(0.0, max(ub, (epsilon if epsilon is not None else 0.0) * 1.5 + 1e-6))
 
     for ax in axes:
-        _format_date_axis(ax)
+        format_date_axis(ax)
 
     fig.suptitle(title)
     plt.tight_layout(rect=(0, 0, 1, 0.96))
@@ -554,7 +438,7 @@ def draw_dynamic_convergence_panel_with_errors_and_endeffects(times: List[pd.Tim
     axes[3].legend(lines1 + lines2, labels1 + labels2, loc='upper right')
 
     for ax in axes:
-        _format_date_axis(ax)
+        format_date_axis(ax)
 
     fig.suptitle(title)
     plt.tight_layout(rect=(0, 0, 1, 0.96))
@@ -618,7 +502,7 @@ def draw_arrival_departure_convergence_stack(
     axes[0].set_title('Cumulative Arrivals vs Cumulative Departures')
     axes[0].set_ylabel('count')
     axes[0].legend(loc='best')
-    _format_date_axis(axes[0])
+    format_date_axis(axes[0])
 
     # Panel 2: rates (Λ vs θ), with house percentile clipping on Λ
     axes[1].plot(times, lambda_cum_rate, label='Λ(T) [1/hr]')
@@ -632,7 +516,7 @@ def draw_arrival_departure_convergence_stack(
         lower_p=lambda_pctl_lower,
         warmup_hours=(lambda_warmup_hours or 0.0),
     )
-    _format_date_axis(axes[1])
+    format_date_axis(axes[1])
 
     fig.suptitle(title)
     if caption:
@@ -740,7 +624,7 @@ def draw_residence_vs_sojourn_stack(
     axes[0].set_title('w(T) vs W*(t) — residence vs sojourn')
     axes[0].set_ylabel('hours')
     axes[0].legend(loc='best')
-    _format_date_axis(axes[0])
+    format_date_axis(axes[0])
 
     # Panel 2: Sojourn scatter vs w(T)
     if len(soj_times) > 0:
@@ -749,7 +633,7 @@ def draw_residence_vs_sojourn_stack(
     axes[1].set_title('Element sojourn time vs Average residence time')
     axes[1].set_ylabel('Time [hrs]')
     axes[1].legend(loc='best')
-    _format_date_axis(axes[1])
+    format_date_axis(axes[1])
 
     fig.suptitle(title)
     if caption:
@@ -844,7 +728,7 @@ def draw_ll_scatter_coherence(
     score = (ok_count / total_count) if total_count > 0 else float("nan")
 
     # ---- Plot
-    fig, ax = _init_fig_ax(figsize=(7.5, 6.0))
+    fig, ax = init_fig_ax(figsize=(7.5, 6.0))
 
     # Scatter (only evaluated points)
     ax.scatter(X, Y, s=16, alpha=0.7, label='Points: (L(T), λ*(t)·W*(t))')
@@ -1048,7 +932,7 @@ def draw_four_panel_column(times: List[pd.Timestamp],
     axes[3].legend()
 
     for ax in axes:
-        _format_date_axis(ax)
+        format_date_axis(ax)
 
     plt.tight_layout(rect=(0, 0, 1, 0.90))
     fig.suptitle(title, fontsize=14, y=0.97)  # larger main title
@@ -1113,7 +997,7 @@ def draw_five_panel_column(times: List[pd.Timestamp],
     axes[4].legend()
 
     for ax in axes:
-        _format_date_axis(ax)
+        format_date_axis(ax)
 
     fig.suptitle(title)
     plt.tight_layout(rect=(0, 0, 1, 0.97))
@@ -1186,7 +1070,7 @@ def draw_five_panel_column_with_scatter(times: List[pd.Timestamp],
         pass
 
     for ax in axes:
-        _format_date_axis(ax)
+        format_date_axis(ax)
 
     fig.suptitle(title)
     plt.tight_layout(rect=(0, 0, 1, 0.97))
@@ -1338,14 +1222,14 @@ def plot_rate_stability_charts(
     ax_top.set_ylabel('count')
     ax_top.set_title('N(t) — Sample Path')
     ax_top.legend(loc='best')
-    _format_date_axis(ax_top)
+    format_date_axis(ax_top)
 
     # Bottom: WIP Growth Rate N(T)/T
     ax = axes[1]
     ax.plot(times, N_over_T, label='N(t)/T', linewidth=1.9, zorder=3)
     ax.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
     ax.axhline(1.0, linewidth=1.0, alpha=1.0, linestyle=':', zorder=1)
-    _format_date_axis(ax)
+    format_date_axis(ax)
     ax.set_xlabel('time')
     ax.set_ylabel('rate')
     ax.set_title(f"{title_prefix}: WIP Growth Rate - N(t)/T" if title_prefix else 'WIP Growth Rate - N(t)/T')
@@ -1372,7 +1256,7 @@ def plot_rate_stability_charts(
     ax_top.set_ylabel('hours')
     ax_top.set_title('R(t) — Total age of WIP')
     ax_top.legend(loc='best')
-    _format_date_axis(ax_top)
+    format_date_axis(ax_top)
 
     # Bottom: Total Age Growth Rate R(T)/T
     ax = axes[1]
@@ -1380,7 +1264,7 @@ def plot_rate_stability_charts(
     ax.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
     ax.axhline(1.0, linewidth=1.0, alpha=1.0, linestyle=":", zorder=1)  # reference guide
 
-    _format_date_axis(ax)
+    format_date_axis(ax)
     ax.set_xlabel("time")
     ax.set_ylabel("rate")
     ax.set_title(
@@ -1407,7 +1291,7 @@ def plot_rate_stability_charts(
     axN.plot(times, N_over_T, label="N(T)/T", linewidth=1.9, zorder=3)
     axN.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
     axN.axhline(1.0, linewidth=1.0, alpha=1.0, linestyle=":", zorder=1)
-    _format_date_axis(axN)
+    format_date_axis(axN)
     axN.set_ylabel("rate")
     axN.set_title("WIP Growth Rate: N(T)/T")
     axN.legend(loc="best")
@@ -1421,7 +1305,7 @@ def plot_rate_stability_charts(
     axR.plot(times, R_over_T, label="R(T)/T", linewidth=1.9, zorder=3)
     axR.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
     axR.axhline(1.0, linewidth=1.0, alpha=1.0, linestyle=":", zorder=1)
-    _format_date_axis(axR)
+    format_date_axis(axR)
     axR.set_ylabel("rate")
     axR.set_title("Total Age Growth Rate: R(T)/T")
     axR.legend(loc="best")
@@ -1434,7 +1318,7 @@ def plot_rate_stability_charts(
     axLam = axes[2]
     axLam.plot(times, lam_star_ts, label="λ*(T) [1/hr]", linewidth=1.9, zorder=3)
     axLam.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    _format_date_axis(axLam)
+    format_date_axis(axLam)
     axLam.set_ylabel("[1/hr]")
     axLam.set_title("λ*(T) — running arrival rate")
     axLam.legend(loc="best")
@@ -1454,7 +1338,7 @@ def plot_rate_stability_charts(
     axW.plot(times, w_ts,        label="w(T) [hrs] (finite-window)", linewidth=1.9, zorder=3)
     axW.plot(times, W_star_ts,   label="W*(T) [hrs] (completed mean)", linewidth=1.9, linestyle="--", zorder=3)
     axW.axhline(0.0, linewidth=0.8, alpha=0.6, zorder=1)
-    _format_date_axis(axW)
+    format_date_axis(axW)
     axW.set_xlabel("time")
     axW.set_ylabel("hours")
     axW.set_title("w(T) vs W*(T) — coherence")
@@ -1464,7 +1348,7 @@ def plot_rate_stability_charts(
     fig.suptitle("Equilibrium and Coherence", fontsize=14, y=0.98)
     try:
         if caption_text:
-            _add_caption(fig, caption_text)
+            add_caption(fig, caption_text)
     except Exception:
         pass
 
