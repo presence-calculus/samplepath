@@ -3,15 +3,16 @@
 # SPDX-License-Identifier: MIT
 import os
 from typing import List, Optional, Tuple, Sequence
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from spath.file_utils import ensure_output_dirs
 from spath.filter import FilterResult
-from spath.metrics import FlowMetricsResult, compute_elementwise_empirical_metrics_old, compute_elementwise_empirical_metrics, compute_tracking_errors, \
+from spath.metrics import FlowMetricsResult, compute_elementwise_empirical_metrics, compute_tracking_errors, \
     compute_coherence_score, compute_end_effect_series, compute_total_active_age_series, ElementWiseEmpiricalMetrics
 
 
@@ -918,7 +919,7 @@ def plot_sample_path_convergence(
 
     # derive W*(t), λ*(t) aligned to times
     if len(metrics.times) > 0:
-        W_star_hours, lam_star = compute_elementwise_empirical_metrics_old(df, metrics.times)
+        W_star_hours, lam_star = compute_elementwise_empirical_metrics(df, metrics.times).as_tuple()
     else:
         W_star_hours = np.array([])
         lam_star = np.array([])
@@ -1205,9 +1206,10 @@ def plot_residence_time_sojourn_time_coherence_charts(df, args, filter_result, m
     written: List[str] = []
 
     if len(metrics.times) > 0:
-        W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics_old(df, metrics.times)
+        W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics(df, metrics.times).as_tuple()
     else:
         W_star_ts = np.array([])
+        lam_star_ts = np.array([])
     # Relative errors & coherence
     eW_ts, eLam_ts, elapsed_ts = compute_tracking_errors(metrics.times, metrics.w, metrics.Lambda, W_star_ts,
                                                          lam_star_ts)
@@ -1319,7 +1321,7 @@ def plot_rate_stability_charts(
         R_over_T = R_raw / denom
 
     # Dynamic empirical series (for λ* and W*)
-    W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics_old(df, times)
+    W_star_ts, lam_star_ts = compute_elementwise_empirical_metrics(df, times).as_tuple()
     w_ts = np.asarray(metrics.w, dtype=float)
 
     # Optional display bits

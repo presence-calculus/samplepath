@@ -458,51 +458,53 @@ class ElementWiseEmpiricalMetrics:
 
 
 def compute_elementwise_empirical_metrics(df: pd.DataFrame, times: List[pd.Timestamp]) -> ElementWiseEmpiricalMetrics:
-    W_star, lam_star = compute_elementwise_empirical_metrics_old(df, times)
+    def _compute_elementwise_empirical_metrics(df: pd.DataFrame,
+                                                  times: List[pd.Timestamp]) -> Tuple[np.ndarray, np.ndarray]:
+        """Return W*(t) and λ*(t) aligned to `times`."""
+        n = len(times)
+        W_star = np.full(n, np.nan, dtype=float)
+        lam_star = np.full(n, np.nan, dtype=float)
+        if n == 0:
+            return W_star, lam_star
+
+        comp = df[df["end_ts"].notna()].copy().sort_values("end_ts")
+        comp_durations = ((comp["end_ts"] - comp["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
+        comp_end_times = comp["end_ts"].to_list()
+
+        starts = df["start_ts"].sort_values().to_list()
+
+        j = 0
+        count_c = 0
+        sum_c = 0.0
+        k = 0
+        count_starts = 0
+        t0 = times[0]
+
+        for i, t in enumerate(times):
+            while j < len(comp_end_times) and comp_end_times[j] <= t:
+                sum_c += comp_durations[j]
+                count_c += 1
+                j += 1
+            if count_c > 0:
+                W_star[i] = sum_c / count_c
+
+            while k < len(starts) and starts[k] <= t:
+                count_starts += 1
+                k += 1
+            elapsed_h = (t - t0).total_seconds() / 3600.0
+            if elapsed_h > 0:
+                lam_star[i] = count_starts / elapsed_h
+
+        return W_star, lam_star
+
+    W_star, lam_star = _compute_elementwise_empirical_metrics(df, times)
     return ElementWiseEmpiricalMetrics(
         times=times,
         W_star=W_star,
         lam_star=lam_star
     )
 
-def compute_elementwise_empirical_metrics_old(df: pd.DataFrame,
-                                              times: List[pd.Timestamp]) -> Tuple[np.ndarray, np.ndarray]:
-    """Return W*(t) and λ*(t) aligned to `times`."""
-    n = len(times)
-    W_star = np.full(n, np.nan, dtype=float)
-    lam_star = np.full(n, np.nan, dtype=float)
-    if n == 0:
-        return W_star, lam_star
 
-    comp = df[df["end_ts"].notna()].copy().sort_values("end_ts")
-    comp_durations = ((comp["end_ts"] - comp["start_ts"]).dt.total_seconds() / 3600.0).to_numpy()
-    comp_end_times = comp["end_ts"].to_list()
-
-    starts = df["start_ts"].sort_values().to_list()
-
-    j = 0
-    count_c = 0
-    sum_c = 0.0
-    k = 0
-    count_starts = 0
-    t0 = times[0]
-
-    for i, t in enumerate(times):
-        while j < len(comp_end_times) and comp_end_times[j] <= t:
-            sum_c += comp_durations[j]
-            count_c += 1
-            j += 1
-        if count_c > 0:
-            W_star[i] = sum_c / count_c
-
-        while k < len(starts) and starts[k] <= t:
-            count_starts += 1
-            k += 1
-        elapsed_h = (t - t0).total_seconds() / 3600.0
-        if elapsed_h > 0:
-            lam_star[i] = count_starts / elapsed_h
-
-    return W_star, lam_star
 
 
 def compute_tracking_errors(times: List[pd.Timestamp],
