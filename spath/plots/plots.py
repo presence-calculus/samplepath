@@ -15,13 +15,6 @@ from spath.plots.convergence import plot_convergence_charts
 from spath.plots.core import draw_five_panel_column, draw_five_panel_column_with_scatter, plot_core_flow_metrics_charts
 from spath.plots.helpers import add_caption, format_date_axis, _clip_axis_to_percentile
 
-
-# ── Arrival departure convergence: two-panel stack ───────────────────
-
-
-# ── Residence vs Sojourn: two-panel stack ────────────────────────────────────
-
-
 # ------- STABILITY CHARTS -------
 
 def plot_rate_stability_charts(
