@@ -3,16 +3,12 @@
 # SPDX-License-Identifier: MIT
 from __future__ import annotations
 
-import os
-from typing import List, Optional
+from typing import List
 
-import pandas as pd
-
-from spath.filter import FilterResult
-from spath.metrics import FlowMetricsResult
 from spath.plots.advanced import plot_advanced_charts
 from spath.plots.convergence import plot_convergence_charts
-from spath.plots.core import draw_five_panel_column, draw_five_panel_column_with_scatter, plot_core_flow_metrics_charts
+from spath.plots.core import plot_core_flow_metrics_charts
+from spath.plots.misc import plot_misc_charts
 from spath.plots.stability import plot_stability_charts
 
 
@@ -20,40 +16,6 @@ from spath.plots.stability import plot_stability_charts
 
 
 # ---- MISC CHARTS
-def plot_five_column_stacks(df, args, filter_result, metrics, out_dir):
-    t_scatter_times = df["start_ts"].tolist()
-    t_scatter_vals = df["duration_hr"].to_numpy()
-    written = []
-
-    col_ts5 = os.path.join(out_dir, 'misc/timestamp_stack_with_A.png')
-    draw_five_panel_column(metrics.times, metrics.N, metrics.Lambda, metrics.Lambda, metrics.w, metrics.A,
-                           f'Finite-window metrics incl. A(T) (timestamp, {filter_result.label})', col_ts5,
-                           scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
-                           lambda_pctl_upper=args.lambda_pctl, lambda_pctl_lower=args.lambda_lower_pctl,
-                           lambda_warmup_hours=args.lambda_warmup)
-    written.append(col_ts5)
-
-
-    col_ts5s = os.path.join(out_dir, 'misc/timestamp_stack_with_scatter.png')
-    draw_five_panel_column_with_scatter(metrics.times, metrics.N, metrics.L, metrics.Lambda, metrics.w,
-                                        f'Finite-window metrics with w(T) plain + w(T)+scatter (timestamp, {filter_result.label})',
-                                        col_ts5s,
-                                        scatter_times=t_scatter_times, scatter_values=t_scatter_vals,
-                                        lambda_pctl_upper=args.lambda_pctl,
-                                        lambda_pctl_lower=args.lambda_lower_pctl,
-                                        lambda_warmup_hours=args.lambda_warmup)
-    written.append(col_ts5s)
-
-    return written
-
-def plot_misc_charts(df: pd.DataFrame,
-    args,
-    filter_result: Optional[FilterResult],
-    metrics: FlowMetricsResult,
-    out_dir: str,
-) -> List[str]:
-    # 5-panel stacks including scatter
-    return  plot_five_column_stacks(df, args, filter_result, metrics, out_dir)
 
 # ---- MAIN Driver -----
 
