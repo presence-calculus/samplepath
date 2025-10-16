@@ -7,6 +7,72 @@ from pandas._libs.tslibs.nattype import NaTType
 
 # ---------- Core sample path and metrics construction ----------
 
+
+
+# ---------- Structured result ----------
+
+@dataclass
+class FlowMetricsResult:
+    """
+    Structured finite-window flow metrics evaluated at observation times.
+
+    Fields
+    ------
+    events : list[(Timestamp, int, int)]
+        The (prepped) source events used for computation. If a driver zeroed-out
+        arrivals prior to t0, those prepped events are stored here.
+    times : list[pd.Timestamp]
+        Observation times in ascending order (report points).
+    L : np.ndarray                # processes
+    Lambda : np.ndarray           # processes/hour
+    w : np.ndarray                # hours (finite-window average residence contribution per arrival)
+    N : np.ndarray                # processes
+    A : np.ndarray                # process·hours
+    Arrivals : np.ndarray         # cumulative arrivals Arr(T) in (t0, T]
+    Departures : np.ndarray       # cumulative departures Dep(T) in (t0, T]
+    mode : Literal["event","calendar"]
+        Observation schedule flavor used by the driver.
+    freq : str | None
+        Resolved pandas frequency alias when mode == "calendar", else None.
+    t0 : pd.Timestamp
+        Start of the finite reporting window (first observation time).
+    tn : pd.Timestamp
+        End of the finite reporting window (last observation time).
+
+    Methods
+    -------
+    to_dataframe() -> pd.DataFrame
+        Tabular view with columns: time, L, Lambda, w, N, A, Arrivals, Departures.
+    """
+    events: List[Tuple[pd.Timestamp, int, int]]
+    times: List[pd.Timestamp]
+    L: np.ndarray
+    Lambda: np.ndarray
+    w: np.ndarray
+    N: np.ndarray
+    A: np.ndarray
+    Arrivals: np.ndarray
+    Departures: np.ndarray
+    mode: Literal["event", "calendar"]
+    freq: Optional[str]
+    t0: pd.Timestamp | NaTType = pd.NaT
+    tn: pd.Timestamp | NaTType = pd.NaT
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            {
+                "time": self.times,
+                "L": self.L,
+                "Lambda": self.Lambda,
+                "w": self.w,
+                "N": self.N,
+                "A": self.A,
+                "Arrivals": self.Arrivals,
+                "Departures": self.Departures,
+            }
+        )
+
+#--- Core Metrics Calculations
 def compute_sample_path_metrics(
     events: List[Tuple[pd.Timestamp, int, int]],
     sample_times: List[pd.Timestamp],
@@ -120,70 +186,6 @@ def compute_sample_path_metrics(
         np.array(out_Arr, dtype=float),
         np.array(out_Dep, dtype=float),
     )
-
-
-# ---------- Structured result ----------
-
-@dataclass
-class FlowMetricsResult:
-    """
-    Structured finite-window flow metrics evaluated at observation times.
-
-    Fields
-    ------
-    events : list[(Timestamp, int, int)]
-        The (prepped) source events used for computation. If a driver zeroed-out
-        arrivals prior to t0, those prepped events are stored here.
-    times : list[pd.Timestamp]
-        Observation times in ascending order (report points).
-    L : np.ndarray                # processes
-    Lambda : np.ndarray           # processes/hour
-    w : np.ndarray                # hours (finite-window average residence contribution per arrival)
-    N : np.ndarray                # processes
-    A : np.ndarray                # process·hours
-    Arrivals : np.ndarray         # cumulative arrivals Arr(T) in (t0, T]
-    Departures : np.ndarray       # cumulative departures Dep(T) in (t0, T]
-    mode : Literal["event","calendar"]
-        Observation schedule flavor used by the driver.
-    freq : str | None
-        Resolved pandas frequency alias when mode == "calendar", else None.
-    t0 : pd.Timestamp
-        Start of the finite reporting window (first observation time).
-    tn : pd.Timestamp
-        End of the finite reporting window (last observation time).
-
-    Methods
-    -------
-    to_dataframe() -> pd.DataFrame
-        Tabular view with columns: time, L, Lambda, w, N, A, Arrivals, Departures.
-    """
-    events: List[Tuple[pd.Timestamp, int, int]]
-    times: List[pd.Timestamp]
-    L: np.ndarray
-    Lambda: np.ndarray
-    w: np.ndarray
-    N: np.ndarray
-    A: np.ndarray
-    Arrivals: np.ndarray
-    Departures: np.ndarray
-    mode: Literal["event", "calendar"]
-    freq: Optional[str]
-    t0: pd.Timestamp | NaTType = pd.NaT
-    tn: pd.Timestamp | NaTType = pd.NaT
-
-    def to_dataframe(self) -> pd.DataFrame:
-        return pd.DataFrame(
-            {
-                "time": self.times,
-                "L": self.L,
-                "Lambda": self.Lambda,
-                "w": self.w,
-                "N": self.N,
-                "A": self.A,
-                "Arrivals": self.Arrivals,
-                "Departures": self.Departures,
-            }
-        )
 
 
 # ---------- Consolidated driver (event- or calendar-boundary observations) ----------
@@ -542,80 +544,3 @@ def compute_coherence_score(eW: np.ndarray,
     coherent = int(np.sum(np.maximum(eW[ok_idx], eLam[ok_idx]) <= epsilon))
     return coherent / total, coherent, total
 
-def compute_total_active_age_series(
-    df: pd.DataFrame,
-    times: List[pd.Timestamp]
-) -> np.ndarray:
-    """
-    Return R(T) aligned to `times`: total age (HOURS) of ACTIVE elements at T.
-
-    Numerically safe: all prefix sums are done in time **relative to t0** and
-    in float64 HOURS (not ns) to avoid int64 overflows.
-
-    active(T): start <= T and (end > T or end is NaT)
-    window clip: ages measured from s' = max(start, t0), so R(t0) = 0.
-    """
-    n = len(times)
-    R = np.zeros(n, dtype=float)
-    if n == 0:
-        return R
-
-    # Ensure ascending times
-    T_seq: List[pd.Timestamp] = [pd.Timestamp(t) for t in times]
-    t0 = T_seq[0]
-    t0_ns = pd.Timestamp(t0).value  # int64 (ns since epoch)
-
-    # ----------------- Prepare start/end arrays -----------------
-    # Starts (absolute for comparisons; sorted)
-    starts_dt = pd.to_datetime(df["start_ts"]).sort_values().to_numpy(dtype="datetime64[ns]")
-
-    # Ends: only completed items; keep their corresponding starts for subtraction
-    ended = df[df["end_ts"].notna()].copy()
-    ended.sort_values("end_ts", inplace=True)
-    ends_dt = pd.to_datetime(ended["end_ts"]).to_numpy(dtype="datetime64[ns]")
-    ended_starts_dt = pd.to_datetime(ended["start_ts"]).to_numpy(dtype="datetime64[ns]")
-
-    # ----------------- Relative-to-t0 in HOURS (float64) -----------------
-    # Convert to ns int for relative deltas, then to hours
-    starts_ns = starts_dt.astype("int64")
-    starts_rel_h = np.maximum((starts_ns - t0_ns) / 3.6e12, 0.0).astype(np.float64)
-    starts_rel_cumsum_h = np.cumsum(starts_rel_h, dtype=np.float64)
-
-    ended_starts_ns = ended_starts_dt.astype("int64")
-    ended_starts_rel_h = np.maximum((ended_starts_ns - t0_ns) / 3.6e12, 0.0).astype(np.float64)
-    ended_starts_rel_cumsum_h = np.cumsum(ended_starts_rel_h, dtype=np.float64)
-
-    # Pointers over sorted arrays
-    S = starts_dt.size
-    E = ends_dt.size
-    i_s = 0  # count of starts with start <= T
-    i_e = 0  # count of ends   with end   <= T
-
-    # ----------------- Main sweep -----------------
-    for i, T in enumerate(T_seq):
-        T_dt_ns = np.datetime64(T).astype("datetime64[ns]")
-
-        # Advance pointers monotonically
-        while i_s < S and starts_dt[i_s] <= T_dt_ns:
-            i_s += 1
-        while i_e < E and ends_dt[i_e] <= T_dt_ns:
-            i_e += 1
-
-        N_active = i_s - i_e
-        if N_active <= 0:
-            R[i] = 0.0
-            continue
-
-        # Sum of clipped (relative) starts up to T, in HOURS
-        S_le_T_rel_h = starts_rel_cumsum_h[i_s - 1] if i_s > 0 else 0.0
-        S_le_T_ended_rel_h = ended_starts_rel_cumsum_h[i_e - 1] if i_e > 0 else 0.0
-        S_active_rel_h = max(S_le_T_rel_h - S_le_T_ended_rel_h, 0.0)
-
-        # R_h = N_active * (T - t0) [hours] - sum_active_clipped_starts [hours]
-        T_rel_h = (pd.Timestamp(T).value - t0_ns) / 3.6e12  # ns → hours
-        R_h = float(N_active) * T_rel_h - S_active_rel_h
-
-        # Numerical safety: never negative
-        R[i] = max(R_h, 0.0)
-
-    return R
