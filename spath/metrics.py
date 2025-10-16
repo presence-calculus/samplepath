@@ -5,11 +5,7 @@ import numpy as np
 import pandas as pd
 from pandas._libs.tslibs.nattype import NaTType
 
-# ---------- Core sample path and metrics construction ----------
-
-
-
-# ---------- Structured result ----------
+# ---------- Core sample path flow metrics construction ----------
 
 @dataclass
 class FlowMetricsResult:
@@ -187,9 +183,6 @@ def compute_sample_path_metrics(
         np.array(out_Dep, dtype=float),
     )
 
-
-# ---------- Consolidated driver (event- or calendar-boundary observations) ----------
-
 def compute_finite_window_flow_metrics(
     events: List[Tuple[pd.Timestamp, int, int]],
     *,
@@ -361,58 +354,7 @@ def _resolve_freq(
         f"or one of {{day, week, month, quarter, year}}."
     )
 
-
-def compute_end_effect_series(df: pd.DataFrame,
-                              times: List[pd.Timestamp],
-                              A_vals: np.ndarray,
-                              W_star: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Compute end-effect diagnostics over [t0, t]:
-
-    Returns arrays aligned to `times`:
-      - rA(T) = E(T) / A(T), where E(T) = A(T) - sum(full durations of items fully contained)
-      - rB(T) = B(T) / total_items_started_by_t, boundary share
-      - rho(T) = T / W*(t), window/typical-duration ratio
-    """
-    n = len(times)
-    rA = np.full(n, np.nan, dtype=float)
-    rB = np.full(n, np.nan, dtype=float)
-    rho = np.full(n, np.nan, dtype=float)
-    if n == 0:
-        return rA, rB, rho
-
-    df = df.copy()
-    df["duration_h"] = (df["end_ts"] - df["start_ts"]).dt.total_seconds() / 3600.0
-    df_sorted_by_end = df.sort_values("end_ts")
-    df_sorted_by_start = df.sort_values("start_ts")
-
-    t0 = times[0]
-
-    for i, t in enumerate(times):
-        elapsed_h = (t - t0).total_seconds() / 3600.0
-        if elapsed_h <= 0:
-            continue
-
-        A_T = float(A_vals[i]) if i < len(A_vals) and np.isfinite(A_vals[i]) else np.nan
-        if not np.isfinite(A_T) or A_T <= 0:
-            continue
-
-        mask_full = df_sorted_by_end["end_ts"].notna() & (df_sorted_by_end["end_ts"] <= t)
-        A_full = float(df_sorted_by_end.loc[mask_full, "duration_h"].sum()) if mask_full.any() else 0.0
-
-        E_T = max(A_T - A_full, 0.0)
-        rA[i] = E_T / A_T if A_T > 0 else np.nan
-
-        mask_started = (df_sorted_by_start["start_ts"] <= t)
-        total_started = int(mask_started.sum())
-        mask_incomplete_by_t = mask_started & ((df_sorted_by_start["end_ts"].isna()) | (df_sorted_by_start["end_ts"] > t))
-        B_T = int(mask_incomplete_by_t.sum())
-        rB[i] = (B_T / total_started) if total_started > 0 else np.nan
-
-        Wstar_t = float(W_star[i]) if i < len(W_star) else float('nan')
-        rho[i] = (elapsed_h / Wstar_t) if np.isfinite(Wstar_t) and Wstar_t > 0 else np.nan
-
-    return rA, rB, rho
-
+#-------- Element-wise empirical metrics ------
 
 @dataclass
 class ElementWiseEmpiricalMetrics:
@@ -506,8 +448,58 @@ def compute_elementwise_empirical_metrics(df: pd.DataFrame, times: List[pd.Times
         lam_star=lam_star
     )
 
+#--------- Calculating end effects and tracking errors ------ #
 
+def compute_end_effect_series(df: pd.DataFrame,
+                              times: List[pd.Timestamp],
+                              A_vals: np.ndarray,
+                              W_star: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Compute end-effect diagnostics over [t0, t]:
 
+    Returns arrays aligned to `times`:
+      - rA(T) = E(T) / A(T), where E(T) = A(T) - sum(full durations of items fully contained)
+      - rB(T) = B(T) / total_items_started_by_t, boundary share
+      - rho(T) = T / W*(t), window/typical-duration ratio
+    """
+    n = len(times)
+    rA = np.full(n, np.nan, dtype=float)
+    rB = np.full(n, np.nan, dtype=float)
+    rho = np.full(n, np.nan, dtype=float)
+    if n == 0:
+        return rA, rB, rho
+
+    df = df.copy()
+    df["duration_h"] = (df["end_ts"] - df["start_ts"]).dt.total_seconds() / 3600.0
+    df_sorted_by_end = df.sort_values("end_ts")
+    df_sorted_by_start = df.sort_values("start_ts")
+
+    t0 = times[0]
+
+    for i, t in enumerate(times):
+        elapsed_h = (t - t0).total_seconds() / 3600.0
+        if elapsed_h <= 0:
+            continue
+
+        A_T = float(A_vals[i]) if i < len(A_vals) and np.isfinite(A_vals[i]) else np.nan
+        if not np.isfinite(A_T) or A_T <= 0:
+            continue
+
+        mask_full = df_sorted_by_end["end_ts"].notna() & (df_sorted_by_end["end_ts"] <= t)
+        A_full = float(df_sorted_by_end.loc[mask_full, "duration_h"].sum()) if mask_full.any() else 0.0
+
+        E_T = max(A_T - A_full, 0.0)
+        rA[i] = E_T / A_T if A_T > 0 else np.nan
+
+        mask_started = (df_sorted_by_start["start_ts"] <= t)
+        total_started = int(mask_started.sum())
+        mask_incomplete_by_t = mask_started & ((df_sorted_by_start["end_ts"].isna()) | (df_sorted_by_start["end_ts"] > t))
+        B_T = int(mask_incomplete_by_t.sum())
+        rB[i] = (B_T / total_started) if total_started > 0 else np.nan
+
+        Wstar_t = float(W_star[i]) if i < len(W_star) else float('nan')
+        rho[i] = (elapsed_h / Wstar_t) if np.isfinite(Wstar_t) and Wstar_t > 0 else np.nan
+
+    return rA, rB, rho
 
 def compute_tracking_errors(times: List[pd.Timestamp],
                             w_vals: np.ndarray,
