@@ -6,6 +6,7 @@
 Finite-window flow metrics & convergence diagnostics with end-effect panel.
 See README.md for context.
 """
+from __future__ import annotations
 
 import sys
 from argparse import Namespace
@@ -20,8 +21,21 @@ from filter import FilterResult, apply_filters
 from metrics import compute_finite_window_flow_metrics, FlowMetricsResult
 from point_process import to_arrival_departure_process
 from spath.metrics import ElementWiseEmpiricalMetrics, compute_elementwise_empirical_metrics
-from spath.plots.plots import produce_all_charts
+from spath.plots.advanced import plot_advanced_charts
+from spath.plots.convergence import plot_convergence_charts
+from spath.plots.core import plot_core_flow_metrics_charts
+from spath.plots.misc import plot_misc_charts
+from spath.plots.stability import plot_stability_charts
 
+def produce_all_charts(df,  args, filter_result, metrics, empirical_metrics, out_dir):
+    written: List[str] = []
+    # create plots
+    written += plot_core_flow_metrics_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_convergence_charts(df, args, filter_result, metrics, empirical_metrics, out_dir)
+    written += plot_stability_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_advanced_charts(df, args, filter_result, metrics, out_dir)
+    written += plot_misc_charts(df, args, filter_result, metrics, out_dir)
+    return written
 
 # -------------------------------
 # Orchestration
@@ -62,5 +76,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
