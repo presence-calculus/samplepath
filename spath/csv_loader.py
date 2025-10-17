@@ -70,7 +70,7 @@ class CSVLoader:
     warn_on_empty: bool = True
     error_on_all_invalid_times: bool = True
 
-    # ---------- delimiter detection & cache ----------
+    # ---------- Helpers  ----------
 
     @staticmethod
     @lru_cache(maxsize=256)
@@ -82,10 +82,10 @@ class CSVLoader:
             sample_bytes: int,
     ) -> Optional[str]:
         # Cache key is (path, size, mtime, candidates, sample_bytes) via lru_cache args
-        return CSVLoader._detect_delimiter(path, candidates, sample_bytes)
+        return CSVLoader.detect_delimiter(path, candidates, sample_bytes)
 
     @staticmethod
-    def _detect_delimiter(path: str, candidates: Tuple[str, ...], sample_bytes: int) -> Optional[str]:
+    def detect_delimiter(path: str, candidates: Tuple[str, ...], sample_bytes: int) -> Optional[str]:
         # Read a small header sample once
         with open(path, "rb") as f:
             sample = f.read(sample_bytes)
@@ -122,6 +122,74 @@ class CSVLoader:
 
         return best
 
+    @staticmethod
+    def require_columns(df: pd.DataFrame, cols: Iterable[str]) -> None:
+        missing = [c for c in cols if c not in df.columns]
+        if missing:
+            raise ValueError(f"Missing required column(s): {missing}")
+
+    def parse_dt_with_stats(self, s: pd.Series):
+        """
+        Returns (parsed_series, n_missing_raw, n_parse_failures).
+
+        - n_missing_raw: rows that were empty/NaN BEFORE parsing.
+        - n_parse_failures: rows that had non-empty text but still became NaT after parsing.
+        """
+        raw = s.copy()
+        parsed = pd.to_datetime(
+            raw,
+            errors="coerce",
+            utc=False,
+            format=self.date_format,
+            dayfirst=self.dayfirst,
+        )
+
+        is_missing_raw = raw.isna() | (raw.astype(str).str.strip() == "")
+        n_missing_raw = int(is_missing_raw.sum())
+
+        n_parse_fail = int((~is_missing_raw & parsed.isna()).sum())
+        return parsed, n_missing_raw, n_parse_fail
+
+    @staticmethod
+    def normalize_timezones(df: pd.DataFrame, cols: Tuple[str, str], target_tz: str) -> pd.DataFrame:
+        """
+        Normalize tz-naive and tz-aware columns to a single timezone.
+
+        - both naive  -> localize both to target_tz
+        - both aware  -> convert both to target_tz
+        - mixed       -> localize the naive, convert the aware
+        """
+        c0, c1 = cols
+        tz0 = df[c0].dt.tz
+        tz1 = df[c1].dt.tz
+
+        def localize(series: pd.Series) -> pd.Series:
+            # Only localize truly naive entries; keep NaT as-is
+            if series.dt.tz is not None:
+                return series
+            return series.dt.tz_localize(target_tz)
+
+        def convert(series: pd.Series) -> pd.Series:
+            if series.dt.tz is None:
+                return series
+            return series.dt.tz_convert(target_tz)
+
+        if tz0 is None and tz1 is None:
+            df[c0] = localize(df[c0])
+            df[c1] = localize(df[c1])
+        elif tz0 is not None and tz1 is not None:
+            df[c0] = convert(df[c0])
+            df[c1] = convert(df[c1])
+        else:
+            if tz0 is None:
+                df[c0] = localize(df[c0])
+                df[c1] = convert(df[c1])
+            else:
+                df[c0] = convert(df[c0])
+                df[c1] = localize(df[c1])
+
+        return df
+
     def load(self, path: str) -> pd.DataFrame:
         # --- choose delimiter ---
         sep = self.delimiter
@@ -146,13 +214,13 @@ class CSVLoader:
 
         # --- column presence checks ---
         df.columns = df.columns.str.strip()
-        self._require_columns(df, self.required_columns)
+        self.require_columns(df, self.required_columns)
 
         # --- parse datetimes with targeted warnings ---
         id, start_ts, end_ts = self.required_columns  # start_ts, end_ts
 
-        df[start_ts], n_start_missing, n_start_fail = self._parse_dt_with_stats(df[start_ts])
-        df[end_ts], n_end_missing,   n_end_fail   = self._parse_dt_with_stats(df[end_ts])
+        df[start_ts], n_start_missing, n_start_fail = self.parse_dt_with_stats(df[start_ts])
+        df[end_ts], n_end_missing, n_end_fail = self.parse_dt_with_stats(df[end_ts])
 
 
         # start_ts: any NaT (missing or failed) is noteworthy
@@ -188,7 +256,7 @@ class CSVLoader:
             for col in (start_ts, end_ts):
                 if not pd.api.types.is_datetime64_any_dtype(df[col]):
                     raise TypeError(f"Column '{col}' must be datetime64[ns][tz] after parsing.")
-            df = self._normalize_timezones(df, (start_ts,end_ts), self.target_tz)
+            df = self.normalize_timezones(df, (start_ts, end_ts), self.target_tz)
 
         # --- drop tzinfo for internal consistency ---
         for col in (start_ts, end_ts):
@@ -234,78 +302,6 @@ class CSVLoader:
             warnings.warn("DataFrame is empty after loading/cleaning.", RuntimeWarning)
 
         return df
-
-    # ------------------------ helpers ------------------------
-
-    @staticmethod
-    def _require_columns(df: pd.DataFrame, cols: Iterable[str]) -> None:
-        missing = [c for c in cols if c not in df.columns]
-        if missing:
-            raise ValueError(f"Missing required column(s): {missing}")
-
-
-    def _parse_dt_with_stats(self, s: pd.Series):
-        """
-        Returns (parsed_series, n_missing_raw, n_parse_failures).
-
-        - n_missing_raw: rows that were empty/NaN BEFORE parsing.
-        - n_parse_failures: rows that had non-empty text but still became NaT after parsing.
-        """
-        raw = s.copy()
-        parsed = pd.to_datetime(
-            raw,
-            errors="coerce",
-            utc=False,
-            format=self.date_format,
-            dayfirst=self.dayfirst,
-        )
-
-        is_missing_raw = raw.isna() | (raw.astype(str).str.strip() == "")
-        n_missing_raw = int(is_missing_raw.sum())
-
-        n_parse_fail = int((~is_missing_raw & parsed.isna()).sum())
-        return parsed, n_missing_raw, n_parse_fail
-
-    @staticmethod
-    def _normalize_timezones(df: pd.DataFrame, cols: Tuple[str, str], target_tz: str) -> pd.DataFrame:
-        """
-        Normalize tz-naive and tz-aware columns to a single timezone.
-
-        - both naive  -> localize both to target_tz
-        - both aware  -> convert both to target_tz
-        - mixed       -> localize the naive, convert the aware
-        """
-        c0, c1 = cols
-        tz0 = df[c0].dt.tz
-        tz1 = df[c1].dt.tz
-
-        def localize(series: pd.Series) -> pd.Series:
-            # Only localize truly naive entries; keep NaT as-is
-            if series.dt.tz is not None:
-                return series
-            return series.dt.tz_localize(target_tz)
-
-        def convert(series: pd.Series) -> pd.Series:
-            if series.dt.tz is None:
-                return series
-            return series.dt.tz_convert(target_tz)
-
-        if tz0 is None and tz1 is None:
-            df[c0] = localize(df[c0])
-            df[c1] = localize(df[c1])
-        elif tz0 is not None and tz1 is not None:
-            df[c0] = convert(df[c0])
-            df[c1] = convert(df[c1])
-        else:
-            if tz0 is None:
-                df[c0] = localize(df[c0])
-                df[c1] = convert(df[c1])
-            else:
-                df[c0] = convert(df[c0])
-                df[c1] = localize(df[c1])
-
-        return df
-
 
 def csv_to_dataframe(
     csv_path: str,
