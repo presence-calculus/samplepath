@@ -10,6 +10,8 @@ from typing import Iterable, Tuple, Optional
 import warnings
 import numpy as np
 import pandas as pd
+from pandas.api.types import DatetimeTZDtype
+
 import os
 import statistics
 
@@ -143,6 +145,7 @@ class CSVLoader:
         df = pd.read_csv(path, sep=sep)
 
         # --- column presence checks ---
+        df.columns = df.columns.str.strip()
         self._require_columns(df, self.required_columns)
 
         # --- parse datetimes with targeted warnings ---
@@ -150,6 +153,7 @@ class CSVLoader:
 
         df[start_ts], n_start_missing, n_start_fail = self._parse_dt_with_stats(df[start_ts])
         df[end_ts], n_end_missing,   n_end_fail   = self._parse_dt_with_stats(df[end_ts])
+
 
         # start_ts: any NaT (missing or failed) is noteworthy
         if n_start_missing or n_start_fail:
@@ -185,6 +189,11 @@ class CSVLoader:
                 if not pd.api.types.is_datetime64_any_dtype(df[col]):
                     raise TypeError(f"Column '{col}' must be datetime64[ns][tz] after parsing.")
             df = self._normalize_timezones(df, (start_ts,end_ts), self.target_tz)
+
+        # --- drop tzinfo for internal consistency ---
+        for col in (start_ts, end_ts):
+            if getattr(df[col].dtype, "tz", None) is not None:
+                df[col] = df[col].dt.tz_localize(None)
 
         # --- compute durations ---
         df["duration_td"] = df[end_ts] - df[start_ts]                                # NaT when end_ts is NaT
