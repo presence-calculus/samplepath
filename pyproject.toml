@@ -5,8 +5,8 @@ description = "Sample Path Analysis Library"
 authors = ["Krishna Kumar <kkumar@exathink.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://py.pcalc.org"
-repository = "https://github.com/krishnaku/samplepath"
+homepage = "https://docs.pcalc.org"
+repository = "https://github.com/presence-calculus/samplepath"
 packages = [{ include = "samplepath" }]
 keywords = ["presence", "flow", "queueing", "analytics"]
 classifiers = [
@@ -29,7 +29,6 @@ sortedcontainers = "^2.4.0"
 # remove them from extras. If optional, move them here and delete from dependencies.
 [tool.poetry.extras]
 polars = ["polars"]
-docs = ["pandas", "numpy", "matplotlib"]
 
 [tool.poetry.group.dev.dependencies]
 notebook = "*"
