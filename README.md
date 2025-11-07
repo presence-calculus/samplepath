@@ -16,48 +16,65 @@ complex adaptive systems.
 using the finite-window formulation of **Little’s Law**.  
 
 It provides deterministic, pathwise measurement tools for analyzing long run
-process dynamics: arrival/departure equilibrium, process time coherence, and
+flow process dynamics: arrival/departure equilibrium, process time coherence, and
 process stability along an observed sample path.
 
-The package implements the computational framework used in the
-*Presence Calculus* project to reason about **equilibrium**, **coherence**, and **stability**
+The package implements parts of a general computation framework for measuring
+and modeling flow processes: [The Presence Calculus Project](https://docs.pcalc.org)
+
+In this library we focus on tools to reason about **equilibrium**, **coherence**, and **stability**
 of flow processes from observed event timelines.
 
 ### Background
 
-For an overview of the key concepts please see 
-[The Many Faces of Little's Law](https://www.polaris-flow-dispatch.com/p/the-many-faces-of-littles-law).
+For an overview of the key concepts behind this library and how they can be applied in practice, please see 
+our posts continuing series on Little's Law and sample path analysis at 
 
-Our continuing series on Little's Law and sample path analysis at [The Polaris Flow Dispatch](https://www.polaris-flow-dispatch.com)
-has more background and applications of these concepts. Please subscribe if you want to get 
-ongoing guidance on how to use these tools and techniques to analyze flow processes in your organization. 
+[The Polaris Flow Dispatch](https://www.polaris-flow-dispatch.com)
+- [The Many Faces of Little's Law](https://www.polaris-flow-dispatch.com/p/the-many-faces-of-littles-law).
+- [Little's Law in a Complex Adaptive System](https://www.polaris-flow-dispatch.com/p/littles-law-in-a-complex-adaptive)
+
+The analyses in these posts  were produced using this toolkit 
+and can be found in the `examples` directory together with their original source data.
+
+Please subscribe if you want to get ongoing guidance on how to use these tools and techniques to analyze flow processes in your organization. 
 
 ## Core capabilities
 
-A flow process is simply a timeline of events from some underlying domain where
-events have effects that persist beyond the time of the event. Each event has one or more
-*marks* to as metadata to describe those effects. The toolkit is designed to be lightweight
-with minimal dependencies. 
+A flow process is simply a timeline of events from some underlying domain, where
+events have *effects* that persist beyond the time of the event. These effects are encoded using
+metadata (called marks) to describe those effects. 
 
-The data requirements are  minimal: a csv file with id, start and end date columns.
+The current version supports the analysis of binary flow processes. These are
+flow processes where the marks denote whether the event represents 
+the start or end of an observed presence of a domain element within some system boundary. 
 
-The current version supports the analysis of binary flow processes: Where we require no
-additional explicit marks (the start and end date serve as implicit marks for the
-start and end of some observed effect)
+These are simplest kind of flow processes we analyze in the presence calculus, but they cover the vast 
+majority of operational use cases we currently model in software delivery, so we will start there.
+
+### Requirements
+
+The data requirements for this analysis are  minimal: a csv file that represents 
+the observed timeline of a binary flow process: with element id, start and end date columns. 
+
+- The start and end dates may be empty, but for a meaningful analysis, we require at least 
+some of these dates to be non-empty. 
+- The system boundary is optional (the name of csv file becomes the default name of the boundary)
 
 Given this input, the toolkit provides
 
-A. Core python modules that correctly implement the computations for: 
+A. Core python modules that implement the computations for sample path analysis: 
 
-- Time-averaged flow metrics that are governed by the finite version of Little's Law
+- Time-averaged flow metrics governed by the finite version of Little's Law
    `N(t), L(T)`,`Λ(T)`, `w(T)`, `λ*(T)`, `W*(T)` (Please see here for definitions)
 - Performing *equilibrium* and **coherence** calculations (e.g., verifying `L(T) ≈ λ*(T)·W*(T)`)
 - Estimating empirical **limits** with uncertainty and **tail** checks to verify stability (alpha)
 
-B. Command line tools also provide simple modules that wrap all these calculation
+B. Command line tools provide utilities that that wrap these calculations
 
-- Generate publication-ready **charts and panel visualizations** 
-- Simple file based tools to run and save scenarios from different scenario analyses.
+- Simple workflows that take csv files as input to run sample path analysis with a rich set of parameters and options.
+- Generate publication-ready **charts and panel visualizations** as static png files. 
+- The ability to save different parametrized analyses from a single csv file as named scenarios.
 
 This toolkit provides the computational foundation for analyzing flow dynamics in 
 software delivery, operations, and other knowledge-work systems.
@@ -65,7 +82,7 @@ software delivery, operations, and other knowledge-work systems.
 
 ## 🚀 Installation (End Users)
 
-Pre-requisites Python 3 (only tested on version 3.11 or higher at present).
+Pre-requisites Python 3 (3.11 or higher at present).
 
 ```bash
 pip install samplepath
