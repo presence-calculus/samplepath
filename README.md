@@ -113,7 +113,7 @@ Pre-requisites Python 3 (3.11 or higher at present).
 - **Windows / Linux:**  
   Download from [python.org/downloads](https://www.python.org/downloads) and follow the installer.
 
----
+
 
 **2. Install pipx** *(recommended for CLI tools)*  
 ```bash
@@ -122,14 +122,14 @@ pipx ensurepath
 ```
 Then restart your terminal so the new PATH takes effect.
 
----
+
 
 **3. Install the CLI**
 ```bash
 pipx install samplepath
 ```
 
----
+
 
 **4. Verify installation**
 ```bash
