@@ -94,7 +94,7 @@ Deterministic, sample-path analogues of Little’s Law:
 | `λ*(T)` | Empirical arrival rate up to `T` |
 | `W*(T)` | Empirical mean sojourn time of items completed by `T` |
 
-These quantities enable rigorous study of **equilibrium** (rate balance), **coherence** (`L ≈ λ*·W*`), and **stability** (convergence of process and empirical measures to limits) even when processes operate far from steady state.
+These quantities enable rigorous study of **equilibrium** (arrival/departure rate convergence), **coherence** (residence time/sojourn time convergence), and **stability** (convergence of process measures to limits) even when processes operate far from steady state.
 
 ---
 
