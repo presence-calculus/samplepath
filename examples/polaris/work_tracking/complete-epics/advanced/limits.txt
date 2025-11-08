@@ -1,0 +1,32 @@
+PROCESS LIMIT ESTIMATION RESULTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+L                    ❌  (1/T_intercept_with_tail_checks)
+    Tail range:   4.602607
+    Coverage:     0.0%
+    Tail points:  23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+W                    ❌  (1/T_intercept_with_tail_checks)
+    Tail range:   520.142906
+    Coverage:     0.0%
+    Tail points:  23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LAMBDA_RATE          ❌  (tail_OLS_rate (C ~ a + ρT))
+    RMSE:         0.000039
+    Tail points:  23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LAMBDA_STAR          ❌  (1/T_intercept_with_tail_checks)
+    Tail range:   0.001028
+    Coverage:     0.0%
+    Tail points:  23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+W_STAR               ❌  (1/T_intercept_with_tail_checks)
+    Tail range:   1342.354684
+    Coverage:     0.0%
+    Tail points:  23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COHERENCE_L_VS_LAMW  ❌  (tail_epsilon_band_agreement)
+    Uncertainty:  ±1.114268
+    Tail range:   3.494432
+    Coverage:     26.1%
+    Tail points:  23
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

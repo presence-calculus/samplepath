@@ -34,7 +34,7 @@ our posts continuing series on Little's Law and sample path analysis at
 The analyses in these posts  were produced using this toolkit 
 and can be found in the `examples` directory together with their original source data.
 
-Please subscribe if you want to get ongoing guidance on how to use these tools and techniques to analyze flow processes in your organization. 
+Please subscribe to The Polaris Flow Dispatch, if you are interested in this topic. 
 
 ## Core capabilities
 
