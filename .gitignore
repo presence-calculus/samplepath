@@ -47,3 +47,5 @@ pytest_cache/
 
 #data
 .csv
+/coverage.xml
+
