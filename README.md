@@ -142,13 +142,13 @@ If this prints the help message, you’re ready to go.
 
 ```bash
 # Analyze completed items, save analysis to the output-dir under the scenario name shipped. Clean existing output directories
-samplepath --input events.csv --output-dir spath-analysis --scenario shipped --completed --clean
+samplepath events.csv --output-dir spath-analysis --scenario shipped --completed --clean
 
 # Limit analysis to elements with class story
-samplepath --input events.csv --class story
+samplepath events.csv --class story
 
 # Apply Tukey filter to remove items with outlier soujourn times before analysis of completed items
-samplepath --input events.csv  --outlier-iqr 1.5 --completed
+samplepath events.csv  --outlier-iqr 1.5 --completed
 ```
 
 ### 📂 Output Layout
