@@ -144,6 +144,11 @@ If this prints the help message, you’re ready to go.
 # Analyze completed items, save analysis to the output-dir under the scenario name shipped. Clean existing output directories
 samplepath events.csv --output-dir spath-analysis --scenario shipped --completed --clean
 
+# Pass an explicit date format (example below shows the typical case for non-US date formats). 
+# We use standard python date formats: https://docs.python.org/3/library/datetime.html#format-codes
+
+samplepath events.csv --date-format "%d/%m/%Y" --output-dir spath-analysis --scenario shipped --completed --clean
+
 # Limit analysis to elements with class story
 samplepath events.csv --class story
 
