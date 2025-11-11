@@ -9,7 +9,7 @@ complex adaptive systems.
 
 ______________________________________________________________________
 
-## 🔍 Overview
+## Overview
 
 **samplepath** is a Python library for the analysis of stability of flow processes
 using the finite-window formulation of **Little’s Law**.
@@ -82,7 +82,7 @@ B. Command line tools provide utilities that that wrap these calculations
 This toolkit provides the computational foundation for analyzing flow dynamics in
 software delivery, operations, and other knowledge-work systems.
 
-## 🧠 Key Metrics
+## Key Metrics
 
 Deterministic, sample-path analogues of Little’s Law:
 
@@ -98,11 +98,11 @@ These quantities enable rigorous study of **equilibrium** (arrival/departure rat
 
 ______________________________________________________________________
 
-## 🚀 Installation (End Users)
+## Installation (End Users)
 
 ### Quick Start with uv (Recommended)
 
-**uv** is a fast, modern Python package manager that handles everything - no need to install Python, pip, or pipx separately!
+**uv** is a fast, modern Python package manager that handles your setup.
 
 ### 1. Install uv
 
@@ -142,7 +142,29 @@ You can also run samplepath directly without installing it globally using `uvx`:
 uvx samplepath events.csv --help
 ```
 
-## 🧩 Example Usage
+### Alternative: Use pip and pipx
+If you already have python 3.11+ environment and dont want to switch package managers, 
+the standard installs via pip and pipx will also work
+
+Using pip
+```bash
+pip install samplepath
+samplepath --help
+```
+
+Using pipx (for end users/global CLI usage)
+```bash
+pipx install samplepath
+samplepath --help
+```
+
+To upgrade later
+
+```bash
+pipx upgrade samplepath
+```
+
+# 🧩 Usage
 
 ```bash
 # Analyze completed items, save analysis to the output-dir under the scenario name shipped. Clean existing output directories
