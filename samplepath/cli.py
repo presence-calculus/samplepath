@@ -25,61 +25,70 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     # -- CSV Parsing --- #
-    parser.add_argument("csv", type=str,
+    csv_group = parser.add_argument_group("CSV Parsing")
+    csv_group.add_argument("csv", type=str,
                         help="Path to CSV (id,start_ts,end_ts[,class])")
-    parser.add_argument("--start_column", type=str, help="Name of csv column representing start time",
-                        default="start_ts")
-    parser.add_argument("--end_column", type=str, help="Name of csv column representing end time", default="end_ts")
 
-    parser.add_argument("--date-format", type=str, default=None,
+    csv_group.add_argument("--delimiter", type=str, default=None,
+                        help="Optional delimiter for csv")
+
+    csv_group.add_argument("--start_column", type=str, help="Name of csv column representing start time",
+                           default="start_ts")
+    csv_group.add_argument("--end_column", type=str, help="Name of csv column representing end time", default="end_ts")
+
+    csv_group.add_argument("--date-format", type=str, default=None,
         help="Optional explicit datetime format string for parsing CSV timestamps (e.g. '%%d/%%m/%%Y %%H:%%M').")
-    parser.add_argument("--delimiter", type=str, default=None,
-        help="Optional delimiter for csv")
-    parser.add_argument("--dayfirst", action="store_true", default=False,
+
+    csv_group.add_argument("--dayfirst", action="store_true", default=False,
         help="Interpret ambiguous dates as day-first (e.g., 03/04/2024 → 3 April 2024).")
 
     # Input Data Filters ---#
-    parser.add_argument("--completed", action="store_true",
+    data_filters = parser.add_argument_group("Data filters")
+    data_filters.add_argument("--completed", action="store_true",
                         help="Only include items with an end_ts (completed work only)")
-    parser.add_argument("--incomplete", action="store_true", help="Only include items without an end_ts (aging view)")
+    data_filters.add_argument("--incomplete", action="store_true", help="Only include items without an end_ts (aging view)")
 
-    parser.add_argument("--classes", type=str, default=None,
+    data_filters.add_argument("--classes", type=str, default=None,
                         help="Comma-separated list of class tags to include (requires a 'class' column)")
 
     # - Outlier trimming --#
-    parser.add_argument("--outlier-hours", type=float, default=None,
+    outliers_group = parser.add_argument_group("Outlier Trimming")
+    outliers_group.add_argument("--outlier-hours", type=float, default=None,
                         help="Drop completed items whose (end_ts - start_ts) exceeds this many hours")
-    parser.add_argument("--outlier-pctl", type=float, default=None,
+    outliers_group.add_argument("--outlier-pctl", type=float, default=None,
                         help="Drop completed items above the Pth percentile of duration (0<P<100) after other filters")
-    parser.add_argument("--outlier-iqr", type=float, default=None,
+    outliers_group.add_argument("--outlier-iqr", type=float, default=None,
                         help="Drop completed items above Q3+K·IQR (Tukey high fence); pass K (e.g., 1.5)")
-    parser.add_argument("--outlier-iqr-two-sided", action="store_true",
+    outliers_group.add_argument("--outlier-iqr-two-sided", action="store_true",
                         help="Also drop items below Q1−K·IQR when used with --outlier-iqr")
     
     # - Fine tuning lambda display --#
-    parser.add_argument("--lambda-pctl", type=float, default=None,
+    lambda_fine_tuning = parser.add_argument_group("Lambda Fine Tuning")
+    lambda_fine_tuning.add_argument("--lambda-pctl", type=float, default=None,
                         help="Clip Λ(T) y-axis to the upper Pth percentile (0<P<100)")
-    parser.add_argument("--lambda-lower-pctl", type=float, default=None,
+    lambda_fine_tuning.add_argument("--lambda-lower-pctl", type=float, default=None,
                         help="Optionally clip the lower end to the Pth percentile as well")
-    parser.add_argument("--lambda-warmup", type=float, default=0.0,
+    lambda_fine_tuning.add_argument("--lambda-warmup", type=float, default=0.0,
                         help="Ignore the first H hours when computing Λ(T) percentiles")
 
     # -- Parameters for tuning sample path convergence charts ---#
-    parser.add_argument("--epsilon", type=float, default=0.05,
+    convergence_thresholds = parser.add_argument_group("Convergence Thresholds")
+    convergence_thresholds.add_argument("--epsilon", type=float, default=0.05,
                         help="Relative error threshold for convergence (default 0.05)")
-    parser.add_argument("--horizon-days", type=float, default=28.0,
+    convergence_thresholds.add_argument("--horizon-days", type=float, default=28.0,
                         help="Ignore this many initial days when assessing convergence - suppress the mixing period (default 28)")
 
     # output directory handling
-    parser.add_argument("--output-dir", type=lambda p: Path(p).expanduser().resolve(), default='charts',
+    output_dirs = parser.add_argument_group("Output Configuration")
+    output_dirs.add_argument("--output-dir", type=lambda p: Path(p).expanduser().resolve(), default='charts',
                         help="Root directory where charts will be written. Output will be written under a subdirectory of this directory named with the csv file name")
 
-    parser.add_argument("--scenario", type=str, default="latest",
+    output_dirs.add_argument("--scenario", type=str, default="latest",
                         help="create the output under a named folder. The default is 'latest' under the output folder created under output-dir")
     
-    parser.add_argument("--save-input", action='store_true', default=True,
+    output_dirs.add_argument("--save-input", action='store_true', default=True,
                         help="Copy the input csv to the output path (saved under input subdirectory)")
-    parser.add_argument("--clean", action="store_true", default=False,
+    output_dirs.add_argument("--clean", action="store_true", default=False,
                         help="removing existing charts in output directory")
 
 
