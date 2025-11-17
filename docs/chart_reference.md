@@ -66,6 +66,28 @@ This example is discussed in detail in our post [Little's Law in a complex adapt
 # Chart details
 Note that all calculations are done in *continuous time* and all charts report time accumulations in hours. 
 
+### Note: This is not statistics!
+
+Sample path analysis is *not* statistical analysis. It measures continuous real-valued ,
+measures over a flow process based on observable behavior. The tools are those of real
+analysis: integrals, derivatives, limits, convergence—not statistical concepts
+like averages, variances, or percentiles of assumed distributions.
+
+This matters especially in stochastic process with
+state, history and feedback mechanisms at play. This is common for flow processes
+in complex adaptive systems. Here, statistical distributions are non-stationary and their moments shift continuously. In such
+domains, sample path analysis and Little’s Law shine because they rely on
+physical conservation principles that constrain *how these averages can evolve
+over time*, regardless of the _nature of the underlying process_. 
+
+A side effect of sample path analysis is that we can
+observe a process as a black box and rigorously apply flow analysis even when a process
+is not stable. In fact, we can determine how close or far away the process is to stability,
+and thus determine whether standard statistical or probabilistic inference techniques can be applied. 
+
+For flow processes in complex adaptive systems, particularly ones with humans in the loop, this
+allows us to use Little’s Law for rigorous reasoning about the dynamics of the processes starting from 
+any observation point. 
 ## Core
 
 Written under:
@@ -97,36 +119,13 @@ H(T) = ∫₀ᵀ N(t) dt
 ```
 
 Since the area is a product of the number of items present over time, the units of H(T) are in item-time.
-
 H(T) is itself not very interesting to chart since this is simply a monotonically increasing function of time. 
 
 Rather, the parameters that drive flow-process dynamics are the time and item averages
 of H(T): L(T) and w(T).  These continuous functions of time are 
 the key quantities in the _finite version of Little’s Law_. 
 
-### Note: This is not statistics!
 
-Sample path analysis is *not* statistical analysis. It measures continuous real-valued ,
-characteristic of a flow process based on observable behavior. The tools are those of real
-analysis: integrals, derivatives, limits, convergence—not statistical concepts
-like averages, variances, or percentiles of assumed distributions.
-
-This matters especially in stochastic process with
-state, history and feedback mechanisms at play. This is common for flow processes
-in complex adaptive systems.
-
-Here, statistical distributions are non-stationary and their moments shift continuously. In such
-domains, sample path analysis and Little’s Law shine because they rely on
-physical conservation principles that constrain *how these averages can evolve
-over time*, regardless of the _nature of the underlying process_. 
-
-A side effect of sample path analysis is that we can
-observe a process as a black box and rigorously apply flow analysis even when a process
-is not stable. In fact, we can determine how close or far away the process is to stability,
-and thus determine whether standard statistical or probabilistic inference techniques can be applied. 
-
-For flow processes in complex adaptive systems, particularly ones with humans in the loop, the answer is often no—but
-Little’s Law _still_ allows rigorous reasoning about the dynamics of the processes anyway.
 
 ## `time_average_N_L.png`
 Time-average WIP:
