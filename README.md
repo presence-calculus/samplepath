@@ -96,6 +96,9 @@ Deterministic, sample-path analogues of Little’s Law:
 
 These quantities enable rigorous study of **equilibrium** (arrival/departure rate convergence), **coherence** (residence time/sojourn time convergence), and **stability** (convergence of process measures to limits) even when processes operate far from steady state.
 
+For a detailed reference of the charts and visualizations produced by sample path
+analysis and what they mean please our [Chart Reference](./docs/chart_reference.md).
+
 ______________________________________________________________________
 
 ## Installation (End Users)
