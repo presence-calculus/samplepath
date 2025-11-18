@@ -64,7 +64,6 @@ This example is discussed in detail in our post [Little's Law in a complex adapt
 ---
 
 # Chart details
-Note that all calculations are done in *continuous time* and all charts report time accumulations in hours. 
 
 ### Note: This is not statistics!
 
@@ -90,8 +89,9 @@ For flow processes in complex adaptive systems, particularly ones with humans in
 allows us to use Little’s Law for rigorous reasoning about the dynamics of the processes starting from 
 _any_ arbitrary observation point. 
 
-## Core Charts
+Note: All calculations are done in *continuous time* and all charts report time accumulations in hours.
 
+## Core Charts
 Written under:
 
 ```
@@ -133,6 +133,7 @@ the key quantities in the _finite version of Little’s Law_.
 Time-average WIP:
 
 `L(T)` is the time average of the area under the sample path. May also be viewed as the rate at which the area H(T) grows. 
+
 Its units are in items. 
 
 ```
@@ -153,6 +154,8 @@ Please note once again that this is _not a statistical average_.
 Λ(T) = A(T) / (T − t0)
 ```
 
+It's units are items/time
+
 If WIP was zero at the beginning of the observation window, then this is the same as the arrival rate, otherwise
 this over-counts the arrival rate at the start, but as we observe the process for longer periods, those initial
 end-effects get averaged out. 
@@ -170,15 +173,15 @@ not observed).
 w(T) = (1/A(T)) H(T)
 ```
 
-Tracks how “observed time in system” evolves over the sample path.
+Tracks how “observed time in system” evolves over the sample path. Its units are time/items
 
 Please see our posts [What is Residence Time](https://www.polaris-flow-dispatch.com/p/what-is-residence-time)
 and [How long does it take](https://www.polaris-flow-dispatch.com/p/how-long-does-it-take) for an explanation
 of what this metric means. 
 
-Understanding the difference and relationship between residence time and familiar
+_Understanding the difference and relationship between residence time and familiar
 metrics like Lead Time, Cycle Time and Work Item Age is crucial for understanding why sample path analysis works
-and these posts explain this. 
+and these posts explain this._ 
 
 ![Average Residence Time](../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/average_residence_time_w.png)
 
@@ -198,6 +201,7 @@ all the points will lie on the with `y = x`.
 
 Notice how points cluster around certain values of L(T). These are significant operating
 modes for the process as it moves towards a stable states. 
+
 ---
 
 ## Scenario-Level Summary
@@ -218,7 +222,7 @@ Four-panel summary:
 
 The four charts are summarized at the top level in one single chart. 
 
-![Little's Law Invariant](../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_flow_metrics.png)
+![Sample Path Flow Metrics](../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_flow_metrics.png)
 
 In this chart the main thing to pay attention to are the _relationships_
 between the changes in each of these component charts over time. 
