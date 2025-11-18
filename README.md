@@ -56,7 +56,7 @@ majority of operational use cases we currently model in software delivery, so we
 
 ## Data Requirements
 
-###Please Note: [sample path analysis is not a statistical method](./docs/not_statistics.md).
+### Please Note: [sample path analysis is not a statistical method](./docs/not_statistics.md).
 
 The data requirements for this analysis are minimal: a csv file that represents
 the observed timeline of a binary flow process: with element id, start and end date columns.
