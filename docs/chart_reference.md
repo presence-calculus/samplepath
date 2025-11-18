@@ -68,8 +68,9 @@ Note that all calculations are done in *continuous time* and all charts report t
 
 ### Note: This is not statistics!
 
-Sample path analysis is *not* statistical analysis. It measures continuous real-valued ,
-measures over a flow process based on observable behavior. The tools are those of real
+Sample path analysis is *not* statistical analysis. It takes continuous real-valued
+measurements over a flow process based on observable behavior. These are functions that we reason about using the
+tools of real
 analysis: integrals, derivatives, limits, convergence—not statistical concepts
 like averages, variances, or percentiles of assumed distributions.
 
@@ -87,8 +88,9 @@ and thus determine whether standard statistical or probabilistic inference techn
 
 For flow processes in complex adaptive systems, particularly ones with humans in the loop, this
 allows us to use Little’s Law for rigorous reasoning about the dynamics of the processes starting from 
-any observation point. 
-## Core
+_any_ arbitrary observation point. 
+
+## Core Charts
 
 Written under:
 
@@ -96,7 +98,7 @@ Written under:
 <scenario>/core/
 ```
 
-## `sample_path_N.png`
+### `sample_path_N.png`
 Instantaneous WIP `N(t)`. This shows the number of items observed
 at time t. 
 
@@ -110,7 +112,7 @@ This is a real time chart that reveals current congestion, bursts, and idle peri
 
 ![Sample Path](../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/sample_path_N.png)
 
-## The area under the sample path
+### The area under the sample path
 A key quantity in sample path analysis is the *area under the sample path*.
 This is calculated as the definite integral of the sample path curve over [0,T] 
 
@@ -127,30 +129,31 @@ the key quantities in the _finite version of Little’s Law_.
 
 
 
-## `time_average_N_L.png`
+### `time_average_N_L.png`
 Time-average WIP:
 
-This is the time average of the area under the sample path. May also be viewed as the rate at which the area H(T) grows. 
+`L(T)` is the time average of the area under the sample path. May also be viewed as the rate at which the area H(T) grows. 
 Its units are in items. 
 
 ```
 L(T) = (1/T) H(T)
 ```
 
-Reveals whether average WIP diverges or converges. This is the key top level indicator of process stability. A flat line here indicates
+Reveals whether long run average WIP diverges or converges. This is the key top level indicator of process stability. A flat line here indicates
 a stable process. 
 
 Please note once again that this is _not a statistical average_. 
 
 ![Time Average of WIP](../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/time_average_N_L.png)
 
-## `cumulative_arrival_rate_Lambda.png`
- Arrival rate of items that have arrived up to T (may include items that started before the window):
+### `cumulative_arrival_rate_Lambda.png`
+ `Λ(T)` is the arrival rate of items that have arrived up to T (may include items that started before the window):
 
 ```
 Λ(T) = A(T) / (T − t0)
 ```
-If WIP was zero at the beginning of the obervation window, then this is the same as the arrival rate, otherwise
+
+If WIP was zero at the beginning of the observation window, then this is the same as the arrival rate, otherwise
 this over-counts the arrival rate at the start, but as we observe the process for longer periods, those initial
 end-effects get averaged out. 
 
@@ -158,7 +161,7 @@ end-effects get averaged out.
 
 
 
-## `average_residence_time_w.png`
+### `average_residence_time_w.png`
 Average time items are observed as spending in the observation window up to time T (clips the time that is spent outside the window and thus
 not observed). 
 
@@ -180,9 +183,7 @@ and these posts explain this.
 ![Average Residence Time](../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/average_residence_time_w.png)
 
 
-## `littles_law_invariant.png`
-Scatter of `L(T)` vs `Λ(T)·w(T)` with `y = x`.  
-Direct Little’s Law invariance check.
+### `littles_law_invariant.png`
 
 This plot visualizes the [finite version of Little's Law](https://www.polaris-flow-dispatch.com/i/172332418/the-finite-version-of-littles-law) at work. 
 
@@ -191,13 +192,15 @@ It states that for all T, `L(T)=Λ(T)·w(T)`.
 We verify this by showing that when we plot `L(T)` vs `Λ(T)·w(T)` on a scatter plot, 
 all the points will lie on the with `y = x`.  
 
-Notice how points cluster around certain values of L(T). These are significant operating
-modes for the process as it moves towards a stable states. 
+
 
 ![Little's Law Invariant](../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/littles_law_invariant.png)
+
+Notice how points cluster around certain values of L(T). These are significant operating
+modes for the process as it moves towards a stable states. 
 ---
 
-# Scenario-Level Summary
+## Scenario-Level Summary
 
 Written directly under:
 
@@ -205,7 +208,7 @@ Written directly under:
 <scenario>/
 ```
 
-## `sample_path_flow_metrics.png`
+### `sample_path_flow_metrics.png`
 Four-panel summary:
 
 1. `N(t)`
@@ -213,14 +216,27 @@ Four-panel summary:
 3. `Λ(T)`
 4. `w(T)`
 
-Primary dashboard for the finite-window LL metrics.
+The four charts are summarized at the top level in one single chart. 
 
-## `sample_path_convergence.png`
-Scatter of `L(T)` vs `λ*(t)·W*(t)` with tolerance band.  
-Highest-level convergence and coherence view.
+![Little's Law Invariant](../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_flow_metrics.png)
 
-Controlled by **Convergence Options**:  
-`--convergence`, `--coherence-eps`, `--completed`, `--incomplete`, `--warmup`.
+In this chart the main thing to pay attention to are the _relationships_
+between the changes in each of these component charts over time. 
+
+At any point in time, the relationship  `L(T)=Λ(T)·w(T)` holds, 
+so if `L(T)` changes Little's Law invariant states that it must be one of the following
+
+- Arrival rate driven: more or fewer things are arriving.
+- Residence time driven: things are taking longer to finish. 
+- A combination of the two: since L(T) is the product of the two, even small changes in each one simultaneously can lead to apparently large changes in L(T)
+- Conversely, when Λ(T) and w(T) move in opposite directions, they cancel each other and L(T) appears flat. This happens often when there is a feedback loop at play in the process. 
+
+then it must be because either `Λ(T)` or `w(T)` or both changed. 
+This allows us to monitor changes in L(T) and then immediately investigate
+the cause of that change. 
+
+All these different types of dynamics can be at play at different points in the evolution of the process. This chart is the place
+where all those long run dynamics will show most directly and clearly. 
 
 ---
 
@@ -253,7 +269,17 @@ Two-row comparison of averages + individual sojourn scatter.
 ## `convergence/panels/residence_time_sojourn_time_scatter.png`
 `w(T)` overlaid with individual ages or sojourns.
 
+## `sample_path_convergence.png`
+Scatter of `L(T)` vs `λ*(t)·W*(t)` with tolerance band.  
+Highest-level convergence and coherence view.
+
+Controlled by **Convergence Options**:  
+`--convergence`, `--coherence-eps`, `--completed`, `--incomplete`, `--warmup`.
+
+
 ---
+
+
 
 # Stability Charts
 
