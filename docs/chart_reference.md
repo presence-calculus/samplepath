@@ -11,14 +11,16 @@ its actual history. We study the behavior of time-varying functions using the
 machinery of real analysis: integrals, derivatives, limits, convergence.
 
 This makes sample path analysis fundamentally different from statistical
-approaches that rely on sampling and summarize behavior through averages,
-variances, percentiles, and similar measures. Those methods implicitly assume
-stationarity: that the moments of the underlying process (average, variance,
+approaches to measuring flow that rely on sampling and summarize behavior through averages,
+variances, percentiles, and similar measures. These methods work well when
+the underlying statistical distributions are well defined and 
+stationary: ie their moments of the underlying process (average, variance,
 skew etc.) don’t drift over time.
 
-The common understanding of Little’s Law is a good example. It is usually framed
-as a theorem about statistical averages. That framing is restrictive because it
-requires stationary distributions to apply it reliably. Yet most real-world
+The common implementations of flow metrics based on Little’s Law is a good example. It is usually framed
+as a theorem about statistical averages and flow metrics measure these averages
+over a sampling window. But this approach
+requires stationary distributions for the law to hold. Yet most real-world
 processes in complex adaptive systems are non-stationary.
 
 Being able to reason about non-stationary processes is essential to analyze
@@ -32,30 +34,41 @@ manifests conservation laws that underlie Little’s Law, and these apply withou
 any pre-conditions, at all times, over
 _any_ finite observation window.
 
-This is a stable invariant that constrain process behavior even when
+This version establishes a stable invariant that constrains process behavior even when
 distributions shift continuously or lack well-defined moments. It gives us a
 rigorous way to reason about nominally distributional properties of
 non-stationary processes by analyzing the interactions between time-varying
 functions that can be constructed from directly observable process behavior.
 
-In this framing, stability becomes an empirical property of the process: the
-convergence of the finite-window parameters toward finite limits over long
-observation horizons. A stable system minimally has non-stationary averages for
-key parameters, and this then allows a statistical and probabilistic techniques
-to be more readily applied.
+n this framing, stability becomes an empirical property of the process: the
+convergence of these time varying functions toward finite limits over long
+observation horizons. When these limits exist, they coincide with the stationary
+averages required by the classical statistical interpretation of Little’s Law. At that
+point, statistical and probabilistic techniques can be applied with much greater
+confidence.
 
-Sample path analysis lets us treat a process as a black box and use the finite
-version of Little’s Law to reason about its internal dynamics from any starting
-point in time, without knowing anything about the internal mechanisms of the
-process or its underlying statistical properties. We can assess how close or far
-the process is from stability—and therefore when standard statistical or
-probabilistic inference is appropriate.
+But even if those limits never exist, sample path analysis lets us treat a
+process as a black box and use the finite version of Little’s Law to reason
+about its internal dynamics from any starting point in time, without knowing
+anything about the internal mechanisms of the process or its underlying
+statistical properties. We can assess how close or far the process is from
+stability—and therefore when standard statistical or probabilistic inference is
+appropriate.
 
 This makes it the ideal analytical tool to reason about processes that operate
 far from equilibrium and stability, as we encounter often in software
 development.
 
 # The Charts
+
+Sample path analysis is a _deterministic_ analysis that can be run on any 
+observed process history. The charts in this package provide a comprehensive
+set of measurements and visualizations that can be used to reason 
+about the stability of flow process. 
+
+We can use the results of the analysis to understand whether a process is stable, and 
+if not what the causes of instability are and what needs to be done to move
+the process towards stability.
 
 The example charts in each section below are drawn from the Polaris scenario
 [completed-stories-outliers-removed](../examples/polaris/flow-of-work/complete-stories-outliers-removed).
