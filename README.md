@@ -18,8 +18,12 @@ It provides deterministic, pathwise measurement tools for analyzing long run
 flow process dynamics: arrival/departure equilibrium, process time coherence, and
 process stability along an observed sample path.
 
-The package implements components of [The Presence Calculus Project](https://docs.pcalc.org): a computational toolkit for modeling
-and measuring flow processes.
+The formal theory behind the concepts we implement in this toolkit can be found
+in the reference textbook [Sample Path Analysis of Queueing Systems](https://www.researchgate.net/publication/303785171_Sample-Path_Analysis_of_Queueing_Systems)
+by Muhammed El-Taha and Shaler Stidham (a downloadable PDF is available at the link).
+
+This package is a part of [The Presence Calculus Project](https://docs.pcalc.org): a computational toolkit for modeling
+and measuring flow processes, based on sample path analysis.
 
 ## Background
 
@@ -33,10 +37,6 @@ our posts continuing series on Little's Law and sample path analysis at
 
 The analyses in these posts were produced using this toolkit
 and can be found in the [examples](./examples/polaris) directory together with their original source data.
-
-The formal theory behind the concepts we implement in this toolkit can be found
-in the reference textbook [Sample Path Analysis of Queueing Systems](https://www.researchgate.net/publication/303785171_Sample-Path_Analysis_of_Queueing_Systems)
-by Muhammed El-Taha and Shaler Stidham (a downloadable PDF is available at the link).
 
 Please subscribe to [The Polaris Flow Dispatch](https://www.polaris-flow-dispatch.com, if you are interested in staying
 abreast of developments and applications of these concepts. 
