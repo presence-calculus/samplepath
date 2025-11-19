@@ -137,7 +137,7 @@ w(T) =  H(T)/A(T)
 ```
 
 Tracks how “observed time in system” evolves over the sample path. Its units are
-time/items
+time.
 
 Please see our
 posts [What is Residence Time](https://www.polaris-flow-dispatch.com/p/what-is-residence-time)
