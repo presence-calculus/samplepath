@@ -56,7 +56,7 @@ majority of operational use cases we currently model in software delivery, so we
 
 ## Data Requirements
 
-### Please Note: [sample path analysis is not a statistical method](./docs/not_statistics.md).
+### Please Note: [sample path analysis is not a statistical method](docs/src/not_statistics.md).
 
 The data requirements for this analysis are minimal: a csv file that represents
 the observed timeline of a binary flow process: with element id, start and end date columns.
@@ -106,7 +106,7 @@ These quantities enable rigorous study of **equilibrium** (arrival/departure rat
 ## Chart Reference 
 
 For a detailed reference of the charts and visualizations produced by sample path
-analysis and what they mean please see the [Chart Reference](./docs/chart_reference.md).
+analysis and what they mean please see the [Chart Reference](docs/src/chart_reference.md).
 
 ______________________________________________________________________
 
@@ -214,7 +214,7 @@ For input `events.csv`, output is organized as:
         ├── advanced/               # optional deep-dive charts
         └── misc/                   # ancillary artifacts
 ```
-A complete reference to the charts can be found [here](./docs/chart_reference.md)
+A complete reference to the charts can be found [here](docs/src/chart_reference.md)
 
 ## 🛠 Development Setup (for Contributors)
 
