@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Chart Reference</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+    html {
+      box-sizing: border-box;
+      font-size: 100%;
+    }
+
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.75;
+      background: #fff;
+      color: #111;
+
+      /* Remove Pandoc's injected width restrictions */
+      max-width: none !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    #page {
+      max-width: 880px;
+      width: 100%;
+      padding: 2rem 1rem;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: Georgia, serif;
+      font-weight: bold;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 1.25rem 0;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+    }
+
+    pre {
+      background: #f8f8f8;
+      padding: 1rem;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, monospace;
+      background: #f5f5f5;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+    }
+
+    blockquote {
+      margin: 2rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid #ddd;
+      color: #666;
+      font-style: italic;
+    }
+
+    .subtitle, .author, .date {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    nav#TOC {
+      margin: 2rem 0;
+      padding: 1rem;
+      border: 1px solid #eee;
+      background: #fafafa;
+      overflow-x: auto;
+    }
+
+    figure {
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+    }
+
+    figcaption {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 0.75rem;
+    }
+
+    header#title-block-header {
+      text-align: center;
+    }
+
+    #presence-link {
+      position: fixed;
+      top: 0.5rem;
+      right: 1rem;
+      font-size: 0.9rem;
+      background: #f9f9f9;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+
+    #presence-link a {
+      text-decoration: none;
+      color: #444;
+    }
+
+    #presence-link a:hover {
+      text-decoration: underline;
+    }
+
+
+    @media screen and (min-width: 1024px) {
+      body {
+        font-size: 1.15rem;
+      }
+
+      #page {
+        padding: 3rem 2rem;
+      }
+    }
+
+    @media screen and (max-width: 768px), (max-device-width: 768px) {
+      #presence-link {
+        position: static;
+        margin: 1rem auto;
+        text-align: center;
+        display: block;
+      }
+    }
+  </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="presence-link">
+  <a href="https://docs.pcalc.org" target="_blank">The Presence Calculus Project</a>
+  <div style="text-align: center; font-size: 80%;">
+    © 2025 Krishna Kumar. All rights reserved.
+  </div>
+</div>
+  <div class="wrapper">
+    <div id="page">
+                  <header id="title-block-header">
+        <h1 class="title"><strong>Chart Reference</strong></h1>
+        
+        <p class="author"><p><a href="https://github.com/presence-calculus/samplepath"><em>The
+Samplepath Analysis Toolkit</em></a></p></p>
+        
+              </header>
+                  <nav id="TOC" role="doc-toc">
+        <h2 id="toc-title">Contents</h2>
+        <ul>
+        <li><a href="#what-is-sample-path-analysis"
+        id="toc-what-is-sample-path-analysis">1 What is Sample Path
+        Analysis?</a>
+        <ul>
+        <li><a href="#the-charts." id="toc-the-charts.">1.1 The
+        charts.</a></li>
+        </ul></li>
+        <li><a href="#core-charts" id="toc-core-charts">2 Core
+        charts</a>
+        <ul>
+        <li><a href="#flow-metrics-summary"
+        id="toc-flow-metrics-summary">2.1 Flow metrics summary</a></li>
+        <li><a href="#the-component-metrics"
+        id="toc-the-component-metrics">2.2 The component metrics</a>
+        <ul>
+        <li><a href="#the-sample-path-nt"
+        id="toc-the-sample-path-nt">The sample path <span
+        class="math inline">\(N(t)\)</span></a></li>
+        <li><a href="#the-area-under-the-sample-path"
+        id="toc-the-area-under-the-sample-path">The area under the
+        sample path</a></li>
+        <li><a href="#lt-time-average-of-nt"
+        id="toc-lt-time-average-of-nt"><span
+        class="math inline">\(L(T)\)</span>: Time average of <span
+        class="math inline">\(N(t)\)</span></a></li>
+        <li><a href="#lambdat-cumulative-arrival-rate"
+        id="toc-lambdat-cumulative-arrival-rate"><span
+        class="math inline">\(\Lambda(T)\)</span>: Cumulative arrival
+        rate</a></li>
+        <li><a href="#wt-average-residence-time"
+        id="toc-wt-average-residence-time"><span
+        class="math inline">\(w(T)\)</span>: Average residence
+        time</a></li>
+        </ul></li>
+        <li><a href="#the-finite-version-of-littles-law"
+        id="toc-the-finite-version-of-littles-law">2.3 The finite
+        version of Little’s Law</a></li>
+        </ul></li>
+        <li><a href="#convergence---equilibrium-coherence"
+        id="toc-convergence---equilibrium-coherence">3 Convergence -
+        Equilibrium &amp; coherence</a>
+        <ul>
+        <li><a href="#convergence" id="toc-convergence">3.1
+        <code>convergence/</code></a></li>
+        <li><a href="#convergencearrival_departure_equilibrium.png"
+        id="toc-convergencearrival_departure_equilibrium.png">3.2
+        <code>convergence/arrival_departure_equilibrium.png</code></a></li>
+        <li><a href="#convergencepanelsarrival_rate_convergence.png"
+        id="toc-convergencepanelsarrival_rate_convergence.png">3.3
+        <code>convergence/panels/arrival_rate_convergence.png</code></a></li>
+        <li><a href="#convergencepanelsresidence_time_convergence.png"
+        id="toc-convergencepanelsresidence_time_convergence.png">3.4
+        <code>convergence/panels/residence_time_convergence.png</code></a></li>
+        <li><a href="#convergenceresidence_sojourn_coherence.png"
+        id="toc-convergenceresidence_sojourn_coherence.png">3.5
+        <code>convergence/residence_sojourn_coherence.png</code></a></li>
+        <li><a
+        href="#convergencepanelsresidence_time_sojourn_time_scatter.png"
+        id="toc-convergencepanelsresidence_time_sojourn_time_scatter.png">3.6
+        <code>convergence/panels/residence_time_sojourn_time_scatter.png</code></a></li>
+        <li><a href="#sample_path_convergence.png"
+        id="toc-sample_path_convergence.png">3.7
+        <code>sample_path_convergence.png</code></a></li>
+        </ul></li>
+        <li><a href="#stability-charts" id="toc-stability-charts">4
+        Stability Charts</a>
+        <ul>
+        <li><a href="#stability-and-stabilitypanels-rate-stability"
+        id="toc-stability-and-stabilitypanels-rate-stability">4.1
+        <code>stability/</code> and <code>stability/panels/</code> —
+        Rate stability</a></li>
+        <li><a href="#stabilitypanelswip_growth_rate.png"
+        id="toc-stabilitypanelswip_growth_rate.png">4.2
+        <code>stability/panels/wip_growth_rate.png</code></a></li>
+        <li><a href="#stabilitypanelstotal_age_growth_rate.png"
+        id="toc-stabilitypanelstotal_age_growth_rate.png">4.3
+        <code>stability/panels/total_age_growth_rate.png</code></a></li>
+        <li><a href="#stabilityrate_stability.png"
+        id="toc-stabilityrate_stability.png">4.4
+        <code>stability/rate_stability.png</code></a></li>
+        </ul></li>
+        <li><a href="#advanced-charts" id="toc-advanced-charts">5
+        Advanced Charts</a>
+        <ul>
+        <li><a
+        href="#advanced-error-terms-end-effects-and-manifold-view"
+        id="toc-advanced-error-terms-end-effects-and-manifold-view">5.1
+        <code>advanced/</code> — Error terms, end-effects, and manifold
+        view</a></li>
+        <li><a href="#advancedresidence_convergence_errors.png"
+        id="toc-advancedresidence_convergence_errors.png">5.2
+        <code>advanced/residence_convergence_errors.png</code></a></li>
+        <li><a
+        href="#advancedresidence_time_convergence_errors_endeffects.png"
+        id="toc-advancedresidence_time_convergence_errors_endeffects.png">5.3
+        <code>advanced/residence_time_convergence_errors_endeffects.png</code></a></li>
+        <li><a href="#advancedinvariant_manifold3d_log.png"
+        id="toc-advancedinvariant_manifold3d_log.png">5.4
+        <code>advanced/invariant_manifold3D_log.png</code></a></li>
+        </ul></li>
+        </ul>
+      </nav>
+            <p>This reference describes every chart produced by the
+            <code>samplepath</code> CLI, grouped by chart type.</p>
+            <h1 id="what-is-sample-path-analysis">1 What is Sample Path
+            Analysis?</h1>
+            <p>Sample path analysis is a <em>deterministic</em> analysis
+            that can be run on any observed flow process history.</p>
+            <p>They let us reason about the dynamics and stability of
+            flow processes over the long run, and also in real-time.</p>
+            <p>We use sample path analysis to determine whether a
+            process is stable, and if not what the causes of instability
+            are, and what needs to be done to move the process towards
+            operationally acceptable range of stability.</p>
+            <p><strong>Please see our technical note</strong>: <a
+            href="./not_statistics.html">Sample path analysis is not a
+            statistical technique.</a></p>
+            <h2 id="the-charts.">1.1 The charts.</h2>
+            <p>The results of the analysis are a collection of charts
+            that are written to an output directory.</p>
+            <p>For input <code>events.csv</code>, output is organized as
+            follows:</p>
+            <div class="sourceCode" id="cb1"><pre
+            class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>output-dir<span class="op">&gt;</span>/</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> events/</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">└──</span> <span class="op">&lt;</span>scenario<span class="op">&gt;</span>/                 <span class="co"># e.g., latest</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> input/                  <span class="co"># a snapshot  of the input csv data</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> core/                   <span class="co"># core flow metrics &amp; tables</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> convergence/            <span class="co"># convergence vs divergence</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> stability/              <span class="co"># boundedness and existence of limits</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> advanced/               <span class="co"># optional deep-dive charts</span></span></code></pre></div>
+            <p>The example charts in each section below are drawn from
+            the Polaris scenario <a
+            href="../../examples/polaris/flow-of-work/complete-stories-outliers-removed">completed-stories-outliers-removed</a>.</p>
+            <p>This example is discussed in detail in our post <a
+            href="https://www.polaris-flow-dispatch.com/i/172332418/sample-path-analysis-a-worked-example">Little’s
+            Law in a complex adaptive system</a></p>
+            <p>Note: All calculations are done in <em>continuous
+            time</em> and all charts report time accumulations in
+            hours.</p>
+            <h1 id="core-charts">2 Core charts</h1>
+            <p>Time series charts showing the core functions that govern
+            the dynamics of the flow process.</p>
+            <p><strong>Conventions:</strong></p>
+            <ul>
+            <li>All functions are charted over a continuous finite
+            interval of time <span
+            class="math inline">\([0,T]\)</span>.</li>
+            <li>Functions of lower-case <span
+            class="math inline">\(t\)</span> are instantaneous
+            measurements at a point in time <span
+            class="math inline">\(0 \le t \le T\)</span>.</li>
+            <li>Functions of upper case T represent <em>aggregates</em>
+            computed over the interval <span
+            class="math inline">\([0,t]\)</span> for each <span
+            class="math inline">\(0 \le t \le T\)</span>.</li>
+            </ul>
+            <p>There are four core time-varying functions</p>
+            <ul>
+            <li>The sample path <span
+            class="math inline">\(N(t)\)</span> (aka <em>instantaneous
+            WIP</em>)</li>
+            <li>L(T): The time average of <span
+            class="math inline">\(N(t)\)</span> (aka time average of
+            WIP)</li>
+            <li><span class="math inline">\(\Lambda(T)\)</span>: The
+            cumulative arrival rate.</li>
+            <li><span class="math inline">\(w(T)\)</span>: The average
+            residence time</li>
+            </ul>
+            <p>The finite version of Little’s Law states that <span
+            class="math display">\[ L(T) = \Lambda(T).w(T) \]</span> for
+            <em>any</em> finite observation window <span
+            class="math inline">\([0,T]\)</span> with <span
+            class="math inline">\(0 \lt T \lt \infty\)</span>.</p>
+            <p>This means that last three functions <em>always</em>
+            change in time in such a way that this identity holds. This
+            constraints governs the global dynamics of the flow process
+            which is what we show in the very first chart you should
+            look at after running the analysis.</p>
+            <h2 id="flow-metrics-summary">2.1 Flow metrics summary</h2>
+            <p>This chart can be found at the top level under
+            <code>&lt;scenario&gt;/</code></p>
+            <table>
+            <colgroup>
+            <col style="width: 14%" />
+            <col style="width: 37%" />
+            <col style="width: 48%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>File</th>
+            <th>What it shows</th>
+            <th>What it means</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>sample_path_flow_metrics.png</code></td>
+            <td>Four-panel vertical stack: <code>N(t)</code>,
+            <code>L(T)</code>, <code>Λ(T)</code>, <code>w(T)</code> over
+            the same time axis.</td>
+            <td>One-glance view of the core finite-window Little’s Law
+            metrics and how they co-evolve along the sample path.</td>
+            </tr>
+            </tbody>
+            </table>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_flow_metrics.png"
+            alt="Fig 1. Sample Path Flow Metrics" />
+            <figcaption aria-hidden="true">Fig 1. Sample Path Flow
+            Metrics</figcaption>
+            </figure>
+            <p>In this chart the main thing to pay attention to are the
+            <em>relationships</em> between the <em>changes</em> in each
+            of these component charts over time.</p>
+            <ul>
+            <li>At any point in time review whether <span
+            class="math inline">\(L(T)\)</span> the time average of
+            <span class="math inline">\(N(t)\)</span> is changing or
+            flat.</li>
+            <li>If it is changing then the finite version of Little’s
+            Law tells us that this must be because at least one of <span
+            class="math inline">\(\Lambda(T)\)</span> or <span
+            class="math inline">\(w(T)\)</span> changed.</li>
+            </ul>
+            <p>It means that these are the <em>only</em> possible
+            explanations:</p>
+            <ul>
+            <li><span class="math inline">\(\Lambda(T)\)</span> changed:
+            more or fewer things are arriving.</li>
+            <li><span class="math inline">\(w(T)\)</span> changed:
+            things are taking more or less time to finish.</li>
+            <li>A combination of the two.</li>
+            </ul>
+            <p>In the last case there are two possibilities.</p>
+            <p>Since <span class="math inline">\(L(T)\)</span> is the
+            product of <span class="math inline">\(\Lambda(T)\)</span>
+            and <span class="math inline">\(w(T)\)</span>:</p>
+            <ul>
+            <li>If they move in the same direction they lead to
+            proportionally large changes in L(T)</li>
+            <li>If they move in opposite directions, the changes cancel
+            each other and <span class="math inline">\(L(T)\)</span>
+            tends to flatten.</li>
+            </ul>
+            <p>The last situation happens often when there is an
+            internal feedback loop at play in the process.</p>
+            <p>All these different types of dynamics can be at play at
+            different points in the evolution of the process. This chart
+            is the place where all those long run dynamics will show
+            most directly and clearly.</p>
+            <p>It helps us answer “how did the process evolve to produce
+            the flow metrics we are seeing at any given moment in time?”
+            These causal relationships allows us to monitor changes in
+            L(T) and then immediately investigate the cause of that
+            change.</p>
+            <p>See our post <a
+            href="https://www.polaris-flow-dispatch.com/i/171471652/the-causal-mechanism">The
+            Causal Arrow in Little’s Law</a> for more discussion on what
+            this means.</p>
+            <hr />
+            <h2 id="the-component-metrics">2.2 The component
+            metrics</h2>
+            <p>Each panel in the main chart is also written under</p>
+            <pre><code>&lt;scenario&gt;/core/</code></pre>
+            <table>
+            <colgroup>
+            <col style="width: 14%" />
+            <col style="width: 41%" />
+            <col style="width: 44%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>File</th>
+            <th>What it shows</th>
+            <th>What it means</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>core/sample_path_N.png</code></td>
+            <td>Step chart of <code>N(t)</code> (count of elements
+            present in the boundary) vs time.</td>
+            <td>Raw sample path of WIP/presence: queues, surges, and
+            droughts show up directly.</td>
+            </tr>
+            <tr>
+            <td><code>core/time_average_N_L.png</code></td>
+            <td>Line chart of <code>L(T)</code> = time-average of
+            <code>N(t)</code> over <code>[0, T]</code>.</td>
+            <td>Tracks how average WIP over the observation window
+            converges (or doesn’t). This is the “L” in Little’s Law,
+            measured pathwise.</td>
+            </tr>
+            <tr>
+            <td><code>core/cumulative_arrival_rate_Lambda.png</code></td>
+            <td>Line chart of <code>Λ(T)</code> (cumulative arrival rate
+            <code>A(T)/(T−t₀)</code>), with optional percentile clipping
+            and warmup exclusion.</td>
+            <td>Empirical arrival rate over time, with tools to ignore
+            early transients and outliers.</td>
+            </tr>
+            <tr>
+            <td><code>core/average_residence_time_w.png</code></td>
+            <td>Line chart of <code>w(T)</code> (average residence time
+            over the window, in hours).</td>
+            <td>Shows how the time items spend in the boundary evolves;
+            long/fat tails and slow drainage show up as increasing
+            <code>w(T)</code>.</td>
+            </tr>
+            <tr>
+            <td><code>core/littles_law_invariant.png</code></td>
+            <td>Scatter of <code>L(T)</code> (x-axis) vs
+            <code>Λ(T)·w(T)</code> (y-axis) with <code>y=x</code>
+            reference line, equal aspect ratio.</td>
+            <td>Pure Little’s Law invariant check: all finite points
+            should lie near <code>y=x</code> if the metric calculations
+            are consistent.</td>
+            </tr>
+            </tbody>
+            </table>
+            <p>Their detail descriptions follow.</p>
+            <h3 id="the-sample-path-nt">The sample path <span
+            class="math inline">\(N(t)\)</span></h3>
+            <p><code>sample_path_N.png</code></p>
+            <p>Instantaneous WIP <code>N(t)</code>. This shows the
+            number of items observed at time t.</p>
+            <p>Since we measure in continuous time, this chart is a
+            <em>step chart</em>.</p>
+            <ul>
+            <li>The line will go up with each arrival and go down with
+            each departure.</li>
+            <li>The line will stay steady if departures and arrivals
+            balance each other at a given instant.</li>
+            <li>In between arrivals and departures, the line will stay
+            flat.</li>
+            </ul>
+            <p>This is a real time chart that reveals current
+            congestion, bursts, and idle periods.</p>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/sample_path_N.png"
+            alt="Sample Path" />
+            <figcaption aria-hidden="true">Sample Path</figcaption>
+            </figure>
+            <h3 id="the-area-under-the-sample-path">The area under the
+            sample path</h3>
+            <p>A key quantity in sample path analysis is the <em>area
+            under the sample path</em>. This is calculated as the
+            definite integral of the sample path curve over [0,T]</p>
+            <pre><code>H(T) = ∫₀ᵀ N(t) dt</code></pre>
+            <p>Since the area is a product of the number of items
+            present over time, the units of H(T) are in item-time. H(T)
+            is itself not very interesting to chart since this is simply
+            a monotonically increasing function of time.</p>
+            <p>Rather, the parameters that drive flow-process dynamics
+            are the time and item averages of H(T): L(T) and w(T). These
+            continuous functions of time are the key quantities in the
+            <em>finite version of Little’s Law</em>.</p>
+            <h3 id="lt-time-average-of-nt"><span
+            class="math inline">\(L(T)\)</span>: Time average of <span
+            class="math inline">\(N(t)\)</span></h3>
+            <p><code>time_average_N_L.png</code></p>
+            <p>Time-average WIP:</p>
+            <p><code>L(T)</code> is the time average of the area under
+            the sample path. May also be viewed as the rate at which the
+            area H(T) grows.</p>
+            <p>Its units are in items.</p>
+            <pre><code>L(T) = (1/T) H(T)</code></pre>
+            <p>Reveals whether long run average WIP diverges or
+            converges. This is the key top level indicator of process
+            stability. A flat line here indicates a stable process.</p>
+            <p>Please note once again that this is <em>not a statistical
+            average</em>.</p>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/time_average_N_L.png"
+            alt="Time Average of WIP" />
+            <figcaption aria-hidden="true">Time Average of
+            WIP</figcaption>
+            </figure>
+            <h3 id="lambdat-cumulative-arrival-rate"><span
+            class="math inline">\(\Lambda(T)\)</span>: Cumulative
+            arrival rate</h3>
+            <p><code>cumulative_arrival_rate_Lambda.png</code></p>
+            <p><code>Λ(T)</code> is the arrival rate of items that have
+            arrived up to T (may include items that started before the
+            window):</p>
+            <pre><code>Λ(T) = A(T) / T</code></pre>
+            <p>It’s units are items/time</p>
+            <p>If WIP was zero at the beginning of the observation
+            window, then this is the same as the arrival rate, otherwise
+            this over-counts the arrival rate at the start, but as we
+            observe the process for longer periods, those initial
+            end-effects get averaged out.</p>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/time_average_N_L.png"
+            alt="Cumulative Arrival Rate" />
+            <figcaption aria-hidden="true">Cumulative Arrival
+            Rate</figcaption>
+            </figure>
+            <h3 id="wt-average-residence-time"><span
+            class="math inline">\(w(T)\)</span>: Average residence
+            time</h3>
+            <p><code>average_residence_time_w.png</code></p>
+            <p>Average time items are observed as spending in the
+            observation window up to time T (clips the time that is
+            spent outside the window and thus not observed).</p>
+            <pre><code>w(T) =  H(T)/A(T)</code></pre>
+            <p>Tracks how “observed time in system” evolves over the
+            sample path. Its units are time.</p>
+            <p>Please see our posts <a
+            href="https://www.polaris-flow-dispatch.com/p/what-is-residence-time">What
+            is Residence Time</a> and <a
+            href="https://www.polaris-flow-dispatch.com/p/how-long-does-it-take">How
+            long does it take</a> for an explanation of what this metric
+            means.</p>
+            <p><em>Understanding the difference and relationship between
+            residence time and familiar metrics like Lead Time, Cycle
+            Time and Work Item Age is crucial for understanding why
+            sample path analysis works and these posts explain
+            this.</em></p>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/average_residence_time_w.png"
+            alt="Average Residence Time" />
+            <figcaption aria-hidden="true">Average Residence
+            Time</figcaption>
+            </figure>
+            <h2 id="the-finite-version-of-littles-law">2.3 The finite
+            version of Little’s Law</h2>
+            <p><code>littles_law_invariant.png</code></p>
+            <p>This plot visualizes the <a
+            href="https://www.polaris-flow-dispatch.com/i/172332418/the-finite-version-of-littles-law">finite
+            version of Little’s Law</a> at work.</p>
+            <p>It states that for all T,
+            <code>L(T)=Λ(T)·w(T)</code>.</p>
+            <p>We verify this by showing that when we plot
+            <code>L(T)</code> vs <code>Λ(T)·w(T)</code> on a scatter
+            plot, all the points will lie on the with
+            <code>y = x</code>.</p>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/littles_law_invariant.png"
+            alt="Little’s Law Invariant" />
+            <figcaption aria-hidden="true">Little’s Law
+            Invariant</figcaption>
+            </figure>
+            <p>Notice how points cluster around certain values of L(T).
+            These are significant operating modes for the process as it
+            moves towards stable states.</p>
+            <hr />
+            <h1 id="convergence---equilibrium-coherence">3 Convergence -
+            Equilibrium &amp; coherence</h1>
+            <table>
+            <colgroup>
+            <col style="width: 9%" />
+            <col style="width: 41%" />
+            <col style="width: 48%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>File</th>
+            <th>What it shows</th>
+            <th>What it means</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>sample_path_convergence.png</code></td>
+            <td>Scatter of <code>L(T)</code> (x-axis) vs
+            <code>λ*(t)·W*(t)</code> (y-axis) with <code>y=x</code> and
+            an ε-band; annotated with a coherence score over a
+            horizon.</td>
+            <td>Direct visual and quantitative test of whether the
+            finite-window sample path obeys Little’s Law asymptotically
+            (sample-path convergence / coherence).</td>
+            </tr>
+            </tbody>
+            </table>
+            <figure>
+            <img
+            src="../../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_convergence.png"
+            alt="Sample Path Convergence" />
+            <figcaption aria-hidden="true">Sample Path
+            Convergence</figcaption>
+            </figure>
+            <table>
+            <colgroup>
+            <col style="width: 16%" />
+            <col style="width: 44%" />
+            <col style="width: 38%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>File</th>
+            <th>What it shows</th>
+            <th>What it means</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>convergence/arrival_departure_equilibrium.png</code></td>
+            <td>Two-row stack: (1) cumulative arrivals <code>A(t)</code>
+            vs cumulative departures <code>D(t)</code>; (2)
+            <code>Λ(T)</code> vs throughput rate
+            <code>θ(T)=D(T)/(T−t₀)</code> with masking after last
+            departure.</td>
+            <td>Tests arrival/departure equilibrium: whether
+            <code>A(t)</code> and <code>D(t)</code> grow together and
+            arrival/throughput rates converge.</td>
+            </tr>
+            <tr>
+            <td><code>convergence/panels/arrival_rate_convergence.png</code></td>
+            <td>Single panel: <code>Λ(T)</code> and <code>λ*(t)</code>
+            (empirical arrival rate) over time, with optional warmup and
+            percentile-based y-limits.</td>
+            <td>Compares window-averaged arrival rate to the
+            element-wise empirical rate; checks consistency of the two
+            ways of measuring “arrival rate”.</td>
+            </tr>
+            <tr>
+            <td><code>convergence/panels/residence_time_convergence.png</code></td>
+            <td>Single panel: <code>w(T)</code> vs <code>W*(t)</code>
+            (empirical mean sojourn time of completed items) over
+            time.</td>
+            <td>Coherence between residence-time and sojourn-time views:
+            if the process is coherent, these two series should converge
+            together.</td>
+            </tr>
+            <tr>
+            <td><code>convergence/residence_sojourn_coherence.png</code></td>
+            <td>Two-row stack: (1) <code>w(T)</code> vs
+            <code>W*(t)</code> overlay; (2) scatter of individual
+            sojourn times against time, with <code>w(T)</code> as a
+            reference line.</td>
+            <td>Ties the averaged quantities back to individual element
+            sojourn times; helps see whether outliers or subpopulations
+            are driving divergence.</td>
+            </tr>
+            <tr>
+            <td><code>convergence/panels/residence_time_sojourn_time_scatter.png</code></td>
+            <td>Line of <code>w(T)</code> over time with overlaid
+            scatter of element <em>age</em> (if
+            <code>--incomplete</code>) or sojourn time (if
+            <code>--completed</code> / default).</td>
+            <td>Visualizes how individual element ages/sojourn times
+            relate to the evolving average residence time, and whether a
+            stable band emerges.</td>
+            </tr>
+            </tbody>
+            </table>
+            <h2 id="convergence">3.1 <code>convergence/</code></h2>
+            <pre><code>&lt;scenario&gt;/convergence/
+&lt;scenario&gt;/convergence/panels/</code></pre>
+            <hr />
+            <h2 id="convergencearrival_departure_equilibrium.png">3.2
+            <code>convergence/arrival_departure_equilibrium.png</code></h2>
+            <p>Cumulative arrivals vs departures, plus
+            arrival/throughput rate comparison.<br />
+            Tests for equilibrium.</p>
+            <h2 id="convergencepanelsarrival_rate_convergence.png">3.3
+            <code>convergence/panels/arrival_rate_convergence.png</code></h2>
+            <p><code>Λ(T)</code> (window-average) and <code>λ*(t)</code>
+            (empirical).<br />
+            Checks rate consistency.</p>
+            <h2 id="convergencepanelsresidence_time_convergence.png">3.4
+            <code>convergence/panels/residence_time_convergence.png</code></h2>
+            <p><code>w(T)</code> vs <code>W*(t)</code>.<br />
+            Coherence between window-average residence and empirical
+            sojourn time.</p>
+            <h2 id="convergenceresidence_sojourn_coherence.png">3.5
+            <code>convergence/residence_sojourn_coherence.png</code></h2>
+            <p>Two-row comparison of averages + individual sojourn
+            scatter.</p>
+            <h2
+            id="convergencepanelsresidence_time_sojourn_time_scatter.png">3.6
+            <code>convergence/panels/residence_time_sojourn_time_scatter.png</code></h2>
+            <p><code>w(T)</code> overlaid with individual ages or
+            sojourns.</p>
+            <h2 id="sample_path_convergence.png">3.7
+            <code>sample_path_convergence.png</code></h2>
+            <p>Scatter of <code>L(T)</code> vs <code>λ*(t)·W*(t)</code>
+            with tolerance band.<br />
+            Highest-level convergence and coherence view.</p>
+            <p>Controlled by <strong>Convergence Options</strong>:<br />
+            <code>--convergence</code>, <code>--coherence-eps</code>,
+            <code>--completed</code>, <code>--incomplete</code>,
+            <code>--warmup</code>.</p>
+            <hr />
+            <h1 id="stability-charts">4 Stability Charts</h1>
+            <h2 id="stability-and-stabilitypanels-rate-stability">4.1
+            <code>stability/</code> and <code>stability/panels/</code> —
+            Rate stability</h2>
+            <table>
+            <colgroup>
+            <col style="width: 13%" />
+            <col style="width: 36%" />
+            <col style="width: 49%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>File</th>
+            <th>What it shows</th>
+            <th>What it means</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>stability/panels/wip_growth_rate.png</code></td>
+            <td>Two-row stack: (1) <code>N(t)</code> step chart; (2) WIP
+            growth rate <code>N(T)/T</code> with reference lines at 0
+            and 1.</td>
+            <td>Tests whether WIP grows linearly (instability) or
+            sublinearly/flat (bounded or stabilizing), using a rate
+            perspective.</td>
+            </tr>
+            <tr>
+            <td><code>stability/panels/total_age_growth_rate.png</code></td>
+            <td>Two-row stack: (1) total active age <code>R(t)</code> in
+            hours; (2) age growth rate <code>R(T)/T</code> with
+            reference lines at 0 and 1.</td>
+            <td>Looks at growth of total age of WIP: sustained growth
+            points to accumulating, aging work and potential
+            instability.</td>
+            </tr>
+            <tr>
+            <td><code>stability/rate_stability.png</code></td>
+            <td>Four-row stack: (1) <code>N(T)/T</code>; (2)
+            <code>R(T)/T</code>; (3) <code>λ*(T)</code>; (4)
+            <code>w(T)</code> vs <code>W*(t)</code>. Captioned
+            “Equilibrium and Coherence”.</td>
+            <td>Integrated stability view: WIP and age growth rates,
+            empirical arrival rate, and residence/sojourn coherence all
+            on one canvas to assess long-run rate stability.</td>
+            </tr>
+            </tbody>
+            </table>
+            <p>Written under:</p>
+            <pre><code>&lt;scenario&gt;/stability/
+&lt;scenario&gt;/stability/panels/</code></pre>
+            <p>Controlled by <strong>Stability Options</strong>:
+            <code>--stability</code>.</p>
+            <h2 id="stabilitypanelswip_growth_rate.png">4.2
+            <code>stability/panels/wip_growth_rate.png</code></h2>
+            <p><code>N(t)</code> and its growth rate
+            <code>N(T)/T</code>.<br />
+            Detects sublinear vs linear growth.</p>
+            <h2 id="stabilitypanelstotal_age_growth_rate.png">4.3
+            <code>stability/panels/total_age_growth_rate.png</code></h2>
+            <p>Total age <code>R(t)</code> and its growth rate.<br />
+            Identifies aging accumulation.</p>
+            <h2 id="stabilityrate_stability.png">4.4
+            <code>stability/rate_stability.png</code></h2>
+            <p>Four-panel stability synthesis:</p>
+            <ul>
+            <li><code>N(T)/T</code></li>
+            <li><code>R(T)/T</code></li>
+            <li><code>λ*(T)</code></li>
+            <li><code>w(T)</code> vs <code>W*(t)</code></li>
+            </ul>
+            <hr />
+            <hr />
+            <h1 id="advanced-charts">5 Advanced Charts</h1>
+            <h2
+            id="advanced-error-terms-end-effects-and-manifold-view">5.1
+            <code>advanced/</code> — Error terms, end-effects, and
+            manifold view</h2>
+            <table>
+            <colgroup>
+            <col style="width: 15%" />
+            <col style="width: 38%" />
+            <col style="width: 45%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>File</th>
+            <th>What it shows</th>
+            <th>What it means</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>advanced/residence_convergence_errors.png</code></td>
+            <td>Three-row stack: (1) <code>w(T)</code> vs
+            <code>W*(t)</code> (dynamic); (2) <code>Λ(T)</code> vs
+            <code>λ*(t)</code> (dynamic); (3) error magnitudes
+            <code>e_W(T)</code> and <code>e_Λ(T)</code> with optional ε
+            threshold.</td>
+            <td>Tracks <em>how</em> coherence is approached or violated,
+            with explicit error terms for residence time and arrival
+            rate over time.</td>
+            </tr>
+            <tr>
+            <td><code>advanced/residence_time_convergence_errors_endeffects.png</code></td>
+            <td>Four-row stack: same as above plus an end-effects panel
+            with <code>r_A(T)</code> (mass share), <code>r_B(T)</code>
+            (boundary share), and <code>ρ(T)=T/W*(t)</code>.</td>
+            <td>Decomposes residual errors into end-effect contributions
+            and time-scaling, making it clear when divergence is driven
+            by boundary conditions vs ongoing dynamics.</td>
+            </tr>
+            <tr>
+            <td><code>advanced/invariant_manifold3D_log.png</code></td>
+            <td>3D log–log–log manifold plot: <code>x = log Λ(T)</code>,
+            <code>y = log w(T)</code>, <code>z = log L(T)</code>,
+            plotting the sample-path trajectory on the plane
+            <code>z = x + y</code>.</td>
+            <td>Geometric view of Little’s Law as an invariant plane;
+            lets you see whether the observed trajectory sticks to the
+            manifold and how it moves across regimes in (rate, time,
+            WIP) space.</td>
+            </tr>
+            </tbody>
+            </table>
+            <p>Written under:</p>
+            <pre><code>&lt;scenario&gt;/advanced/</code></pre>
+            <p>Controlled by <strong>Advanced Options</strong>:
+            <code>--advanced</code>.</p>
+            <h2 id="advancedresidence_convergence_errors.png">5.2
+            <code>advanced/residence_convergence_errors.png</code></h2>
+            <p><code>w(T)</code> vs <code>W*(t)</code>;<br />
+            <code>Λ(T)</code> vs <code>λ*(t)</code>;<br />
+            error magnitudes.</p>
+            <h2
+            id="advancedresidence_time_convergence_errors_endeffects.png">5.3
+            <code>advanced/residence_time_convergence_errors_endeffects.png</code></h2>
+            <p>Adds end-effects: <code>r_A(T)</code>,
+            <code>r_B(T)</code>, <code>ρ(T)</code>.</p>
+            <h2 id="advancedinvariant_manifold3d_log.png">5.4
+            <code>advanced/invariant_manifold3D_log.png</code></h2>
+            <p>3D log–log–log manifold:<br />
+            <code>(log Λ(T), log w(T), log L(T))</code> on the plane
+            <code>z = x + y</code>.</p>
+            <hr />
+          </div>
+  </div>
+</body>
+</html>
