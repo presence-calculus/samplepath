@@ -1,0 +1,118 @@
+Scenario Parameters
+================================================================================
+
+csv
+---
+Help: Path to CSV (id,start_ts,end_ts[,class])
+Value: examples/kanban/csv/wip_5_sla_80_4_20.csv
+
+--date-format
+-------------
+Help: Optional explicit datetime format string for parsing CSV timestamps (e.g.
+  '%%d/%%m/%%Y %%H:%%M').
+Value: None
+
+--delimiter
+-----------
+Help: Optional delimiter for csv
+Value: None
+
+--dayfirst
+----------
+Help: Interpret ambiguous dates as day-first (e.g., 03/04/2024 → 3 April 2024).
+Default: False
+Value: False
+
+--completed
+-----------
+Help: Only include items with an end_ts (completed work only)
+Default: False
+Value: False
+
+--incomplete
+------------
+Help: Only include items without an end_ts (aging view)
+Default: False
+Value: False
+
+--classes
+---------
+Help: Comma-separated list of class tags to include (requires a 'class' column)
+Value: None
+
+--outlier-hours
+---------------
+Help: Drop completed items whose (end_ts - start_ts) exceeds this many hours
+Value: None
+
+--outlier-pctl
+--------------
+Help: Drop completed items above the Pth percentile of duration (0<P<100) after
+  other filters
+Value: None
+
+--outlier-iqr
+-------------
+Help: Drop completed items above Q3+K·IQR (Tukey high fence); pass K (e.g., 1.5)
+Value: None
+
+--outlier-iqr-two-sided
+-----------------------
+Help: Also drop items below Q1−K·IQR when used with --outlier-iqr
+Default: False
+Value: False
+
+--lambda-pctl
+-------------
+Help: Clip Λ(T) y-axis to the upper Pth percentile (0<P<100)
+Value: None
+
+--lambda-lower-pctl
+-------------------
+Help: Optionally clip the lower end to the Pth percentile as well
+Value: None
+
+--lambda-warmup
+---------------
+Help: Ignore the first H hours when computing Λ(T) percentiles
+Default: 0.0
+Value: 0.0
+
+--epsilon
+---------
+Help: Relative error threshold for convergence (default 0.05)
+Default: 0.05
+Value: 0.05
+
+--horizon-days
+--------------
+Help: Ignore this many initial days when assessing convergence - suppress the
+  mixing period (default 28)
+Default: 28.0
+Value: 28.0
+
+--output-dir
+------------
+Help: Root directory where charts will be written. Output will be written under a
+  subdirectory of this directory named with the csv file name
+Default: charts
+Value: /Users/krishna/code/pcalc/samplepath/examples/kanban
+
+--scenario
+----------
+Help: create the output under a named folder. The default is 'latest' under the
+  output folder created under output-dir
+Default: latest
+Value: latest
+
+--save-input
+------------
+Help: Copy the input csv to the output path (saved under input subdirectory)
+Default: True
+Value: True
+
+--clean
+-------
+Help: removing existing charts in output directory
+Default: False
+Value: False
