@@ -236,9 +236,29 @@ samplepath events.csv --class story
 samplepath events.csv  --outlier-iqr 1.5 --completed
 ```
 
-### 📂 Output Layout
+## 📂 Input Format
+
+The input format is simple. 
+
+The csv requires three columns
+
+- _id_: any string identifier to denote an element/item
+- _start_ts_: the start time of an event
+- _end_ts_: the end time of an event
+
+Additionally you may pass any other columns. They are all ignored for now, except for a column called _class_ which
+you can use to filter results by event/item type. 
+
+- If your csv has different column names, you can map them with  `--start_column` and `--end_column` options.
+- You might need to explicitly pass a date format for the time stamps if you see date parsing errors. The `--date-format` argument does this. 
 
 Results and charts are saved to the output directory as follows:
+- The default output directory is  "charts" in your current directory.
+- You can override this with the --output-dir argument. 
+
+See the [CLI Documentation](./docs/cli.md) for the full list of command line options. 
+
+## 📂 Output Layout
 
 For input `events.csv`, output is organized as:
 
