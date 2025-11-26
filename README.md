@@ -82,8 +82,8 @@ There are several capabilities we get from this:
   from complex adaptive systems. 
 - We can retrospectively reason about cause and effect in observed behavior 
   of these operational processes, and do so in a deterministic fashion. 
-- Naturally handle processes with state, history and path dependent 
-  behavior which are the norm in software development.  
+- Naturally model and reason about processes with state, history and path 
+  dependent behavior which are the norm in complex systems.  
 
 Thus sample path analysis is _the_ technical bridge to rigorously model and 
 measure flow processes in complex
