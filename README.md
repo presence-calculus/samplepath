@@ -111,8 +111,7 @@ abreast of developments and applications of these concepts.
 
 ## Flow processes
 
-A [flow process](https://www.polaris-flow-dispatch.
-com/i/172332418/flow-processes) is simply a timeline of events from some 
+A [flow process](https://www.polaris-flow-dispatch.com/i/172332418/flow-processes) is simply a timeline of events from some 
 underlying operational domain, where
 events have *effects* that persist beyond the time of the event. 
 The  effects are encoded using
