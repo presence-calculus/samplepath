@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Command Line Reference</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+    html {
+      box-sizing: border-box;
+      font-size: 100%;
+    }
+
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.75;
+      background: #fff;
+      color: #111;
+
+      /* Remove Pandoc's injected width restrictions */
+      max-width: none !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    #page {
+      max-width: 880px;
+      width: 100%;
+      padding: 2rem 1rem;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: Georgia, serif;
+      font-weight: bold;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 1.25rem 0;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+    }
+
+    pre {
+      background: #f8f8f8;
+      padding: 1rem;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, monospace;
+      background: #f5f5f5;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+    }
+
+    blockquote {
+      margin: 2rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid #ddd;
+      color: #666;
+      font-style: italic;
+    }
+
+    .subtitle, .author, .date {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    nav#TOC {
+      margin: 2rem 0;
+      padding: 1rem;
+      border: 1px solid #eee;
+      background: #fafafa;
+      overflow-x: auto;
+    }
+
+    figure {
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+    }
+
+    figcaption {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 0.75rem;
+    }
+
+    header#title-block-header {
+      text-align: center;
+    }
+
+    #presence-link {
+      position: fixed;
+      top: 0.5rem;
+      right: 1rem;
+      font-size: 0.9rem;
+      background: #f9f9f9;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+
+    #presence-link a {
+      text-decoration: none;
+      color: #444;
+    }
+
+    #presence-link a:hover {
+      text-decoration: underline;
+    }
+
+
+    @media screen and (min-width: 1024px) {
+      body {
+        font-size: 1.15rem;
+      }
+
+      #page {
+        padding: 3rem 2rem;
+      }
+    }
+
+    @media screen and (max-width: 768px), (max-device-width: 768px) {
+      #presence-link {
+        position: static;
+        margin: 1rem auto;
+        text-align: center;
+        display: block;
+      }
+    }
+  </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<div id="presence-link">
+  <a href="https://docs.pcalc.org" target="_blank">The Presence Calculus Project</a>
+  <div style="text-align: center; font-size: 80%;">
+    © 2025 Krishna Kumar. All rights reserved.
+  </div>
+</div>
+  <div class="wrapper">
+    <div id="page">
+                  <header id="title-block-header">
+        <h1 class="title"><strong>Command Line Reference</strong></h1>
+        
+        <p class="author"><p><a href="https://github.com/presence-calculus/samplepath"><em>The
+Samplepath Analysis Toolkit</em></a></p></p>
+        
+              </header>
+                  <nav id="TOC" role="doc-toc">
+        <h2 id="toc-title">Contents</h2>
+        <ul>
+        <li><a href="#invocation" id="toc-invocation">1
+        Invocation</a></li>
+        <li><a href="#options" id="toc-options">2 Options</a>
+        <ul>
+        <li><a href="#csv-parsing" id="toc-csv-parsing">2.1 CSV
+        Parsing</a></li>
+        <li><a href="#data-filters" id="toc-data-filters">2.2 Data
+        Filters</a></li>
+        <li><a href="#outlier-trimming" id="toc-outlier-trimming">2.3
+        Outlier Trimming</a></li>
+        <li><a href="#lambda-fine-tuning"
+        id="toc-lambda-fine-tuning">2.4 Lambda Fine Tuning</a></li>
+        <li><a href="#convergence-thresholds"
+        id="toc-convergence-thresholds">2.5 Convergence
+        Thresholds</a></li>
+        <li><a href="#output-configuration"
+        id="toc-output-configuration">2.6 Output Configuration</a></li>
+        <li><a href="#what-the-command-does"
+        id="toc-what-the-command-does">2.7 What the command
+        does</a></li>
+        <li><a href="#example" id="toc-example">2.8 Example</a></li>
+        </ul></li>
+        <li><a href="#inputs-and-outputs" id="toc-inputs-and-outputs">3
+        Inputs and Outputs</a>
+        <ul>
+        <li><a href="#input-format" id="toc-input-format">3.1 Input
+        Format</a></li>
+        <li><a href="#output-layout" id="toc-output-layout">3.2 Output
+        Layout</a></li>
+        </ul></li>
+        </ul>
+      </nav>
+            <h1 id="invocation">1 Invocation</h1>
+            <p>This tool generates finite-window Little’s Law charts
+            from an CSV file containing <code>id</code>,
+            <code>start_ts</code>, <code>end_ts</code>, and optionally a
+            <code>class</code> column. It produces a full set of long
+            run samplepath flow-metrics charts and writes them under an
+            output directory.</p>
+            <p>Invoke it on the command line with</p>
+            <div class="sourceCode" id="cb1"><pre
+            class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">samplepath</span> <span class="op">&lt;</span>csv-file<span class="op">&gt;</span> <span class="pp">[</span><span class="ss">options</span><span class="pp">]</span></span></code></pre></div>
+            <h1 id="options">2 Options</h1>
+            <h2 id="csv-parsing">2.1 CSV Parsing</h2>
+            <ul>
+            <li><p><strong>csv</strong> <em>(positional)</em><br />
+            Path to the CSV. Should contain at least the columns
+            (<code>id,start_ts,end_ts[, class]</code>)</p></li>
+            <li><p><strong>–delimiter</strong> <em>(default:
+            <code>","</code>)</em><br />
+            Optional delimiter override</p></li>
+            <li><p><strong>–start_column</strong> <em>(default:
+            <code>start_ts</code>)</em><br />
+            Name of start timestamp column</p></li>
+            <li><p><strong>–end_column</strong> <em>(default:
+            <code>end_ts</code>)</em><br />
+            Name of end timestamp column</p></li>
+            <li><p><strong>–date-format</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Explicit datetime format string for parsing</p></li>
+            </ul>
+            <hr />
+            <h2 id="data-filters">2.2 Data Filters</h2>
+            <p>Drop rows from the CSV before running the analysis.
+            Useful for isolating subprocesses in the main file. Use with
+            <code>--scenario</code> to save subprocess results.</p>
+            <ul>
+            <li><p><strong>–completed</strong> <em>(default:
+            <code>False</code>)</em><br />
+            Include only items with <code>end_ts</code></p></li>
+            <li><p><strong>–incomplete</strong> <em>(default:
+            <code>False</code>)</em><br />
+            Include only items without <code>end_ts</code></p></li>
+            <li><p><strong>–classes</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Comma-separated list of class tags to include</p></li>
+            </ul>
+            <hr />
+            <h2 id="outlier-trimming">2.3 Outlier Trimming</h2>
+            <p>Remove outliers to see whether the remaining process
+            converges.</p>
+            <ul>
+            <li><p><strong>–outlier-hours</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Drop items exceeding this many hours in sojourn
+            time</p></li>
+            <li><p><strong>–outlier-pctl</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Drop items above the given percentile of sojourn
+            times</p></li>
+            <li><p><strong>–outlier-iqr</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Drop items above Q3 + K·IQR (<a
+            href="https://en.wikipedia.org/wiki/Outlier#Tukey&#39;s_fences">Tukey
+            fence</a>)</p></li>
+            <li><p><strong>–outlier-iqr-two-sided</strong> <em>(default:
+            <code>False</code>)</em><br />
+            Also drop items below Q1 − K·IQR when combined with
+            <code>--outlier-iqr</code></p></li>
+            </ul>
+            <hr />
+            <h2 id="lambda-fine-tuning">2.4 Lambda Fine Tuning</h2>
+            <p>Sometimes it helps to drop early points in the λ(T) chart
+            so the remainder displays on a more meaningful scale.</p>
+            <ul>
+            <li><p><strong>–lambda-pctl</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Clip Λ(T) to the upper percentile (e.g., use <code>99</code>
+            to clarify charts)</p></li>
+            <li><p><strong>–lambda-lower-pctl</strong> <em>(default:
+            <code>None</code>)</em><br />
+            Clip the lower bound as well</p></li>
+            <li><p><strong>–lambda-warmup</strong> <em>(default:
+            <code>0.0</code>)</em><br />
+            Ignore the first H hours when computing Λ(T)
+            percentiles</p></li>
+            </ul>
+            <hr />
+            <h2 id="convergence-thresholds">2.5 Convergence
+            Thresholds</h2>
+            <ul>
+            <li><p><strong>–epsilon</strong> <em>(default:
+            <code>0.05</code>)</em><br />
+            Relative error threshold for convergence</p></li>
+            <li><p><strong>–horizon-days</strong> <em>(default:
+            <code>28.0</code>)</em><br />
+            Ignore this many initial days when assessing
+            convergence</p></li>
+            </ul>
+            <hr />
+            <h2 id="output-configuration">2.6 Output Configuration</h2>
+            <ul>
+            <li><p><strong>–output-dir</strong> <em>(default:
+            <code>charts</code>)</em><br />
+            Root directory where charts will be written</p></li>
+            <li><p><strong>–scenario</strong> <em>(default:
+            <code>latest</code>)</em><br />
+            Subdirectory inside the output root</p></li>
+            <li><p><strong>–save-input</strong> <em>(default:
+            <code>True</code>)</em><br />
+            Copy the input CSV into the output directory</p></li>
+            <li><p><strong>–clean</strong> <em>(default:
+            <code>False</code>)</em><br />
+            Remove existing charts before writing new results</p></li>
+            </ul>
+            <hr />
+            <h2 id="what-the-command-does">2.7 What the command
+            does</h2>
+            <ol type="1">
+            <li>Parse CLI arguments<br />
+            </li>
+            <li>Create the output directory structure<br />
+            </li>
+            <li>Copy input CSV under scenario</li>
+            <li>Write CLI parameters into the scenario folder<br />
+            </li>
+            <li>Run the sample-path analysis<br />
+            </li>
+            <li>Generate the charts and write to the output
+            directory.</li>
+            <li>Print paths to generated charts</li>
+            </ol>
+            <hr />
+            <h2 id="example">2.8 Example</h2>
+            <div class="sourceCode" id="cb2"><pre
+            class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">samplepath</span> events.csv <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--completed</span> <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outlier-iqr</span> 1.5 <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--lambda-pctl</span> 99 <span class="dt">\</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> charts <span class="dt">\</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--scenario</span> weekly_report <span class="dt">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--clean</span></span></code></pre></div>
+            <hr />
+            <h1 id="inputs-and-outputs">3 Inputs and Outputs</h1>
+            <h2 id="input-format">3.1 Input Format</h2>
+            <p>The input format is simple.</p>
+            <p>The csv requires three columns</p>
+            <ul>
+            <li><em>id</em>: any string identifier to denote an
+            element/item</li>
+            <li><em>start_ts</em>: the start time of an event</li>
+            <li><em>end_ts</em>: the end time of an event</li>
+            </ul>
+            <p>Additionally you may pass any other columns. They are all
+            ignored for now, except for a column called <em>class</em>
+            which you can use to filter results by event/item type.</p>
+            <ul>
+            <li>If your csv has different column names, you can map them
+            with <code>--start_column</code> and
+            <code>--end_column</code> options.</li>
+            <li>You might need to explicitly pass a date format for the
+            time stamps if you see date parsing errors. The
+            <code>--date-format</code> argument does this.</li>
+            </ul>
+            <p>Results and charts are saved to the output directory as
+            follows: - The default output directory is “charts” in your
+            current directory. - You can override this with the
+            –output-dir argument.</p>
+            <p>See the <a href="docs/src/cli.html">CLI Documentation</a>
+            for the full list of command line options.</p>
+            <h2 id="output-layout">3.2 Output Layout</h2>
+            <p>For input <code>events.csv</code>, output is organized
+            as:</p>
+            <div class="sourceCode" id="cb3"><pre
+            class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>output-dir<span class="op">&gt;</span>/</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> events/</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">└──</span> <span class="op">&lt;</span>scenario<span class="op">&gt;</span>/                 <span class="co"># e.g., latest</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> input/                  <span class="co"># input snapshots</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> core/                   <span class="co"># core metrics &amp; tables</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> convergence/            <span class="co"># limit estimates &amp; diagnostics</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> convergence/panels/     <span class="co"># multi-panel figures</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> stability/panels/       <span class="co"># stability/variance panels</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="ex">├──</span> advanced/               <span class="co"># optional deep-dive charts</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="ex">└──</span> misc/                   <span class="co"># ancillary artifacts</span></span></code></pre></div>
+            <p>–</p>
+            <p>A complete reference to the charts produced can be found
+            in <a href=".%20/chart_reference.html">The Chart
+            Reference</a>.</p>
+          </div>
+  </div>
+</body>
+</html>

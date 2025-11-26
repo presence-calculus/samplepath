@@ -12,19 +12,27 @@ figPrefix: "Figure"
 numberSections: true
 sectionsDepth: 2
 ---
-# Samplepath CLI Documentation
+
+# Invocation
 
 This tool generates finite-window Little’s Law charts from an CSV file containing `id`, `start_ts`, `end_ts`, and optionally a `class` column. 
 It produces a full set of long run samplepath flow-metrics charts and writes them under an output directory.
 
----
+Invoke it on the command line with
+
+```bash
+samplepath <csv-file> [options]
+```
+# Options
+
 
 ## CSV Parsing
 
 - **csv** *(positional)*  
-  Path to the CSV (`id,start_ts,end_ts[,class]`)
+  Path to the CSV. Should contain at least the columns (`id,start_ts,end_ts[,
+  class]`)
 
-- **--delimiter** *(default: `None`)*  
+- **--delimiter** *(default: `","`)*  
   Optional delimiter override
 
 - **--start_column** *(default: `start_ts`)*  
@@ -36,8 +44,6 @@ It produces a full set of long run samplepath flow-metrics charts and writes the
 - **--date-format** *(default: `None`)*  
   Explicit datetime format string for parsing
 
-- **--dayfirst** *(default: `False`)*  
-  Interpret ambiguous dates as day-first
 
 ---
 
@@ -115,18 +121,20 @@ Sometimes it helps to drop early points in the λ(T) chart so the remainder disp
 
 ---
 
-## Process Overview
+## What the command does
 
 1. Parse CLI arguments  
 2. Create the output directory structure  
-3. Optionally copy input CSV  
+3. Copy input CSV  under scenario
 4. Write CLI parameters into the scenario folder  
 5. Run the sample-path analysis  
+6. Generate the charts and write to the output directory. 
 6. Print paths to generated charts  
 
 ---
-## Example
 
+## Example
+```bash
 samplepath events.csv \
   --completed \
   --outlier-iqr 1.5 \
@@ -134,4 +142,51 @@ samplepath events.csv \
   --output-dir charts \
   --scenario weekly_report \
   --clean
+```
 
+---
+
+# Inputs and Outputs
+
+## Input Format
+
+The input format is simple. 
+
+The csv requires three columns
+
+- _id_: any string identifier to denote an element/item
+- _start_ts_: the start time of an event
+- _end_ts_: the end time of an event
+
+Additionally you may pass any other columns. They are all ignored for now, except for a column called _class_ which
+you can use to filter results by event/item type. 
+
+- If your csv has different column names, you can map them with  `--start_column` and `--end_column` options.
+- You might need to explicitly pass a date format for the time stamps if you see date parsing errors. The `--date-format` argument does this. 
+
+Results and charts are saved to the output directory as follows:
+- The default output directory is  "charts" in your current directory.
+- You can override this with the --output-dir argument. 
+
+See the [CLI Documentation](docs/src/cli.md) for the full list of command line options. 
+
+## Output Layout
+
+For input `events.csv`, output is organized as:
+
+```bash
+<output-dir>/
+└── events/
+    └── <scenario>/                 # e.g., latest
+        ├── input/                  # input snapshots
+        ├── core/                   # core metrics & tables
+        ├── convergence/            # limit estimates & diagnostics
+        ├── convergence/panels/     # multi-panel figures
+        ├── stability/panels/       # stability/variance panels
+        ├── advanced/               # optional deep-dive charts
+        └── misc/                   # ancillary artifacts
+```
+--
+
+A complete reference to the charts produced can be found in [The Chart 
+Reference](. /chart_reference.md).
