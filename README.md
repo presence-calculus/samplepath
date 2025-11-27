@@ -81,14 +81,18 @@ There are several capabilities we get from this:
 - We can precisely define, measure and reason about properties such as 
   equilibrium,  coherence and stability, using real-world operational data 
   from complex adaptive systems. 
+- We can do so _not just for stable processes_ but for processes that 
+  operate far from stable equilibrium.
 - We can retrospectively reason about cause and effect in observed behavior 
-  of these operational processes, and do so in a deterministic fashion. 
+  of these operational processes, and do so in a deterministic fashion - 
+  _even for process that are not stable_.  
 - Naturally model and reason about processes with state, history and path 
   dependent behavior which are the norm in complex systems.  
 
-Thus sample path analysis is _the_ technical bridge to rigorously model and 
-measure flow processes in complex
-adaptive systems. 
+These are precisely the conditions that confound traditional statistical and
+probabilistic reasoning about operational processes in complex systems. Thus
+sample path analysis is _the_ technical bridge to rigorously model and 
+measure flow processes in such contexts.
 
 ---
 
