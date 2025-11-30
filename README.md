@@ -195,8 +195,9 @@ on how to apply the concepts.
 ## Chart Reference 
 
 For a detailed reference of the computations, charts and visualizations produced by sample path
-analysis, please see the [Chart Reference](docs/src/chart_reference.md).
+analysis, please see the [Chart Reference](http://samplepath.pcalc.org/html/chart_reference.html).
 
+For complete documentation, see our [documentation site](http://samplepath.pcalc.org). 
 ---
 
 # 3. Goals for this toolkit
