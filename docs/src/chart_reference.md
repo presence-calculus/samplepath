@@ -55,7 +55,7 @@ For input `events.csv`, output is organized as follows:
 ```
 
 The example charts in each section below are drawn from the Polaris scenario
-[completed-stories-outliers-removed](../../examples/polaris/flow-of-work/complete-stories-outliers-removed).
+[completed-stories-outliers-removed](https://github.com/presence-calculus/samplepath/tree/main/examples/polaris/flow-of-work/complete-stories-outliers-removed).
 
 This example is discussed in detail in our
 post [Little's Law in a complex adaptive system](https://www.polaris-flow-dispatch.com/i/172332418/sample-path-analysis-a-worked-example)
