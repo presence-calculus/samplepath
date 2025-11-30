@@ -15,9 +15,13 @@ PAIRS=(
 MATH_ENGINE="--mathjax"     # e.g., "--mathjax" or leave empty ""
 
 # -------- Git helpers --------
-GIT_AWARE=0
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  GIT_AWARE=1
+# Allow overriding from the command line, e.g.:
+#   GIT_AWARE=0 ./pandocs.sh   # rebuild everything
+if [[ -z "${GIT_AWARE+x}" ]]; then
+  GIT_AWARE=0
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    GIT_AWARE=1
+  fi
 fi
 
 git_file_changed() {
