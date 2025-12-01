@@ -105,6 +105,7 @@ pandoc_for_file() {
   # Build args safely under `set -u`
   local -a args=(
     --filter pandoc-crossref
+    --lua-filter="$repo_root/docs/build/interpolate-vars.lua"
     --lua-filter="$repo_root/docs/build/md2html-links.lua"
     --number-sections
     --toc
