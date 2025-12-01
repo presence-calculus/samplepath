@@ -6,10 +6,11 @@ author: |
 figures-numbered: true
 link-citations: true
 
-header-image: "../assets/sample_path_flow_metrics.png"
+document-root: "../.."
+header-image: "$document-root/assets/sample_path_flow_metrics.png"
 
 toc-title: "Contents"
-toc-depth: 2
+toc-depth: 3
 
 figPrefix: "Figure"
 numberSections: true
@@ -34,7 +35,7 @@ We use sample path analysis to determine whether a process is stable, and
 if not what the causes of instability are, and what needs to be done to move
 the process towards operationally acceptable range of stability. 
 
-**Please see our technical note**: [Sample path analysis is not a statistical technique.](./not_statistics.md)
+**Please see our technical note**: [Sample path analysis is not a statistical technique.](../not_statistics.md)
 
 ## The charts.
 
@@ -103,7 +104,7 @@ This chart can be found at the top level under  `<scenario>/`
 | `sample_path_flow_metrics.png` | Four-panel vertical stack: `N(t)`, `L(T)`, `Λ(T)`, `w(T)` over the same time axis. | One-glance view of the core finite-window Little’s Law metrics and how they co-evolve along the sample path. |
 
 
-![Fig 1. Sample Path Flow Metrics](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_flow_metrics.png)
+![Fig 1. Sample Path Flow Metrics](images/sample_path_flow_metrics.png)
 
 In this chart the main thing to pay attention to are the _relationships_
 between the _changes_ in each of these component charts over time.
@@ -176,7 +177,7 @@ Since we measure in continuous time, this chart is a *step chart*.
 This is a real time chart that reveals current congestion, bursts, and idle
 periods.
 
-![Sample Path](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/sample_path_N.png)
+![Sample Path](images/core/sample_path_N.png)
 
 ### The area under the sample path
 
@@ -215,7 +216,7 @@ process.
 
 Please note once again that this is _not a statistical average_.
 
-![Time Average of WIP](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/time_average_N_L.png)
+![Time Average of WIP](images/core/time_average_N_L.png)
 
 ### $\Lambda(T)$: Cumulative arrival rate  
 `cumulative_arrival_rate_Lambda.png`
@@ -234,7 +235,7 @@ same as the arrival rate, otherwise this over-counts the arrival rate at the
 start, but as we observe the process for longer periods, those initial
 end-effects get averaged out.
 
-![Cumulative Arrival Rate](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/time_average_N_L.png)
+![Cumulative Arrival Rate](images/core/time_average_N_L.png)
 
 ### $w(T)$: Average residence time
 `average_residence_time_w.png`
@@ -258,7 +259,7 @@ _Understanding the difference and relationship between residence time and
 familiar metrics like Lead Time, Cycle Time and Work Item Age is crucial for
 understanding why sample path analysis works and these posts explain this._
 
-![Average Residence Time](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/average_residence_time_w.png)
+![Average Residence Time](images/core/average_residence_time_w.png)
 
 ## The finite version of Little's Law 
 `littles_law_invariant.png`
@@ -272,7 +273,7 @@ It states that for all T, `L(T)=Λ(T)·w(T)`.
 We verify this by showing that when we plot `L(T)` vs `Λ(T)·w(T)` on a scatter
 plot, all the points will lie on the with `y = x`.
 
-![Little's Law Invariant](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/core/littles_law_invariant.png)
+![Little's Law Invariant](images/core/littles_law_invariant.png)
 
 Notice how points cluster around certain values of L(T). These are significant
 operating modes for the process as it moves towards  stable states.
@@ -285,7 +286,7 @@ operating modes for the process as it moves towards  stable states.
 |-------------------------------|---------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `sample_path_convergence.png` | Scatter of `L(T)` (x-axis) vs `λ*(t)·W*(t)` (y-axis) with `y=x` and an ε-band; annotated with a coherence score over a horizon. | Direct visual and quantitative test of whether the finite-window sample path obeys Little’s Law asymptotically (sample-path convergence / coherence). |
 
-![Sample Path Convergence](../../examples/polaris/flow-of-work/complete-stories-outliers-removed/sample_path_convergence.png)
+![Sample Path Convergence](images/sample_path_convergence.png)
 
 | File                                                         | What it shows                                                                                                                                                      | What it means                                                                                                                               |
 |--------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
