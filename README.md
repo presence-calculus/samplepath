@@ -35,7 +35,7 @@ when observed over a long, but finite period of time.
 A key aspect of this
 technique is that it is _distribution-free_. It does not require well-defined
 statistical or probability distributions to reason rigorously about a flow process. Please
-see [sample path analysis is not a statistical method](https://samplepath.pcalc.org/html/not_statistics.html)
+see [sample path analysis is not a statistical method](https://samplepath.pcalc.org/html/not-statistics.html)
 for more details.
 
 As a result, this technique allows us to extend many results from stochastic
@@ -197,7 +197,7 @@ on how to apply the concepts.
 ## Chart Reference 
 
 For a detailed reference of the computations, charts and visualizations produced by sample path
-analysis, please see the [Chart Reference](http://samplepath.pcalc.org/articles/chart_reference).
+analysis, please see the [Chart Reference](http://samplepath.pcalc.org/articles/chart-reference).
 
 For complete documentation, see our [documentation site](http://samplepath.pcalc.org). 
 
@@ -401,7 +401,7 @@ For input `events.csv`, output is organized as:
 ```
 --
 
-A complete reference to the charts produced can be found [here](https://samplepath.pcalc.org/articles/chart_reference).
+A complete reference to the charts produced can be found [here](https://samplepath.pcalc.org/articles/chart-reference).
 
 ---
 

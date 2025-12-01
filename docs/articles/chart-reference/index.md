@@ -35,7 +35,7 @@ We use sample path analysis to determine whether a process is stable, and
 if not what the causes of instability are, and what needs to be done to move
 the process towards operationally acceptable range of stability. 
 
-**Please see our technical note**: [Sample path analysis is not a statistical technique.](../not_statistics/index)
+**Please see our technical note**: [Sample path analysis is not a statistical technique.](../not-statistics/index)
 
 ## The charts.
 
