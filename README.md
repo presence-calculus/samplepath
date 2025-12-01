@@ -197,7 +197,7 @@ on how to apply the concepts.
 ## Chart Reference 
 
 For a detailed reference of the computations, charts and visualizations produced by sample path
-analysis, please see the [Chart Reference](http://samplepath.pcalc.org/html/chart_reference.html).
+analysis, please see the [Chart Reference](http://samplepath.pcalc.org/articles/chart_reference).
 
 For complete documentation, see our [documentation site](http://samplepath.pcalc.org). 
 
@@ -381,7 +381,7 @@ Results and charts are saved to the output directory as follows:
 - The default output directory is  "charts" in your current directory.
 - You can override this with the --output-dir argument. 
 
-See the [CLI Documentation](https://samplepath.pcalc.org/articles/clu) for the full list of command line options. 
+See the [CLI Documentation](https://samplepath.pcalc.org/articles/cli) for the full list of command line options. 
 
 ## 📂 Output Layout
 
