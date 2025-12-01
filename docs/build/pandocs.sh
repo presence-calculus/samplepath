@@ -2,20 +2,24 @@
 set -euo pipefail
 shopt -s nullglob  # allow empty globs without errors
 
-# -------- Configuration --------
-# Map each SOURCE_DIR to a TARGET_DIR.
-# You can mark a source as recursive by appending '/**' to it, e.g.:
-#   "docs-src/**:docs"    # walk docs-src recursively
-#   "docs-src:docs"       # only top-level + immediate subdirs (flat)
-PAIRS=(
-  "docs/src:docs/html"
-  "examples/**:docs/html/examples"
-)
+# ---------------------------------------------------------
+# Locate script directory (portable, works via symlinks too)
+# ---------------------------------------------------------
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-MATH_ENGINE="--mathjax"     # e.g., "--mathjax" or leave empty ""
+# ---------------------------------------------------------
+# Config file: default is pandocs.conf next to this script,
+# but can be overridden via PANDOCS_CONFIG env var
+# ---------------------------------------------------------
+CONFIG_FILE="${PANDOCS_CONFIG:-$SCRIPT_DIR/pandocs.conf}"
 
-# File extensions treated as static assets (copied as-is, not run through pandoc)
-ASSET_EXTENSIONS=("png" "jpg" "jpeg" "gif" "svg" "css" "js" "pdf")
+if [[ ! -f "$CONFIG_FILE" ]]; then
+  echo "Error: Config file not found: $CONFIG_FILE" >&2
+  exit 1
+fi
+
+# shellcheck source=/dev/null
+source "$CONFIG_FILE"
 
 is_asset() {
   local f="$1"
@@ -128,7 +132,7 @@ pandoc_for_file() {
 }
 
 # -------- Processing --------
-for pair in "${PAIRS[@]}"; do
+for pair in "${SOURCE_MAP[@]}"; do
   IFS=":" read -r SRC_SPEC TGT_ROOT <<<"$pair"
 
   # Per-pair recursion: "src/**:dst" means recursive under src
