@@ -1,6 +1,6 @@
 [project]
 name = "samplepath"
-version = "0.1.1"
+version = "0.1.2"
 description = "Sample Path Analysis Library"
 authors = [
     { name = "Krishna Kumar", email = "kkumar@exathink.com" }
@@ -53,7 +53,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://docs.pcalc.org"
+Homepage = "https://samplepath.pcalc.org"
 Repository = "https://github.com/presence-calculus/samplepath"
 
 [project.scripts]
