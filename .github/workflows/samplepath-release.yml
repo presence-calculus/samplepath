@@ -1,0 +1,57 @@
+name: Release (tag → PyPI & GitHub)
+
+on:
+  push:
+    tags:
+      - "v*.*.*"   # e.g. v0.3.1
+
+jobs:
+  test-build-publish:
+    runs-on: ubuntu-latest
+
+    # Needed for:
+    # - OIDC → PyPI trusted publishing (id-token)
+    # - Creating GitHub releases (contents)
+    permissions:
+      id-token: write
+      contents: write
+
+    environment:
+      name: pypi-release
+      url: https://pypi.org/project/samplepath/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python (from uv/pyproject config)
+        run: uv python install
+
+      - name: Install dependencies (incl. dev/test)
+        run: uv sync --dev
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Build sdist & wheel
+        run: uv build
+        # Produces dist/*.tar.gz and dist/*.whl
+
+      # ---- PyPI Trusted Publishing (no token needed) ----
+      - name: Publish to PyPI (trusted publisher)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+          # You can also set 'skip-existing: true' if you want idempotency
+
+      # ---- GitHub Release with artifacts ----
+      - name: Create GitHub Release and upload artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
