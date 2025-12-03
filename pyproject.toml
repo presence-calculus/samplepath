@@ -116,8 +116,6 @@ commit = true
 tag = true
 push = false  # good for safety; you push manually
 
-[tool.bumpver.tag]
-format = "v{new_version}"
 
 [[tool.uv.index]]
 name = "pypi"
