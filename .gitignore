@@ -5,9 +5,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Poetry
+# uv
 dist/
-build/
 *.egg-info/
 
 .mypy_cache/
