@@ -1,0 +1,30 @@
+repos:
+
+  # --- isort: import sorting (Black-compatible) ---
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  # --- Black: Python formatter ---
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+
+  # --- mdformat: Markdown formatter ---
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.17
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-frontmatter
+          - mdformat-black
+
+  # --- Basic whitespace hygiene ---
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
