@@ -86,7 +86,6 @@ pandoc_for_file() {
 
   repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 
-
   # Find resources with fallback order: file dir -> src_root -> git root
   local bib csl tpl
   bib="$(first_existing \
@@ -102,22 +101,58 @@ pandoc_for_file() {
         "$src_root/pandoc_template.html" \
         ${repo_root:+$repo_root/docs/build/pandoc_template.html} 2>/dev/null || true)"
 
-  # Build args safely under `set -u`
+  # ---------------------------------------------------------
+  # 1. Base Arguments (Minimal)
+  # ---------------------------------------------------------
+  #
   local -a args=(
-    --filter pandoc-crossref
     --lua-filter="$repo_root/docs/build/interpolate-vars.lua"
     --lua-filter="$repo_root/docs/build/md2html-links.lua"
-    --number-sections
-    --toc
-    --citeproc
     --wrap=auto
     --quiet
   )
 
-  [[ -n "${bib:-}" ]] && args+=( --bibliography="$bib" )
-  [[ -n "${csl:-}" ]] && args+=( --csl="$csl" )
-  [[ -n "${tpl:-}" ]] && args+=( --template="$tpl" )
+  # ---------------------------------------------------------
+  # 2. Conditional Logic (The "Checks")
+  # ---------------------------------------------------------
 
+  # FEATURE A: Cross-references (Section & Figure Numbers)
+  # Triggered by: 'numberSections: true' in YAML
+  # We use PREPEND to ensure crossref runs before other filters.
+  if grep -qE "^[[:space:]]*numberSections:[[:space:]]*true" "$file"; then
+     args=( --filter pandoc-crossref "${args[@]}" )
+     # Note: We do NOT add --number-sections here; pandoc-crossref handles it.
+  fi
+
+  # FEATURE B: Citations
+  # Triggered by: 'citations: true' OR 'link-citations: true'
+  if grep -qE "^[[:space:]]*(citations|link-citations):[[:space:]]*true" "$file"; then
+    args+=( --citeproc )
+
+    # Only load bibliography/csl if citation mode is active AND files exist
+    [[ -n "${bib:-}" ]] && args+=( --bibliography="$bib" )
+    [[ -n "${csl:-}" ]] && args+=( --csl="$csl" )
+  fi
+
+  # FEATURE C: Table of Contents
+  # Triggered by: 'toc: true'
+  if grep -qE "^[[:space:]]*toc:[[:space:]]*true" "$file"; then
+    args+=( --toc )
+
+    # Check for optional Depth limit (toc-depth: X)
+    local toc_depth_val
+    toc_depth_val=$(grep "^[[:space:]]*toc-depth:" "$file" | head -n 1 | awk -F: '{print $2}' | tr -d '[:space:]')
+    if [[ -n "$toc_depth_val" ]]; then
+      args+=( --toc-depth="$toc_depth_val" )
+    fi
+  fi
+
+  # ---------------------------------------------------------
+  # 3. Final Assembly
+  # ---------------------------------------------------------
+
+  # Template is applied to all HTML outputs (if found)
+  [[ -n "${tpl:-}" ]] && args+=( --template="$tpl" )
 
   args+=( -s "$file" -o "$out_html" )
 
