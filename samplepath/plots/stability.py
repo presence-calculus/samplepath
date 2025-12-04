@@ -6,9 +6,9 @@ from __future__ import annotations
 import os
 from typing import List, Optional
 
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 
 from samplepath.filter import FilterResult
 from samplepath.metrics import FlowMetricsResult, compute_elementwise_empirical_metrics

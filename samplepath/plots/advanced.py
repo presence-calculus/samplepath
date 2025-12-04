@@ -30,8 +30,8 @@ def plot_llaw_manifold_3d(
     import os
 
     import matplotlib.pyplot as plt
-    import numpy as np
     from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
+    import numpy as np
 
     # ---- helpers ------------------------------------------------------------
     def _safe_log(a: np.ndarray) -> np.ndarray:

@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 import argparse
 import os
+from pathlib import Path
 import shutil
 import textwrap
-from pathlib import Path
 from typing import LiteralString
 
 

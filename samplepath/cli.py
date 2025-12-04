@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
+import sys
 
 from .file_utils import (
     copy_input_csv_to_output,

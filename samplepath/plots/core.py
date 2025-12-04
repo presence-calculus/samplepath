@@ -4,11 +4,11 @@
 import os
 from typing import List, Optional
 
-import numpy as np
-import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+import numpy as np
+import pandas as pd
 
 from samplepath.filter import FilterResult
 from samplepath.metrics import FlowMetricsResult

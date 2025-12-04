@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: MIT
 from typing import List, Optional, Sequence, Tuple
 
-import numpy as np
-import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+import numpy as np
+import pandas as pd
 
 
 def add_caption(fig: Figure, text: str) -> None:
