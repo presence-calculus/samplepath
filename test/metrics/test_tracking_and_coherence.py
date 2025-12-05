@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from samplepath.metrics import compute_tracking_errors, compute_coherence_score
+from samplepath.metrics import compute_coherence_score, compute_tracking_errors
 
 
 def _make_times(n=4, start="2024-01-01 00:00", step_hours=1):
@@ -23,7 +23,9 @@ def test_compute_tracking_errors_perfect_match():
     lam_star = np.array([0.5, 1.0, 1.5, 2.0])
     lam_vals = lam_star.copy()
 
-    eW, eLam, elapsed = compute_tracking_errors(times, w_vals, lam_vals, W_star, lam_star)
+    eW, eLam, elapsed = compute_tracking_errors(
+        times, w_vals, lam_vals, W_star, lam_star
+    )
 
     assert np.allclose(elapsed, [0.0, 1.0, 2.0, 3.0])
     assert np.allclose(eW[np.isfinite(W_star) & (W_star > 0)], 0.0)
@@ -41,7 +43,9 @@ def test_compute_tracking_errors_constant_offset_on_lambda_only():
     lam_star = np.array([1.0, 2.0, 3.0, 4.0])
     lam_vals = lam_star + 0.5
 
-    eW, eLam, elapsed = compute_tracking_errors(times, w_vals, lam_vals, W_star, lam_star)
+    eW, eLam, elapsed = compute_tracking_errors(
+        times, w_vals, lam_vals, W_star, lam_star
+    )
 
     assert np.allclose(eW, 0.0)
     expected_rel = np.abs(lam_vals - lam_star) / lam_star
@@ -52,13 +56,15 @@ def test_compute_tracking_errors_constant_offset_on_lambda_only():
 def test_compute_tracking_errors_with_nans_masked():
     times = _make_times(4)
 
-    W_star  = np.array([np.nan, 2.0, np.nan, 4.0])
-    w_vals  = np.array([np.nan, 2.2, 3.0,  np.nan])
+    W_star = np.array([np.nan, 2.0, np.nan, 4.0])
+    w_vals = np.array([np.nan, 2.2, 3.0, np.nan])
 
-    lam_star = np.array([1.0,   np.nan, 3.0,  4.0])
-    lam_vals = np.array([1.1,   2.0,    np.nan, 4.4])
+    lam_star = np.array([1.0, np.nan, 3.0, 4.0])
+    lam_vals = np.array([1.1, 2.0, np.nan, 4.4])
 
-    eW, eLam, elapsed = compute_tracking_errors(times, w_vals, lam_vals, W_star, lam_star)
+    eW, eLam, elapsed = compute_tracking_errors(
+        times, w_vals, lam_vals, W_star, lam_star
+    )
 
     # eW: only index 1 has finite W_star>0 AND finite w_vals
     assert np.isnan(eW[0])
@@ -83,7 +89,9 @@ def test_compute_coherence_score_basic_pass():
     epsilon = 0.20
     horizon_hours = 80.0
 
-    score, coherent, total = compute_coherence_score(eW, eLam, elapsed, epsilon, horizon_hours)
+    score, coherent, total = compute_coherence_score(
+        eW, eLam, elapsed, epsilon, horizon_hours
+    )
     assert coherent == 3
     assert total == 3
     assert np.isclose(score, 1.0)
@@ -96,7 +104,9 @@ def test_compute_coherence_score_mixed_and_edge_cases():
     epsilon = 0.20
     horizon_hours = 80.0
 
-    score, coherent, total = compute_coherence_score(eW, eLam, elapsed, epsilon, horizon_hours)
+    score, coherent, total = compute_coherence_score(
+        eW, eLam, elapsed, epsilon, horizon_hours
+    )
     # Eligible (elapsed >= horizon): indices 0,1,3,4; NaNs excluded
     assert coherent == 0
     assert total == 2  # indices 3 and 4 considered; both fail one side
@@ -110,7 +120,9 @@ def test_compute_coherence_score_no_eligible_returns_nan_score():
     epsilon = 0.20
     horizon_hours = 80.0
 
-    score, coherent, total = compute_coherence_score(eW, eLam, elapsed, epsilon, horizon_hours)
+    score, coherent, total = compute_coherence_score(
+        eW, eLam, elapsed, epsilon, horizon_hours
+    )
     assert total == 0
     assert coherent == 0
     assert np.isnan(score)

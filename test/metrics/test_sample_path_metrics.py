@@ -17,6 +17,7 @@ def _t(s: str) -> pd.Timestamp:
 #  SINGLE BOXCAR (one item active for 2 hours)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+
 @pytest.fixture
 def single_boxcar():
     t0 = _t("2024-01-01 00:00")
@@ -70,6 +71,7 @@ def test_single_boxcar_final_counts(single_boxcar):
 #  OVERLAPPING ITEMS (peak N = 2)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+
 @pytest.fixture
 def overlapping_items():
     t0 = _t("2024-01-01 00:00")
@@ -122,6 +124,7 @@ def test_overlapping_items_final_w_equals_A_over_arrivals(overlapping_items):
 #  SAME-TIMESTAMP TIES (arrival then departure)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+
 @pytest.fixture
 def same_timestamp_tie():
     t0 = _t("2024-01-01 00:00")
@@ -137,12 +140,18 @@ def test_same_timestamp_tie_final_counts(same_timestamp_tie):
 
 def test_same_timestamp_tie_nan_metrics(same_timestamp_tie):
     _, L, Lam, w, _, A, _, _ = same_timestamp_tie
-    assert np.isnan(L[0]) and np.isnan(Lam[0]) and np.isclose(A[0], 0.0) and np.isclose(w[0], 0.0)
+    assert (
+        np.isnan(L[0])
+        and np.isnan(Lam[0])
+        and np.isclose(A[0], 0.0)
+        and np.isclose(w[0], 0.0)
+    )
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  EMPTY INPUTS
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_empty_events_returns_empty_arrays():
     t0 = _t("2024-01-01 00:00")

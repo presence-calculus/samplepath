@@ -2,23 +2,25 @@
 # SPDX-License-Identifier: MIT
 # test/samplepath/test_file_utils.py
 
+import argparse
 import os
 from pathlib import Path
-import argparse
+
 import pandas as pd
 import pytest
 
 from samplepath.file_utils import (
+    copy_input_csv_to_output,
+    ensure_output_dirs,
     make_fresh_dir,
     make_root_dir,
-    ensure_output_dirs,
     write_cli_args_to_file,
-    copy_input_csv_to_output,
 )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # make_fresh_dir
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_make_fresh_dir_creates_directory(tmp_path):
     d = tmp_path / "exists_already"
@@ -27,9 +29,11 @@ def test_make_fresh_dir_creates_directory(tmp_path):
     out = make_fresh_dir(d)
     assert out.exists() and out.is_dir()  # one assertion
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # make_root_dir
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_make_root_dir_returns_stem_scenario_dir(tmp_path):
     csv = tmp_path / "input.csv"
@@ -38,6 +42,7 @@ def test_make_root_dir_returns_stem_scenario_dir(tmp_path):
     # Expect <tmp>/<csv_stem>/scenarioA
     expected = tmp_path / "input" / "scenarioA"
     assert Path(out) == expected  # one assertion
+
 
 def test_make_root_dir_clean_recreates_directory(tmp_path):
     csv = tmp_path / "data.csv"
@@ -48,9 +53,11 @@ def test_make_root_dir_clean_recreates_directory(tmp_path):
     # If cleaned, the previous file should be gone, but we assert directory exists (single assertion)
     assert out_dir2.exists() and out_dir2.is_dir()  # one assertion
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ensure_output_dirs
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_ensure_output_dirs_creates_exact_known_subdirs(tmp_path):
     csv = tmp_path / "events.csv"
@@ -81,9 +88,11 @@ def test_ensure_output_dirs_creates_exact_known_subdirs(tmp_path):
     # Single assertion: exact match (no missing, no extras)
     assert actual == expected
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # write_cli_args_to_file
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_write_cli_args_to_file_creates_parameters_txt(tmp_path, capsys):
     parser = argparse.ArgumentParser(prog="demo")
@@ -94,9 +103,11 @@ def test_write_cli_args_to_file_creates_parameters_txt(tmp_path, capsys):
     # Single assertion: file exists
     assert (tmp_path / "parameters.txt").exists()  # one assertion
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # copy_input_csv_to_output
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_copy_input_csv_to_output_copies_file(tmp_path):
     src = tmp_path / "sample.csv"
@@ -107,6 +118,7 @@ def test_copy_input_csv_to_output_copies_file(tmp_path):
 
     dest = copy_input_csv_to_output(src, out_dir)
     assert dest.exists() and dest == (out_dir / "input" / "sample.csv")
+
 
 def test_copy_input_csv_to_output_raises_on_missing_source(tmp_path):
     missing = tmp_path / "nope.csv"

@@ -1,30 +1,32 @@
 repos:
 
+  # --- Basic whitespace hygiene ---
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [ --markdown-linebreak-ext=md ]
+
   # --- isort: import sorting (Black-compatible) ---
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 7.0.0
     hooks:
       - id: isort
 
   # --- Black: Python formatter ---
   - repo: https://github.com/psf/black
-    rev: 24.8.0
+    rev: 25.11.0
     hooks:
       - id: black
 
-  # --- mdformat: Markdown formatter ---
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 0.7.19  # Keep this on the stable 0.7.x line
     hooks:
       - id: mdformat
         additional_dependencies:
-          - mdformat-gfm
-          - mdformat-frontmatter
+          - mdformat-gfm<1.0           # Pin plugin to <1.0 to match mdformat 0.7.x
+          - mdformat-frontmatter<3.0   # Pin frontmatter (v3+ might require mdformat 1.0)
+          - mdformat-dollarmath        # Usually safe, but won't break if others are pinned
           - mdformat-black
-
-  # --- Basic whitespace hygiene ---
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
+          - mdformat-pyproject
