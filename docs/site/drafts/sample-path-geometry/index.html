@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>index</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+
+    html {
+      box-sizing: border-box;
+      font-size: 100%;
+    }
+
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Nunito, Arial, sans-serif;
+      font-size: 1.1rem;
+      line-height: 1.75;
+      background: #fff;
+      color: #111;
+
+      /* Remove Pandoc's injected width restrictions */
+      max-width: none !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    #page {
+      max-width: 880px;
+      width: 100%;
+      padding: 2rem 1rem;
+    }
+
+    h1, h2, h3, h4 {
+      font-weight: bold;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    p {
+      margin: 1.25rem 0;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+    }
+
+    pre {
+      background: #f8f8f8;
+      padding: 1rem;
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, monospace;
+      background: #f5f5f5;
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+    }
+
+    blockquote {
+      margin: 2rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid #ddd;
+      color: #666;
+      font-style: italic;
+    }
+
+    .subtitle, .author, .date {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    nav#TOC {
+      margin: 2rem 0;
+      padding: 1rem;
+      border: 1px solid #eee;
+      background: #fafafa;
+      overflow-x: auto;
+    }
+
+    figure {
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 2rem auto;
+    }
+
+    figcaption {
+      font-size: 0.9em;
+      color: #555;
+      margin-top: 0.75rem;
+    }
+
+    header#title-block-header {
+      text-align: center;
+    }
+
+    #presence-link {
+      margin: 3rem auto 0;
+      padding: 1.25rem 1rem 1.5rem;
+      text-align: center;
+      font-size: 0.95rem;
+      color: #444;
+      border-top: 1px solid #e5e7ea;
+      background: #f9f9f9;
+      border-radius: 8px 8px 0 0;
+    }
+
+    #presence-link a {
+      text-decoration: none;
+      color: #222;
+      font-weight: 600;
+    }
+
+    #presence-link a:hover {
+      text-decoration: underline;
+    }
+
+    .site-nav {
+      margin: 0 auto 2rem;
+      padding: 0.75rem 1rem;
+      background: #f6f7f8;
+      border: 1px solid #e5e7ea;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      justify-content: center;
+      font-size: 0.98rem;
+    }
+
+    .site-nav a {
+      color: #222;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.2rem 0.35rem;
+    }
+
+    .site-nav a:hover {
+      text-decoration: underline;
+    }
+
+
+    @media screen and (min-width: 1024px) {
+      body {
+        font-size: 1.15rem;
+      }
+
+      #page {
+        padding: 3rem 2rem;
+      }
+    }
+
+  </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div id="page">
+      <nav class="site-nav" aria-label="Primary">
+        <a href="https://samplepath.pcalc.org/index.html">Home</a>
+        <a href="https://samplepath.pcalc.org/articles/package-overview/index.html">Package Overview</a>
+        <a href="https://samplepath.pcalc.org/articles/cli/index.html">Command Line</a>
+        <a href="https://samplepath.pcalc.org/articles/chart-reference/index.html">Chart Reference</a>
+        <a href="https://samplepath.pcalc.org/examples/README.html">Examples</a>
+      </nav>
+                              <h1
+                              id="geometry-of-the-finitewindow-identity-in-real-space-and-log-space">Geometry
+                              of the Finite–Window Identity in Real
+                              Space and Log Space</h1>
+                              <p>This note summarizes the geometric
+                              structure implied by the finite–window
+                              Little identity<br />
+                              <span class="math display">\[
+                              L(T) = \Lambda(T)\,w(T)
+                              \]</span> for all observation windows
+                              <span
+                              class="math inline">\(T&gt;0\)</span>.<br />
+                              We examine the argument in two
+                              domains:</p>
+                              <ol type="1">
+                              <li><strong>Real space</strong> <span
+                              class="math inline">\((L,\Lambda,w)\)</span>
+                              using the exact finite–difference identity
+                              and the differential constraint.<br />
+                              </li>
+                              <li><strong>Log space</strong> <span
+                              class="math inline">\((\ell,a,r) = (\log
+                              L,\log\Lambda,\log w)\)</span> where the
+                              identity becomes linear and all increments
+                              behave additively.</li>
+                              </ol>
+                              <hr />
+                              <h2 id="realspace-geometry">1. Real–space
+                              geometry</h2>
+                              <p>Assume<br />
+                              <span class="math display">\[
+                              L(T)=\Lambda(T)\,w(T)
+                              \]</span> for all <span
+                              class="math inline">\(T&gt;0\)</span>.<br />
+                              Fix any two endpoints <span
+                              class="math inline">\(0&lt;T_1&lt;T_2\)</span>
+                              and write<br />
+                              <span class="math display">\[
+                              L_i=L(T_i),\qquad
+                              \Lambda_i=\Lambda(T_i),\qquad w_i=w(T_i)
+                              \]</span> with finite increments<br />
+                              <span class="math display">\[
+                              \Delta L=L_2-L_1,\qquad
+                              \Delta\Lambda=\Lambda_2-\Lambda_1,\qquad
+                              \Delta w = w_2-w_1.
+                              \]</span></p>
+                              <h3
+                              id="exact-finitedifference-relation">1.1
+                              Exact finite–difference relation</h3>
+                              <p>Using<br />
+                              <span class="math display">\[
+                              L_1=\Lambda_1 w_1,\qquad L_2=\Lambda_2
+                              w_2,
+                              \]</span> subtracting gives the exact
+                              identity<br />
+                              <span class="math display">\[
+                              \Delta L=\Lambda_1\,\Delta w \;+\;
+                              w_1\,\Delta\Lambda \;+\;
+                              \Delta\Lambda\,\Delta w.
+                              \]</span></p>
+                              <p>This shows that <span
+                              class="math inline">\((\Delta
+                              L,\Delta\Lambda,\Delta w)\)</span> cannot
+                              vary independently.<br />
+                              The coupling term <span
+                              class="math inline">\(\Delta\Lambda\,\Delta
+                              w\)</span> reflects the curvature of the
+                              surface<br />
+                              <span class="math display">\[
+                              L = \Lambda w.
+                              \]</span></p>
+                              <h3
+                              id="firstorder-tangentplane-approximation">1.2
+                              First–order (tangent–plane)
+                              approximation</h3>
+                              <p>When <span
+                              class="math inline">\(T_2\)</span> is
+                              close to <span
+                              class="math inline">\(T_1\)</span>, the
+                              product term is second order,
+                              yielding<br />
+                              <span class="math display">\[
+                              \Delta L \approx \Lambda_1\,\Delta w +
+                              w_1\,\Delta\Lambda.
+                              \]</span></p>
+                              <p>This is the equation of the
+                              <strong>tangent plane</strong> to the
+                              nonlinear surface<br />
+                              <span class="math display">\[
+                              L = \Lambda w
+                              \]</span> at the point <span
+                              class="math inline">\((\Lambda_1,w_1,L_1)\)</span>.<br />
+                              Small finite–window steps therefore move
+                              approximately within this plane.</p>
+                              <h3 id="differential-form">1.3
+                              Differential form</h3>
+                              <p>For smooth trajectories, taking <span
+                              class="math inline">\(T_2\to T_1\)</span>
+                              gives the exact differential
+                              constraint<br />
+                              <span class="math display">\[
+                              \frac{dL}{dT}
+                              =
+                              w(T)\,\frac{d\Lambda}{dT}
+                              +
+                              \Lambda(T)\,\frac{dw}{dT}.
+                              \]</span></p>
+                              <p>This is the total derivative of <span
+                              class="math inline">\(L=\Lambda
+                              w\)</span>.<br />
+                              In real space the geometry is therefore
+                              <strong>curved</strong>, with linear
+                              behavior obtained only locally via the
+                              tangent plane.</p>
+                              <hr />
+                              <h2 id="logspace-geometry">2. Log–space
+                              geometry</h2>
+                              <p>Define the log–coordinates<br />
+                              <span class="math display">\[
+                              \ell = \log L,\qquad a =
+                              \log\Lambda,\qquad r = \log w.
+                              \]</span></p>
+                              <p>Applying <span
+                              class="math inline">\(\log\)</span> to the
+                              finite–window identity gives<br />
+                              <span class="math display">\[
+                              \ell = a + r.
+                              \]</span></p>
+                              <p>This is the equation of a
+                              <strong>plane</strong> in <span
+                              class="math inline">\((a,r,\ell)\)</span>–space.</p>
+                              <h3
+                              id="exact-finitedifference-relation-for-any-two-points">2.1
+                              Exact finite–difference relation for any
+                              two points</h3>
+                              <p>Let<br />
+                              <span class="math display">\[
+                              P_1=(a_1,r_1,\ell_1),\qquad
+                              P_2=(a_2,r_2,\ell_2)
+                              \]</span> be any two points satisfying
+                              <span
+                              class="math inline">\(\ell=a+r\)</span>,
+                              and define increments<br />
+                              <span class="math display">\[
+                              \Delta a=a_2-a_1,\qquad \Delta
+                              r=r_2-r_1,\qquad \Delta\ell=\ell_2-\ell_1.
+                              \]</span></p>
+                              <p>Because both points lie on the plane,
+                              we have<br />
+                              <span class="math display">\[
+                              \Delta\ell=\Delta a+\Delta r.
+                              \]</span></p>
+                              <p>This holds for
+                              <strong>arbitrary</strong> finite steps:
+                              large windows, small windows, stable or
+                              unstable processes.<br />
+                              The geometry is globally linear.</p>
+                              <h3 id="differential-form-1">2.2
+                              Differential form</h3>
+                              <p>Differentiating <span
+                              class="math inline">\(\ell=a+r\)</span>
+                              gives<br />
+                              <span class="math display">\[
+                              \frac{d\ell}{dT}
+                              =
+                              \frac{da}{dT}
+                              +
+                              \frac{dr}{dT}.
+                              \]</span></p>
+                              <p>Equivalently, in terms of the original
+                              variables,<br />
+                              <span class="math display">\[
+                              \frac{1}{L}\frac{dL}{dT}
+                              =
+                              \frac{1}{\Lambda}\frac{d\Lambda}{dT}
+                              +
+                              \frac{1}{w}\frac{dw}{dT}.
+                              \]</span></p>
+                              <p>This expresses relative (logarithmic)
+                              changes as a <strong>simple additive
+                              decomposition</strong>, in contrast to the
+                              nonlinear real–space identity.</p>
+                              <h3 id="geometric-implication">2.3
+                              Geometric implication</h3>
+                              <p>In log space:</p>
+                              <ul>
+                              <li>The entire constraint <span
+                              class="math inline">\(L=\Lambda w\)</span>
+                              becomes a <strong>flat 2D
+                              surface</strong>.<br />
+                              </li>
+                              <li>Every pair of points satisfies the
+                              linear relation <span
+                              class="math inline">\(\Delta\ell=\Delta
+                              a+\Delta r\)</span>.<br />
+                              </li>
+                              <li>Finite increments behave as exact
+                              vector additions.</li>
+                              </ul>
+                              <p>Thus the curved geometry of real space
+                              collapses into a globally linear structure
+                              in log space.</p>
+                              <hr />
+                              <h2 id="summary">Summary</h2>
+                              <ul>
+                              <li><p>In <strong>real space</strong>,
+                              <span class="math inline">\(L=\Lambda
+                              w\)</span> defines a curved surface and
+                              the increments satisfy<br />
+                              <span class="math display">\[
+                              \Delta L=\Lambda_1\,\Delta
+                              w+w_1\,\Delta\Lambda+\Delta\Lambda\,\Delta
+                              w,
+                              \]</span> with the differential
+                              equation<br />
+                              <span class="math display">\[
+                              \frac{dL}{dT}=w\,\frac{d\Lambda}{dT}+\Lambda\,\frac{dw}{dT}.
+                              \]</span></p></li>
+                              <li><p>In <strong>log space</strong>,
+                              <span
+                              class="math inline">\(\ell=a+r\)</span>
+                              defines a plane and all increments satisfy
+                              the exact identity<br />
+                              <span class="math display">\[
+                              \Delta\ell=\Delta a+\Delta r,
+                              \]</span> with the differential
+                              version<br />
+                              <span class="math display">\[
+                              \frac{d\ell}{dT}=\frac{da}{dT}+\frac{dr}{dT}.
+                              \]</span></p></li>
+                              </ul>
+                              <p>Real space is nonlinear, curved, and
+                              locally constrained.<br />
+                              Log space is globally linear, additive,
+                              and geometrically flat.</p>
+                              <hr />
+                              <h2
+                              id="deriving-the-differential-equation-for-the-co-evolution-of-lt-lambdat-and-wt">Deriving
+                              the differential equation for the
+                              co-evolution of <span
+                              class="math inline">\(L(T)\)</span>, <span
+                              class="math inline">\(\Lambda(T)\)</span>,
+                              and <span
+                              class="math inline">\(w(T)\)</span></h2>
+                              <p>We assume the finite-window identity
+                              holds for every prefix length <span
+                              class="math inline">\(T&gt;0\)</span>:
+                              <span class="math display">\[
+                              L(T) = \Lambda(T)\,w(T).
+                              \]</span> Here <span
+                              class="math inline">\(L(T)\)</span>, <span
+                              class="math inline">\(\Lambda(T)\)</span>,
+                              and <span
+                              class="math inline">\(w(T)\)</span> are
+                              functionals of the same underlying sample
+                              path: for each <span
+                              class="math inline">\(T\)</span> they are
+                              computed deterministically from the events
+                              in <span
+                              class="math inline">\([0,T]\)</span>.</p>
+                              <h3
+                              id="starting-from-the-finite-window-identity">1.
+                              Starting from the finite-window
+                              identity</h3>
+                              <p>For each <span
+                              class="math inline">\(T\)</span>, define
+                              <span class="math display">\[
+                              f(T) := L(T),\quad g(T) :=
+                              \Lambda(T),\quad h(T) := w(T).
+                              \]</span> The finite-window identity is
+                              simply <span class="math display">\[
+                              f(T) = g(T)\,h(T)\quad\text{for all
+                              }T&gt;0.
+                              \]</span></p>
+                              <h3 id="differentiate-the-product">2.
+                              Differentiate the product</h3>
+                              <p>Assume <span
+                              class="math inline">\(f,g,h\)</span> are
+                              differentiable at some <span
+                              class="math inline">\(T\)</span>. Then we
+                              can apply the ordinary product rule to
+                              <span class="math inline">\(f(T) =
+                              g(T)\,h(T)\)</span>: <span
+                              class="math display">\[
+                              \frac{df}{dT}(T) =
+                              \frac{d}{dT}\bigl(g(T)\,h(T)\bigr) =
+                              g(T)\,\frac{dh}{dT}(T) +
+                              h(T)\,\frac{dg}{dT}(T).
+                              \]</span> Now substitute back <span
+                              class="math inline">\(f=L\)</span>, <span
+                              class="math inline">\(g=\Lambda\)</span>,
+                              and <span
+                              class="math inline">\(h=w\)</span>: <span
+                              class="math display">\[
+                              \frac{dL}{dT}(T)
+                              =
+                              \Lambda(T)\,\frac{dw}{dT}(T)
+                              +
+                              w(T)\,\frac{d\Lambda}{dT}(T).
+                              \]</span></p>
+                              <h3
+                              id="derivation-via-finite-differences-optional-more-sample-path-flavored">3.
+                              Derivation via finite differences
+                              (optional, more “sample-path”
+                              flavored)</h3>
+                              <p>Fix <span
+                              class="math inline">\(T\)</span> and a
+                              small increment <span
+                              class="math inline">\(\Delta
+                              T&gt;0\)</span>. Using the identity at
+                              <span class="math inline">\(T\)</span> and
+                              <span class="math inline">\(T+\Delta
+                              T\)</span>: <span class="math display">\[
+                              L(T) = \Lambda(T)\,w(T),\qquad
+                              L(T+\Delta T) = \Lambda(T+\Delta
+                              T)\,w(T+\Delta T).
+                              \]</span> Define finite differences <span
+                              class="math display">\[
+                              \Delta L = L(T+\Delta T)-L(T),\quad
+                              \Delta\Lambda = \Lambda(T+\Delta
+                              T)-\Lambda(T),\quad
+                              \Delta w = w(T+\Delta T)-w(T).
+                              \]</span> Then <span
+                              class="math display">\[
+                              \Delta L
+                              =
+                              \Lambda(T)\,\Delta w
+                              +
+                              w(T)\,\Delta\Lambda
+                              +
+                              \Delta\Lambda\,\Delta w.
+                              \]</span> Divide by <span
+                              class="math inline">\(\Delta T\)</span>:
+                              <span class="math display">\[
+                              \frac{\Delta L}{\Delta T}
+                              =
+                              \Lambda(T)\,\frac{\Delta w}{\Delta T}
+                              +
+                              w(T)\,\frac{\Delta\Lambda}{\Delta T}
+                              +
+                              \frac{\Delta\Lambda}{\Delta T}\,\Delta w.
+                              \]</span> If <span
+                              class="math inline">\(L,\Lambda,w\)</span>
+                              are differentiable at <span
+                              class="math inline">\(T\)</span>, then as
+                              <span class="math inline">\(\Delta T\to
+                              0\)</span> we have <span
+                              class="math inline">\(\Delta w\to
+                              0\)</span> and <span
+                              class="math display">\[
+                              \frac{\Delta L}{\Delta
+                              T}\to\frac{dL}{dT}(T),\quad
+                              \frac{\Delta\Lambda}{\Delta
+                              T}\to\frac{d\Lambda}{dT}(T),\quad
+                              \frac{\Delta w}{\Delta
+                              T}\to\frac{dw}{dT}(T),
+                              \]</span> while the mixed term vanishes:
+                              <span class="math display">\[
+                              \frac{\Delta\Lambda}{\Delta T}\,\Delta w
+                              \;\longrightarrow\; 0.
+                              \]</span> Taking the limit <span
+                              class="math inline">\(\Delta T\to
+                              0\)</span> yields <span
+                              class="math display">\[
+                              \frac{dL}{dT}(T)
+                              =
+                              \Lambda(T)\,\frac{dw}{dT}(T)
+                              +
+                              w(T)\,\frac{d\Lambda}{dT}(T),
+                              \]</span> which is the desired governing
+                              differential equation for the co-evolution
+                              of the three functionals.</p>
+                              <h2
+                              id="derivation-of-the-finite-difference-formula.">derivation
+                              of the finite difference formula.</h2>
+                              <p>We start from the identities at two
+                              window endpoints: <span
+                              class="math display">\[
+                              L_1 = \Lambda_1 w_1,\qquad L_2 = \Lambda_2
+                              w_2.
+                              \]</span></p>
+                              <p>Define the finite differences: <span
+                              class="math display">\[
+                              \Delta L = L_2 - L_1,\qquad \Delta\Lambda
+                              = \Lambda_2 - \Lambda_1,\qquad \Delta w =
+                              w_2 - w_1.
+                              \]</span></p>
+                              <p>Write the second point in terms of the
+                              first point and increments: <span
+                              class="math display">\[
+                              \Lambda_2 = \Lambda_1 +
+                              \Delta\Lambda,\qquad w_2 = w_1 + \Delta w.
+                              \]</span></p>
+                              <p>Substitute into <span
+                              class="math inline">\(L_2 = \Lambda_2
+                              w_2\)</span>: <span
+                              class="math display">\[
+                              L_2 = (\Lambda_1 + \Delta\Lambda)(w_1 +
+                              \Delta w).
+                              \]</span></p>
+                              <p>Expand the product: <span
+                              class="math display">\[
+                              (\Lambda_1 + \Delta\Lambda)(w_1 + \Delta
+                              w)
+                              =
+                              \Lambda_1 w_1
+                              + \Lambda_1 \Delta w
+                              + w_1 \Delta\Lambda
+                              + \Delta\Lambda\,\Delta w.
+                              \]</span></p>
+                              <p>Subtract <span
+                              class="math inline">\(L_1 = \Lambda_1
+                              w_1\)</span> to obtain the
+                              finite-difference identity: <span
+                              class="math display">\[
+                              \Delta L
+                              = \Lambda_1\,\Delta w
+                              + w_1\,\Delta\Lambda
+                              + \Delta\Lambda\,\Delta w.
+                              \]</span></p>
+                              <h1 id="tensor-form">Tensor form</h1>
+                              <p>Let the state of the finite–window
+                              metrics at time <span
+                              class="math inline">\(T\)</span> be
+                              represented by the vector <span
+                              class="math display">\[
+                              X(T) =
+                              \begin{bmatrix}
+                              L(T)
+                              \Lambda(T)
+                              w(T)
+                              \end{bmatrix}.
+                              \]</span></p>
+                              <p>For any two window endpoints <span
+                              class="math inline">\(T_1 &lt;
+                              T_2\)</span>, define the increment tensor
+                              <span class="math display">\[
+                              \Delta X =
+                              \begin{bmatrix}
+                              \Delta L
+                              \Delta\Lambda
+                              \Delta w
+                              \end{bmatrix}
+                              =
+                              \begin{bmatrix}
+                              L_2 - L_1
+                              \Lambda_2 - \Lambda_1
+                              w_2 - w_1
+                              \end{bmatrix}.
+                              \]</span></p>
+                              <p>The finite–window identity <span
+                              class="math display">\[
+                              L = \Lambda\,w
+                              \]</span> can be expressed as the bilinear
+                              form <span class="math display">\[
+                              F(X) = X_2\,X_3 - X_1 = 0,
+                              \]</span> with <span
+                              class="math inline">\(X_1=L\)</span>,
+                              <span
+                              class="math inline">\(X_2=\Lambda\)</span>,
+                              <span
+                              class="math inline">\(X_3=w\)</span>.</p>
+                              <p>The first–order expansion (tensor form
+                              of the differential) is <span
+                              class="math display">\[
+                              DF(X_1)\,\Delta X
+                              =
+                              \frac{\partial F}{\partial X_1}\Delta X_1
+                              +
+                              \frac{\partial F}{\partial X_2}\Delta X_2
+                              +
+                              \frac{\partial F}{\partial X_3}\Delta X_3.
+                              \]</span></p>
+                              <p>Compute the gradient: <span
+                              class="math display">\[
+                              \nabla F(X_1)
+                              =
+                              \begin{bmatrix}
+                              -1
+                              w_1
+                              \Lambda_1
+                              \end{bmatrix}.
+                              \]</span></p>
+                              <p>Thus the constraint on increments is
+                              <span class="math display">\[
+                              \nabla F(X_1)^{\!\top}\,\Delta X
+                              =
+                              -\,\Delta L
+                              +
+                              w_1\,\Delta\Lambda
+                              +
+                              \Lambda_1\,\Delta w.
+                              \]</span></p>
+                              <p>Because both <span
+                              class="math inline">\(X_1\)</span> and
+                              <span class="math inline">\(X_2\)</span>
+                              satisfy <span
+                              class="math inline">\(F(X)=0\)</span>, the
+                              linearized constraint must equal the
+                              second–order remainder: <span
+                              class="math display">\[
+                              \nabla F(X_1)^{\!\top}\,\Delta X
+                              =
+                              -\,\Delta\Lambda\,\Delta w.
+                              \]</span></p>
+                              <p>Rearranging yields the
+                              finite-difference tensor identity: <span
+                              class="math display">\[
+                              \Delta L
+                              =
+                              \Lambda_1\,\Delta w
+                              +
+                              w_1\,\Delta\Lambda
+                              +
+                              \Delta\Lambda\,\Delta w.
+                              \]</span></p>
+                              <p>This expression decomposes the
+                              increment <span
+                              class="math inline">\(\Delta L\)</span>
+                              into a first–order multilinear term <span
+                              class="math display">\[
+                              (\nabla F(X_1))^\top \Delta X
+                              =
+                              \Lambda_1\,\Delta w + w_1\,\Delta\Lambda
+                              \]</span> and a symmetric second–order
+                              tensor correction <span
+                              class="math display">\[
+                              \Delta\Lambda\,\Delta w.
+                              \]</span></p>
+            <footer id="presence-link" role="contentinfo">
+        <a href="https://samplepath.pcalc.org" target="_blank" rel="noreferrer">The Sample Path Analysis Toolkit</a>
+        <div style="margin-top: 0.35rem; font-size: 0.85rem; color: #555;">
+          © 2025 Krishna Kumar. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>
