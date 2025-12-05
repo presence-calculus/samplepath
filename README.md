@@ -34,7 +34,7 @@ long, but finite period of time.
 A key aspect of this technique is that it is _distribution-free_. It does not require
 well-defined statistical or probability distributions to reason rigorously about a flow
 process. Please see
-[sample path analysis is not a statistical method](https://samplepath.pcalc.org/html/not-statistics.html)
+[sample path analysis is not a statistical method](https://samplepath.pcalc.org/articles/not-statistics)
 for more details.
 
 As a result, this technique allows us to extend many results from stochastic process
