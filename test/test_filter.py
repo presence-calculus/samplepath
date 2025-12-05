@@ -2,30 +2,32 @@
 # SPDX-License-Identifier: MIT
 # test/samplepath/test_filter.py
 
+import argparse
+
 import numpy as np
 import pandas as pd
 import pytest
-import argparse
 
 from samplepath.filter import (
-    _parse_classes,
+    FilterResult,
+    FilterSpec,
     _completed_base_label,
-    _require_cols,
+    _f_classes,
     _f_completed_only,
     _f_incomplete_only,
-    _f_classes,
     _f_outlier_hours,
-    _f_outlier_pctl,
     _f_outlier_iqr,
-    run_filters,
+    _f_outlier_pctl,
+    _parse_classes,
+    _require_cols,
     apply_filters,
-    FilterSpec,
-    FilterResult,
+    run_filters,
 )
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Fixtures
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 @pytest.fixture
 def df_basic():
@@ -36,17 +38,17 @@ def df_basic():
             "start_ts": pd.to_datetime(
                 ["2024-01-01 00:00", "2024-01-02 00:00", "2024-01-03 00:00"]
             ),
-            "end_ts": pd.to_datetime(
-                ["2024-01-01 02:00", "2024-01-02 06:00", pd.NaT]
-            ),
+            "end_ts": pd.to_datetime(["2024-01-01 02:00", "2024-01-02 06:00", pd.NaT]),
             "duration_hr": [2.0, 6.0, np.nan],
             "class": ["alpha", "beta", "gamma"],
         }
     )
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Helpers
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_parse_classes_none_returns_none():
     assert _parse_classes(None) is None
@@ -70,9 +72,11 @@ def test_require_cols_raises_on_missing(df_basic):
     with pytest.raises(ValueError):
         _require_cols(df_basic[["id"]], ["start_ts"])
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Individual filters (signatures per filter.py)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_f_completed_only_keeps_only_completed(df_basic):
     spec = FilterSpec(completed_only=True)
@@ -113,14 +117,18 @@ def test_f_outlier_pctl_invalid_threshold_raises(df_basic):
     mask = pd.Series(True, index=df_basic.index)
     applied, dropped, thresholds, outlier_tags = [], {}, {}, []
     with pytest.raises(ValueError):
-        _f_outlier_pctl(df_basic, mask, spec, applied, dropped, thresholds, outlier_tags)
+        _f_outlier_pctl(
+            df_basic, mask, spec, applied, dropped, thresholds, outlier_tags
+        )
 
 
 def test_f_outlier_pctl_applies_to_completed_only(df_basic):
     spec = FilterSpec(outlier_pctl=90)
     mask = pd.Series(True, index=df_basic.index)
     applied, dropped, thresholds, outlier_tags = [], {}, {}, []
-    new_mask = _f_outlier_pctl(df_basic, mask, spec, applied, dropped, thresholds, outlier_tags)
+    new_mask = _f_outlier_pctl(
+        df_basic, mask, spec, applied, dropped, thresholds, outlier_tags
+    )
     completed = df_basic.loc[df_basic["end_ts"].notna() & new_mask]
     assert (completed["duration_hr"] <= completed["duration_hr"].max()).all()
 
@@ -129,7 +137,9 @@ def test_f_outlier_iqr_returns_original_mask_for_small_sample(df_basic):
     spec = FilterSpec(outlier_iqr=1.5)
     mask = pd.Series(True, index=df_basic.index)
     applied, dropped, thresholds, outlier_tags = [], {}, {}, []
-    new_mask = _f_outlier_iqr(df_basic, mask, spec, applied, dropped, thresholds, outlier_tags)
+    new_mask = _f_outlier_iqr(
+        df_basic, mask, spec, applied, dropped, thresholds, outlier_tags
+    )
     assert new_mask.equals(mask)
 
 
@@ -143,15 +153,19 @@ def test_f_outlier_iqr_two_sided_with_large_sample():
     spec = FilterSpec(outlier_iqr=1.5, outlier_iqr_two_sided=True)
     mask = pd.Series(True, index=df.index)
     applied, dropped, thresholds, outlier_tags = [], {}, {}, []
-    new_mask = _f_outlier_iqr(df, mask, spec, applied, dropped, thresholds, outlier_tags)
+    new_mask = _f_outlier_iqr(
+        df, mask, spec, applied, dropped, thresholds, outlier_tags
+    )
     kept = df.loc[new_mask, "duration_hr"]
     low = thresholds.get("iqr_low_hr", kept.min())
     high = thresholds.get("iqr_high_hr", kept.max())
     assert kept.between(low, high).all()
 
+
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Driver + result objects
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 def test_run_filters_mutual_exclusion(df_basic):
     spec = FilterSpec(completed_only=True, incomplete_only=True)

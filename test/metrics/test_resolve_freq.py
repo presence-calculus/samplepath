@@ -1,6 +1,6 @@
 # tests/test_resolve_freq.py
-import pytest
 import pandas as pd
+import pytest
 
 from samplepath.metrics import _resolve_freq
 
@@ -57,31 +57,33 @@ def test_year_with_anchor(anchor, expected):
 
 
 # in test_passthrough_valid_pandas_aliases
-@pytest.mark.parametrize("alias", [
-    "D",
-    "h",       # was "H"
-    "W-MON",
-    "W-SUN",
-    "MS",
-    "ME",      # was "M"
-    "QS-JAN",
-    "QE",      # was "Q"
-    "YS-JAN",
-    "YE",      # was "Y"
-])
+@pytest.mark.parametrize(
+    "alias",
+    [
+        "D",
+        "h",  # was "H"
+        "W-MON",
+        "W-SUN",
+        "MS",
+        "ME",  # was "M"
+        "QS-JAN",
+        "QE",  # was "Q"
+        "YS-JAN",
+        "YE",  # was "Y"
+    ],
+)
 def test_passthrough_valid_pandas_aliases(alias):
     out = _resolve_freq(alias)
     assert out == alias
     pd.tseries.frequencies.to_offset(out)
 
 
-
 @pytest.mark.parametrize(
     "bucket_kwargs",
     [
-        ({"bucket": "week", "week_anchor": "XYZ"}),        # questionable week anchor
+        ({"bucket": "week", "week_anchor": "XYZ"}),  # questionable week anchor
         ({"bucket": "quarter", "quarter_anchor": "???"}),  # questionable quarter anchor
-        ({"bucket": "year", "year_anchor": "13"}),         # invalid month code
+        ({"bucket": "year", "year_anchor": "13"}),  # invalid month code
     ],
 )
 def test_invalid_anchor_values_return_string_for_downstream_validation(bucket_kwargs):
