@@ -1358,6 +1358,19 @@ wheels = [
 ]
 
 [[package]]
+name = "mdformat-dollarmath"
+version = "0.0.5"
+source = { registry = "https://pypi.org/simple/" }
+dependencies = [
+    { name = "mdformat" },
+    { name = "mdit-py-plugins" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/54/cdb29149645d7d9cb28a3a58944f2d54952dc1645b274a79d3c65b2e9b66/mdformat_dollarmath-0.0.5.tar.gz", hash = "sha256:1f844e730e70f7cee2334105173b593e92a84440f7bf86e7537e83e0c37070c3", size = 5813, upload-time = "2025-09-18T03:15:48.339Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6a/3f/5019bdff6000987315ee2e4f54851f79b1ed125eb1bb2402af181759d766/mdformat_dollarmath-0.0.5-py3-none-any.whl", hash = "sha256:6dd5f4c07ecceb89b192bfe1d3e6c6049d6b9a463f80617d313690491aea1db3", size = 4741, upload-time = "2025-09-18T03:15:47.056Z" },
+]
+
+[[package]]
 name = "mdformat-frontmatter"
 version = "2.0.8"
 source = { registry = "https://pypi.org/simple/" }
@@ -1384,6 +1397,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/56/6f/a626ebb142a290474401b67e2d61e73ce096bf7798ee22dfe6270f924b3f/mdformat_gfm-1.0.0.tar.gz", hash = "sha256:d1d49a409a6acb774ce7635c72d69178df7dce1dc8cdd10e19f78e8e57b72623", size = 10112, upload-time = "2025-10-16T09:12:22.402Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e6/18/6bc2189b744dd383cad03764f41f30352b1278d2205096f77a29c0b327ad/mdformat_gfm-1.0.0-py3-none-any.whl", hash = "sha256:7305a50efd2a140d7c83505b58e3ac5df2b09e293f9bbe72f6c7bee8c678b005", size = 10970, upload-time = "2025-10-16T09:12:21.276Z" },
+]
+
+[[package]]
+name = "mdformat-pyproject"
+version = "0.0.2"
+source = { registry = "https://pypi.org/simple/" }
+dependencies = [
+    { name = "mdformat" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5f/b0/6c7342afcb5518891f3c908f9e9f73fc399b727fe5b8133b31c8d468eae6/mdformat_pyproject-0.0.2.tar.gz", hash = "sha256:1638c4be0d239f49eea72089aafd06dc4ec603068ccc4868f91f0958b15b82c8", size = 5550, upload-time = "2024-11-20T19:39:13.301Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bb/d7/0598e8de54d439ee7deda6bcba7816b36aaf28c26542ff9a0510cc29c079/mdformat_pyproject-0.0.2-py3-none-any.whl", hash = "sha256:e0791a335e53264d5589be353c519e230ac555b64fa076005bc64ca037717710", size = 4761, upload-time = "2024-11-20T19:39:11.879Z" },
 ]
 
 [[package]]
@@ -2458,8 +2483,10 @@ dev = [
     { name = "isort" },
     { name = "mdformat" },
     { name = "mdformat-black" },
+    { name = "mdformat-dollarmath" },
     { name = "mdformat-frontmatter" },
     { name = "mdformat-gfm" },
+    { name = "mdformat-pyproject" },
     { name = "mypy" },
     { name = "notebook" },
     { name = "pdoc" },
@@ -2485,8 +2512,10 @@ dev = [
     { name = "isort" },
     { name = "mdformat" },
     { name = "mdformat-black" },
+    { name = "mdformat-dollarmath" },
     { name = "mdformat-frontmatter" },
     { name = "mdformat-gfm" },
+    { name = "mdformat-pyproject" },
     { name = "mypy" },
     { name = "notebook" },
     { name = "pdoc", specifier = ">=15.0.3,<16.0.0" },
