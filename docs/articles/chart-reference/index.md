@@ -217,10 +217,6 @@ This is a real time chart that reveals current congestion, bursts, and idle peri
 
 > If you are familiar with Cumulative Flow Diagrams, $N(t)$ represents the distance between the cumulative arrival line and the cumulative departure line in the diagram.
 
-In stochastic process language, $N(t)$ is a _process_ over the flow process
-
-the primary _object under analysis_. Little's Law describes the
-
 ![Sample Path](images/core/sample_path_N.png)
 
 ### The area under the sample path
